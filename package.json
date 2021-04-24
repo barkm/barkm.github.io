@@ -1,0 +1,22 @@
+{
+  "name": "barkm.github.io",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "https://barkm.github.io",
+  "scripts": {
+    "dev": "webpack serve --config ./bundler/webpack.dev.js --open",
+    "build": "webpack --config ./bundler/webpack.prod.js"
+  },
+  "dependencies": {
+    "three": "^0.128.0"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "*",
+    "css-loader": "^5.2.4",
+    "html-webpack-plugin": "^5.3.1",
+    "mini-css-extract-plugin": "^1.5.0",
+    "webpack": "^5.35.1",
+    "webpack-cli": "^4.6.0",
+    "webpack-dev-server": "^3.11.2"
+  }
+}
