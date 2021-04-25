@@ -1,4 +1,5 @@
 const path = require("path")
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const MiniCSSExtractPlugin = require("mini-css-extract-plugin")
 
@@ -24,6 +25,13 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [MiniCSSExtractPlugin.loader, "css-loader"]
+            },
+            {
+                test: /\.glb$/,
+                type: "asset/resource",
+                generator: {
+                    filename: "models/[name].[hash][ext]"
+                }
             }
         ]
     }

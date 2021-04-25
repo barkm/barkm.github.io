@@ -1,5 +1,19 @@
 import * as THREE from "three"
 
+export function getPerspectiveCamera(properties, sizes) {
+    const camera = new THREE.PerspectiveCamera(
+        properties.fov,
+        sizes.width / sizes.height,
+        properties.near,
+        properties.far
+    )
+    window.addEventListener('resize', () => {
+        camera.aspect = sizes.width / sizes.height
+        camera.updateProjectionMatrix()
+    })
+    return camera
+}
+
 export function getRenderer(canvas, sizes) {
     const renderer = new THREE.WebGLRenderer({canvas: canvas})
     renderer.setSize(sizes.width, sizes.height)
@@ -7,7 +21,6 @@ export function getRenderer(canvas, sizes) {
     window.addEventListener("resize", () =>
     {
         renderer.setSize(sizes.width, sizes.height)
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     })
     return renderer
 }
@@ -19,8 +32,9 @@ export function getUpdateFunction(updateFunctions) {
     {
         const elapsedTime = clock.getElapsedTime()
         const deltaTime = elapsedTime - previousTime
+        previousTime = elapsedTime
         if(updateFunctions) {
-            updateFunctions.map((f) => { f(elapsedTime, deltaTime) })
+            updateFunctions.map((f) => { f({elapsedTime, deltaTime}) })
         }
         window.requestAnimationFrame(update)
     }
