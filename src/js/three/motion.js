@@ -1,40 +1,49 @@
 import { modulo } from "../utils";
 import * as THREE from "three";
 
-function getRotationController(
-  startRotation,
-  getTargetRotation,
-  rotationGain,
-  rotationVelocityGain
-) {
-  const state = {
-    rotation: startRotation,
-    rotationVelocity: 0,
-  };
-  const target = {
-    rotation: 0,
-    rotationVelocity: 0,
-  };
-  return (time) => {
-    target.rotation = getTargetRotation(time, state);
+class RotationController {
+  constructor(
+    startRotation,
+    getTargetRotation,
+    rotationGain,
+    rotationVelocityGain
+  ) {
+    this.startRotation = startRotation;
+    this.getTargetRotation = getTargetRotation;
+    this.rotationGain = rotationGain;
+    this.rotationVelocityGain = rotationVelocityGain;
 
-    let errorRotation = modulo(target.rotation - state.rotation, 2 * Math.PI);
+    this.state = {
+      rotation: startRotation,
+      rotationVelocity: 0,
+    };
+    this.target = {
+      rotation: 0,
+      rotationVelocity: 0,
+    };
+  }
+  update(time) {
+    this.target.rotation = this.getTargetRotation(time, this.state);
+
+    let errorRotation = modulo(
+      this.target.rotation - this.state.rotation,
+      2 * Math.PI
+    );
     if (errorRotation > Math.PI) {
       errorRotation = errorRotation - 2 * Math.PI;
     }
 
     const errorRotationVelocity =
-      target.rotationVelocity - state.rotationVelocity;
+      this.target.rotationVelocity - this.state.rotationVelocity;
 
-    const inputRotation = rotationGain * errorRotation;
-    const inputRotationVelocity = rotationVelocityGain * errorRotationVelocity;
+    const inputRotation = this.rotationGain * errorRotation;
+    const inputRotationVelocity =
+      this.rotationVelocityGain * errorRotationVelocity;
 
-    state.rotationVelocity +=
+    this.state.rotationVelocity +=
       time.deltaTime * (inputRotation + inputRotationVelocity);
-    state.rotation += time.deltaTime * state.rotationVelocity;
-
-    return state;
-  };
+    this.state.rotation += time.deltaTime * this.state.rotationVelocity;
+  }
 }
 
 function getUpdateObject(object3d) {
@@ -116,13 +125,13 @@ export function getMotionCallback(
   const startYRotation = Math.atan2(direction.x, direction.z);
   const startXRotation = Math.asin(-direction.y / direction.length());
 
-  const getYaw = getRotationController(
+  const yawController = new RotationController(
     startYRotation,
     motion.getTargetYaw,
     rotationGain,
     rotationVelocityGain
   );
-  const getPitch = getRotationController(
+  const pitchController = new RotationController(
     startXRotation,
     motion.getTargetPitch,
     rotationGain,
@@ -132,8 +141,8 @@ export function getMotionCallback(
   const updateObject = getUpdateObject(object3d);
 
   return (time) => {
-    const yRotation = getYaw(time);
-    const xRotation = getPitch(time);
-    updateObject(time, xRotation, yRotation);
+    pitchController.update(time);
+    yawController.update(time);
+    updateObject(time, pitchController.state, yawController.state);
   };
 }
