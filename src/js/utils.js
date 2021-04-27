@@ -1,4 +1,12 @@
 
+export function modulo(a, b) {
+    return ((a % b) + b) % b
+}
+
+export function randomUniform(low, high) {
+    return (high - low) * Math.random() + low
+}
+
 export function getWindowSizes() {
     const sizes = {
         width: window.innerWidth,
