@@ -14,10 +14,6 @@ gui.closed = true;
 
 const scene = new THREE.Scene();
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(5, 5, 5);
-scene.add(directionalLight);
-
 const turtleMaterialParameters = { color: 0x4d46cf, wireframe: true };
 const turtleMaterial = new THREE.MeshBasicMaterial(turtleMaterialParameters);
 const turtleGui = gui.addFolder("turtle");
