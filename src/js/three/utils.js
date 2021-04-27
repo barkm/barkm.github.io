@@ -14,6 +14,20 @@ export function getPerspectiveCamera(properties, sizes) {
   return camera;
 }
 
+export function addVisibilityToggle(gui, object3d, scene, name) {
+  const toggle = () => {
+    if (object3d.parent == scene) {
+      scene.remove(object3d);
+    } else {
+      scene.add(object3d);
+    }
+  };
+  gui
+    .add({ show: object3d.parent == scene }, "show")
+    .name(name)
+    .onChange(toggle);
+}
+
 export function getRenderer(canvas, sizes) {
   const renderer = new THREE.WebGLRenderer({ canvas: canvas });
   renderer.setSize(sizes.width, sizes.height);

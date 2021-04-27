@@ -1,9 +1,16 @@
 import "./style.css";
+
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import * as dat from "dat.gui";
+
 import * as UTILS from "./js/utils";
 import * as THREE_UTILS from "./js/three/utils";
 import { addTurtle } from "./js/three/models";
 import * as MOTION from "./js/three/motion";
+
+const gui = new dat.GUI();
+gui.closed = true;
 
 const scene = new THREE.Scene();
 
@@ -11,7 +18,14 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.position.set(5, 5, 5);
 scene.add(directionalLight);
 
-const turtle = addTurtle(scene);
+const turtleMaterialParameters = { color: 0x4d46cf, wireframe: true };
+const turtleMaterial = new THREE.MeshBasicMaterial(turtleMaterialParameters);
+const turtleGui = gui.addFolder("turtle");
+turtleGui.add(turtleMaterial, "wireframe");
+turtleGui.addColor(turtleMaterialParameters, "color").onChange(() => {
+  turtleMaterial.color.set(turtleMaterialParameters.color);
+});
+const turtle = addTurtle(scene, turtleMaterial);
 
 const windowSizes = UTILS.getWindowSizes();
 
@@ -25,7 +39,20 @@ const renderer = THREE_UTILS.getRenderer(
   document.querySelector("canvas"),
   windowSizes
 );
+renderer.setClearColor(0xffffff);
 renderer.render(scene, camera);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enabled = false;
+gui
+  .add(controls, "enabled")
+  .name("controls")
+  .onChange(() => {
+    if (!controls.enabled) controls.reset();
+  });
+
+const axesHelper = new THREE.AxesHelper();
+THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axes helper");
 
 let motion_callback = null;
 
@@ -47,12 +74,30 @@ const update = THREE_UTILS.getUpdateFunction([
         UTILS.randomUniform(-Math.PI / 2, Math.PI / 2)
       );
 
+      const turtleBox = new THREE.BoxGeometry(5, 5, 5);
+      const turtleBoxMesh = new THREE.Mesh(
+        turtleBox,
+        new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true })
+      );
+      THREE_UTILS.addVisibilityToggle(
+        turtleGui,
+        turtleBoxMesh,
+        scene,
+        "boundary"
+      );
+
       const motion = MOTION.getStayWithinBoxMotion(
         turtle.group,
         { x: 0, y: 0, z: 0 },
-        { width: 5, height: 5, depth: 5 }
+        turtleBox.parameters
       );
-      motion_callback = MOTION.getMotionCallback(turtle.group, motion);
+
+      motion_callback = MOTION.getMotionCallback(
+        turtle.group,
+        motion,
+        { rotation: 0.5, rotationVelocity: 2 },
+        turtleGui.addFolder("motion")
+      );
     }
     motion_callback(time);
   },

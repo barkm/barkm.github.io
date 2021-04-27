@@ -2,17 +2,10 @@ import { modulo } from "../utils";
 import * as THREE from "three";
 
 class RotationController {
-  constructor(
-    startRotation,
-    getTargetRotation,
-    rotationGain,
-    rotationVelocityGain
-  ) {
+  constructor(startRotation, getTargetRotation, gains) {
     this.startRotation = startRotation;
     this.getTargetRotation = getTargetRotation;
-    this.rotationGain = rotationGain;
-    this.rotationVelocityGain = rotationVelocityGain;
-
+    this.gains = gains;
     this.state = {
       rotation: startRotation,
       rotationVelocity: 0,
@@ -36,9 +29,9 @@ class RotationController {
     const errorRotationVelocity =
       this.target.rotationVelocity - this.state.rotationVelocity;
 
-    const inputRotation = this.rotationGain * errorRotation;
+    const inputRotation = this.gains.rotation * errorRotation;
     const inputRotationVelocity =
-      this.rotationVelocityGain * errorRotationVelocity;
+      this.gains.rotationVelocity * errorRotationVelocity;
 
     this.state.rotationVelocity +=
       time.deltaTime * (inputRotation + inputRotationVelocity);
@@ -47,7 +40,7 @@ class RotationController {
 }
 
 function getUpdateObject(object3d) {
-  return (time, xRotation, yRotation) => {
+  return (time, speed, xRotation, yRotation) => {
     object3d.setRotationFromAxisAngle(
       new THREE.Vector3(0, 1, 0),
       yRotation.rotation
@@ -57,7 +50,7 @@ function getUpdateObject(object3d) {
 
     const direction = new THREE.Vector3();
     object3d.getWorldDirection(direction);
-    object3d.position.add(direction.multiplyScalar(time.deltaTime));
+    object3d.position.add(direction.multiplyScalar(speed * time.deltaTime));
   };
 }
 
@@ -114,12 +107,7 @@ export function getStayWithinBoxMotion(object3d, center, sides) {
   );
 }
 
-export function getMotionCallback(
-  object3d,
-  motion,
-  rotationGain = 0.5,
-  rotationVelocityGain = 2
-) {
+export function getMotionCallback(object3d, motion, gains, gui) {
   let direction = new THREE.Vector3();
   object3d.getWorldDirection(direction);
   const startYRotation = Math.atan2(direction.x, direction.z);
@@ -128,21 +116,35 @@ export function getMotionCallback(
   const yawController = new RotationController(
     startYRotation,
     motion.getTargetYaw,
-    rotationGain,
-    rotationVelocityGain
+    gains
   );
   const pitchController = new RotationController(
     startXRotation,
     motion.getTargetPitch,
-    rotationGain,
-    rotationVelocityGain
+    gains
   );
+
+  const parameters = {
+    speed: 1,
+  };
+
+  if (gui) {
+    gui.add(parameters, "speed").min(0).max(5);
+    const gainsFolder = gui.addFolder("gains");
+    gainsFolder.add(gains, "rotation").min(0).max(5);
+    gainsFolder.add(gains, "rotationVelocity").min(0).max(5);
+  }
 
   const updateObject = getUpdateObject(object3d);
 
   return (time) => {
     pitchController.update(time);
     yawController.update(time);
-    updateObject(time, pitchController.state, yawController.state);
+    updateObject(
+      time,
+      parameters.speed,
+      pitchController.state,
+      yawController.state
+    );
   };
 }
