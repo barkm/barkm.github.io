@@ -5,7 +5,11 @@
   "homepage": "https://barkm.github.io",
   "scripts": {
     "dev": "webpack serve --config ./bundler/webpack.dev.js --open",
-    "build": "webpack --config ./bundler/webpack.prod.js"
+    "build": "webpack --config ./bundler/webpack.prod.js",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
     "three": "^0.128.0"
@@ -14,7 +18,10 @@
     "clean-webpack-plugin": "*",
     "css-loader": "^5.2.4",
     "html-webpack-plugin": "^5.3.1",
+    "husky": "^6.0.0",
+    "lint-staged": "^10.5.4",
     "mini-css-extract-plugin": "^1.5.0",
+    "prettier": "^2.2.1",
     "webpack": "^5.35.1",
     "webpack-cli": "^4.6.0",
     "webpack-dev-server": "^3.11.2"
