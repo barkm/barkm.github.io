@@ -52,8 +52,8 @@ export function getStayWithinBoxMotion(position, center, sides) {
     return 0;
   };
   return {
-    getTargetYaw: getStayWithinAreaYaw(position, isOutsideXZ, getCenterXZ),
-    getTargetPitch: getStayWithinYPitch(signedDistanceOutsideY),
+    yaw: getStayWithinAreaYaw(position, isOutsideXZ, getCenterXZ),
+    pitch: getStayWithinYPitch(signedDistanceOutsideY),
   };
 }
 
@@ -73,28 +73,25 @@ function chainGetTargetRotations(getTargetRotations) {
   };
 }
 
-export function getMotionCallback(
-  initialYaw,
-  initialPitch,
-  getTargetYaw,
-  getTargetPitch,
-  gains,
-  gui
-) {
-  getTargetYaw = chainGetTargetRotations([
+export function getMotionCallback(initial, getTarget, gains, gui) {
+  const getTargetYaw = chainGetTargetRotations([
     getIdentityTarget,
     getNoRotationVelocityTarget,
-    getTargetYaw,
+    getTarget.yaw,
   ]);
-  getTargetPitch = chainGetTargetRotations([
+  const getTargetPitch = chainGetTargetRotations([
     getIdentityTarget,
     getNoRotationVelocityTarget,
-    getTargetPitch,
+    getTarget.pitch,
   ]);
 
-  const yawController = new RotationController(initialYaw, getTargetYaw, gains);
+  const yawController = new RotationController(
+    initial.yaw,
+    getTargetYaw,
+    gains
+  );
   const pitchController = new RotationController(
-    initialPitch,
+    initial.pitch,
     getTargetPitch,
     gains
   );

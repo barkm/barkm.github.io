@@ -89,21 +89,10 @@ const update = THREE_UTILS.getUpdateFunction([
         turtleBox.parameters
       );
 
-      let direction = new THREE.Vector3();
-      turtle.group.getWorldDirection(direction);
-      const initialYaw = {
-        rotation: Math.atan2(direction.x, direction.z),
-        rotationVelocity: 0,
-      };
-      const initialPitch = {
-        rotation: Math.asin(-direction.y / direction.length()),
-        rotationVelocity: 0,
-      };
+      const initialRotations = THREE_MOTION.getInitialRotations(turtle.group);
       motionCallback = MOTION.getMotionCallback(
-        initialYaw,
-        initialPitch,
-        motion.getTargetYaw,
-        motion.getTargetPitch,
+        initialRotations,
+        motion,
         { rotation: 0.5, rotationVelocity: 2 },
         turtleGui.addFolder("motion")
       );
