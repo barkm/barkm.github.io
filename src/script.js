@@ -40,7 +40,6 @@ const renderer = THREE_UTILS.getRenderer(
   windowSizes
 );
 renderer.setClearColor(0xffffff);
-renderer.render(scene, camera);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enabled = false;
