@@ -73,40 +73,39 @@ function chainGetTargetRotations(getTargetRotations) {
   };
 }
 
-export function getMotionCallback(initial, getTarget, gains, gui) {
-  const getTargetYaw = chainGetTargetRotations([
-    getIdentityTarget,
-    getNoRotationVelocityTarget,
-    getTarget.yaw,
-  ]);
-  const getTargetPitch = chainGetTargetRotations([
-    getIdentityTarget,
-    getNoRotationVelocityTarget,
-    getTarget.pitch,
-  ]);
-
-  const yawController = new RotationController(
-    initial.yaw,
-    getTargetYaw,
-    gains
-  );
-  const pitchController = new RotationController(
-    initial.pitch,
-    getTargetPitch,
-    gains
-  );
-
+function getRotationController(initialRotation, getTargetRotation, gains, gui) {
   if (gui) {
     gui.add(gains, "rotation").min(0).max(5);
     gui.add(gains, "rotationVelocity").min(0).max(5);
   }
+  getTargetRotation = chainGetTargetRotations([
+    getIdentityTarget,
+    getNoRotationVelocityTarget,
+    getTargetRotation,
+  ]);
+  return new RotationController(initialRotation, getTargetRotation, gains);
+}
 
-  return (time) => {
-    yawController.update(time);
-    pitchController.update(time);
-    return {
-      yaw: yawController.state,
-      pitch: pitchController.state,
-    };
-  };
+export function getMotionCallback(
+  initialRotation,
+  getTargetRotation,
+  gain,
+  gui
+) {
+  const yawController = getRotationController(
+    initialRotation.yaw,
+    getTargetRotation.yaw,
+    gain.yaw,
+    gui ? gui.addFolder("gain.yaw") : null
+  );
+  const pitchController = getRotationController(
+    initialRotation.pitch,
+    getTargetRotation.pitch,
+    gain.yaw,
+    gui ? gui.addFolder("gain.pitch") : null
+  );
+  return (time) => ({
+    yaw: yawController.update(time),
+    pitch: pitchController.update(time),
+  });
 }

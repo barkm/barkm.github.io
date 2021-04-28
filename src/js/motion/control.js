@@ -28,5 +28,7 @@ export class RotationController {
     this.state.rotationVelocity +=
       time.deltaTime * (inputRotation + inputRotationVelocity);
     this.state.rotation += time.deltaTime * this.state.rotationVelocity;
+
+    return this.state;
   }
 }

@@ -90,10 +90,11 @@ const update = THREE_UTILS.getUpdateFunction([
       );
 
       const initialRotations = THREE_MOTION.getInitialRotations(turtle.group);
+      const gains = { rotation: 0.5, rotationVelocity: 2 };
       motionCallback = MOTION.getMotionCallback(
         initialRotations,
         motion,
-        { rotation: 0.5, rotationVelocity: 2 },
+        { yaw: gains, pitch: gains },
         turtleGui.addFolder("motion")
       );
     }
