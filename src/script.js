@@ -88,7 +88,7 @@ const update = THREE_UTILS.getUpdateFunction([
 
       const motion = MOTION.getStayWithinBoxMotion(
         turtle.group.position,
-        { x: 0, y: 0, z: 0 },
+        turtleBoxMesh.position,
         turtleBox.parameters
       );
 
