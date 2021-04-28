@@ -32,7 +32,7 @@ class RotationController {
   }
 }
 
-function getUpdateObject(object3d) {
+export function getUpdateObject(object3d) {
   return (time, speed, xRotation, yRotation) => {
     object3d.setRotationFromAxisAngle(
       new THREE.Vector3(0, 1, 0),
@@ -118,36 +118,29 @@ function chainGetTargetRotations(getTargetRotations) {
   };
 }
 
-export function getMotionCallback(object3d, motion, gains, gui) {
-  let direction = new THREE.Vector3();
-  object3d.getWorldDirection(direction);
-  const initialYawState = {
-    rotation: Math.atan2(direction.x, direction.z),
-    rotationVelocity: 0,
-  };
-  const initialPitchState = {
-    rotation: Math.asin(-direction.y / direction.length()),
-    rotationVelocity: 0,
-  };
-
-  const getTargetYaw = chainGetTargetRotations([
+export function getMotionCallback(
+  initialYaw,
+  initialPitch,
+  getTargetYaw,
+  getTargetPitch,
+  gains,
+  callbacks,
+  gui
+) {
+  getTargetYaw = chainGetTargetRotations([
     getIdentityTarget,
     getNoRotationVelocityTarget,
-    motion.getTargetYaw,
-  ]);
-  const getTargetPitch = chainGetTargetRotations([
-    getIdentityTarget,
-    getNoRotationVelocityTarget,
-    motion.getTargetPitch,
-  ]);
-
-  const yawController = new RotationController(
-    initialYawState,
     getTargetYaw,
-    gains
-  );
+  ]);
+  getTargetPitch = chainGetTargetRotations([
+    getIdentityTarget,
+    getNoRotationVelocityTarget,
+    getTargetPitch,
+  ]);
+
+  const yawController = new RotationController(initialYaw, getTargetYaw, gains);
   const pitchController = new RotationController(
-    initialPitchState,
+    initialPitch,
     getTargetPitch,
     gains
   );
@@ -163,16 +156,11 @@ export function getMotionCallback(object3d, motion, gains, gui) {
     gainsFolder.add(gains, "rotationVelocity").min(0).max(5);
   }
 
-  const updateObject = getUpdateObject(object3d);
-
   return (time) => {
     pitchController.update(time);
     yawController.update(time);
-    updateObject(
-      time,
-      parameters.speed,
-      pitchController.state,
-      yawController.state
+    callbacks.map((f) =>
+      f(time, parameters.speed, pitchController.state, yawController.state)
     );
   };
 }
