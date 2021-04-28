@@ -32,6 +32,9 @@ const camera = THREE_UTILS.getPerspectiveCamera(
 );
 camera.position.set(0, 0, 10);
 
+const cameraHelper = THREE_UTILS.getFixedCameraHelper(camera);
+THREE_UTILS.addVisibilityToggle(gui, cameraHelper, scene, "cameraHelper");
+
 const renderer = THREE_UTILS.getRenderer(
   document.querySelector("canvas"),
   windowSizes
@@ -49,7 +52,7 @@ gui
   });
 
 const axesHelper = new THREE.AxesHelper();
-THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axes helper");
+THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axesHelper");
 
 let motionCallback = null;
 

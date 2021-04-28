@@ -14,6 +14,17 @@ export function getPerspectiveCamera(properties, sizes) {
   return camera;
 }
 
+export function getFixedCameraHelper(camera) {
+  const cameraHelper = new THREE.CameraHelper(camera);
+  cameraHelper.matrixAutoUpdate = true;
+  cameraHelper.position.set(
+    camera.position.x,
+    camera.position.y,
+    camera.position.z
+  );
+  return cameraHelper;
+}
+
 export function addVisibilityToggle(gui, object3d, scene, name) {
   const toggle = () => {
     if (object3d.parent == scene) {
