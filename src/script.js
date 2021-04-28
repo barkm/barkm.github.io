@@ -7,7 +7,8 @@ import * as dat from "dat.gui";
 import * as UTILS from "./js/utils";
 import * as THREE_UTILS from "./js/three/utils";
 import { addTurtle } from "./js/three/models";
-import * as MOTION from "./js/three/motion";
+import * as THREE_MOTION from "./js/three/motion";
+import * as MOTION from "./js/motion/motion";
 
 const gui = new dat.GUI();
 gui.closed = true;
@@ -50,7 +51,7 @@ gui
 const axesHelper = new THREE.AxesHelper();
 THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axes helper");
 
-let motion_callback = null;
+let motionCallback = null;
 
 const update = THREE_UTILS.getUpdateFunction([
   () => {
@@ -63,7 +64,7 @@ const update = THREE_UTILS.getUpdateFunction([
     if (!turtle.group) {
       return;
     }
-    if (!motion_callback) {
+    if (!motionCallback) {
       turtle.group.rotation.y = UTILS.randomUniform(0, 2 * Math.PI);
       turtle.group.rotateOnAxis(
         new THREE.Vector3(1, 0, 0),
@@ -83,7 +84,7 @@ const update = THREE_UTILS.getUpdateFunction([
       );
 
       const motion = MOTION.getStayWithinBoxMotion(
-        turtle.group,
+        turtle.group.position,
         { x: 0, y: 0, z: 0 },
         turtleBox.parameters
       );
@@ -98,18 +99,23 @@ const update = THREE_UTILS.getUpdateFunction([
         rotation: Math.asin(-direction.y / direction.length()),
         rotationVelocity: 0,
       };
-      motion_callback = MOTION.getMotionCallback(
-        turtle.group,
+      motionCallback = MOTION.getMotionCallback(
         initialYaw,
         initialPitch,
         motion.getTargetYaw,
         motion.getTargetPitch,
         { rotation: 0.5, rotationVelocity: 2 },
-        [MOTION.getUpdateObject(turtle.group)],
         turtleGui.addFolder("motion")
       );
     }
-    motion_callback(time);
+    const rotation = motionCallback(time);
+    THREE_MOTION.updateObject(
+      turtle.group,
+      time,
+      1,
+      rotation.yaw,
+      rotation.pitch
+    );
   },
 ]);
 
