@@ -2,18 +2,11 @@ import { modulo } from "../utils";
 import * as THREE from "three";
 
 class RotationController {
-  constructor(startRotation, getTarget, gains) {
-    this.startRotation = startRotation;
+  constructor(initialState, getTarget, gains) {
     this.getTarget = getTarget;
+    this.state = initialState;
+    this.target = null;
     this.gains = gains;
-    this.state = {
-      rotation: startRotation,
-      rotationVelocity: 0,
-    };
-    this.target = {
-      rotation: 0,
-      rotationVelocity: 0,
-    };
   }
   update(time) {
     this.target = this.getTarget(time, this.state, this.target);
@@ -118,16 +111,22 @@ export function getStayWithinBoxMotion(object3d, center, sides) {
 export function getMotionCallback(object3d, motion, gains, gui) {
   let direction = new THREE.Vector3();
   object3d.getWorldDirection(direction);
-  const startYRotation = Math.atan2(direction.x, direction.z);
-  const startXRotation = Math.asin(-direction.y / direction.length());
+  const initialYawState = {
+    rotation: Math.atan2(direction.x, direction.z),
+    rotationVelocity: 0,
+  };
+  const initialPitchState = {
+    rotation: Math.asin(-direction.y / direction.length()),
+    rotationVelocity: 0,
+  };
 
   const yawController = new RotationController(
-    startYRotation,
+    initialYawState,
     motion.getTargetYaw,
     gains
   );
   const pitchController = new RotationController(
-    startXRotation,
+    initialPitchState,
     motion.getTargetPitch,
     gains
   );
