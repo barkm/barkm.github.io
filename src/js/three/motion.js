@@ -53,7 +53,7 @@ function getStayWithinRegionMotion(
   getCenterXZ,
   signedDistanceOutsideY
 ) {
-  const getTargetYaw = (time, state, target) => {
+  const getYaw = (time, state, target) => {
     if (isOutSideXZ()) {
       const origin = getCenterXZ();
       const deltaX = origin.x - object3d.position.x;
@@ -65,7 +65,7 @@ function getStayWithinRegionMotion(
     }
     return target;
   };
-  const getTargetPitch = (time, state, target) => {
+  const getPitch = (time, state, target) => {
     const distance = signedDistanceOutsideY();
     if (Math.abs(distance) > 0) {
       return {
@@ -80,8 +80,8 @@ function getStayWithinRegionMotion(
     return target;
   };
   return {
-    getTargetYaw,
-    getTargetPitch,
+    getYaw,
+    getPitch,
   };
 }
 
@@ -115,16 +115,16 @@ export function noRotationVelocityMotion() {
     return { rotation: state.rotation, rotationVelocity: 0 };
   };
   return {
-    getTargetYaw: noRotationVelocity,
-    getTargetPitch: noRotationVelocity,
+    getYaw: noRotationVelocity,
+    getPitch: noRotationVelocity,
   };
 }
 
 export function identityMotion() {
   const identityMotion = (time, state, target) => state;
   return {
-    getTargetYaw: identityMotion,
-    getTargetPitch: identityMotion,
+    getYaw: identityMotion,
+    getPitch: identityMotion,
   };
 }
 
@@ -138,12 +138,8 @@ function chainTargetFunctions(targetFunctions) {
 
 export function chainMotions(motions) {
   return {
-    getTargetYaw: chainTargetFunctions(
-      motions.map((motion) => motion.getTargetYaw)
-    ),
-    getTargetPitch: chainTargetFunctions(
-      motions.map((motion) => motion.getTargetPitch)
-    ),
+    getYaw: chainTargetFunctions(motions.map((motion) => motion.getYaw)),
+    getPitch: chainTargetFunctions(motions.map((motion) => motion.getPitch)),
   };
 }
 
@@ -163,12 +159,12 @@ export function getMotionCallback(object3d, motion, gains, gui) {
 
   const yawController = new RotationController(
     initialYawState,
-    motion.getTargetYaw,
+    motion.getYaw,
     gains
   );
   const pitchController = new RotationController(
     initialPitchState,
-    motion.getTargetPitch,
+    motion.getPitch,
     gains
   );
 
