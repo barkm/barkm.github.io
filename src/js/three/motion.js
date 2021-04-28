@@ -2,9 +2,9 @@ import { modulo } from "../utils";
 import * as THREE from "three";
 
 class RotationController {
-  constructor(startRotation, getTargetRotation, gains) {
+  constructor(startRotation, getTarget, gains) {
     this.startRotation = startRotation;
-    this.getTargetRotation = getTargetRotation;
+    this.getTarget = getTarget;
     this.gains = gains;
     this.state = {
       rotation: startRotation,
@@ -16,7 +16,7 @@ class RotationController {
     };
   }
   update(time) {
-    this.target.rotation = this.getTargetRotation(time, this.state);
+    this.target = this.getTarget(time, this.state, this.target);
 
     let errorRotation = modulo(
       this.target.rotation - this.state.rotation,
@@ -60,21 +60,29 @@ function getStayWithinRegionMotion(
   getCenterXZ,
   signedDistanceOutsideY
 ) {
-  const getTargetYaw = (time, state) => {
+  const getTargetYaw = (time, state, target) => {
+    let rotation = state.rotation;
     if (isOutSideXZ()) {
       const origin = getCenterXZ();
       const deltaX = origin.x - object3d.position.x;
       const deltaZ = origin.z - object3d.position.z;
-      return Math.atan2(deltaX, deltaZ);
+      rotation = Math.atan2(deltaX, deltaZ);
     }
-    return state.rotation;
+    return {
+      rotation: rotation,
+      rotationVelocity: 0,
+    };
   };
-  const getTargetPitch = (time, state) => {
+  const getTargetPitch = (time, state, target) => {
+    let rotation = state.rotation;
     const distance = signedDistanceOutsideY();
     if (Math.abs(distance) > 0) {
-      return THREE.MathUtils.clamp(2 * distance, -Math.PI / 2, Math.PI / 2);
+      rotation = THREE.MathUtils.clamp(2 * distance, -Math.PI / 2, Math.PI / 2);
     }
-    return state.rotation;
+    return {
+      rotation: rotation,
+      rotationVelocity: 0,
+    };
   };
   return {
     getTargetYaw,
