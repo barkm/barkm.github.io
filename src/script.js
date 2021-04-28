@@ -9,7 +9,7 @@ import * as THREE_UTILS from "./js/three/utils";
 import { Turtle } from "./js/three/turtle";
 
 const gui = new dat.GUI();
-gui.closed = true;
+gui.hide();
 
 const scene = new THREE.Scene();
 
@@ -54,7 +54,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enabled = false;
 gui
   .add(controls, "enabled")
-  .name("controls")
+  .name("camera")
   .onChange(() => {
     if (!controls.enabled) controls.reset();
   });
