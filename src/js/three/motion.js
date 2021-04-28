@@ -47,13 +47,8 @@ function getUpdateObject(object3d) {
   };
 }
 
-function getStayWithinRegionMotion(
-  object3d,
-  isOutSideXZ,
-  getCenterXZ,
-  signedDistanceOutsideY
-) {
-  const getYaw = (time, state, target) => {
+function getStayWithinAreaYaw(object3d, isOutSideXZ, getCenterXZ) {
+  return (time, state, target) => {
     if (isOutSideXZ()) {
       const origin = getCenterXZ();
       const deltaX = origin.x - object3d.position.x;
@@ -65,7 +60,10 @@ function getStayWithinRegionMotion(
     }
     return target;
   };
-  const getPitch = (time, state, target) => {
+}
+
+function getStayWithinYPitch(signedDistanceOutsideY) {
+  return (time, state, target) => {
     const distance = signedDistanceOutsideY();
     if (Math.abs(distance) > 0) {
       return {
@@ -79,9 +77,17 @@ function getStayWithinRegionMotion(
     }
     return target;
   };
+}
+
+function getStayWithinRegionMotion(
+  object3d,
+  isOutSideXZ,
+  getCenterXZ,
+  signedDistanceOutsideY
+) {
   return {
-    getYaw,
-    getPitch,
+    getYaw: getStayWithinAreaYaw(object3d, isOutSideXZ, getCenterXZ),
+    getPitch: getStayWithinYPitch(signedDistanceOutsideY),
   };
 }
 
