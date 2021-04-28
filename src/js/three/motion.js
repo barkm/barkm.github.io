@@ -79,18 +79,6 @@ function getStayWithinYPitch(signedDistanceOutsideY) {
   };
 }
 
-function getStayWithinRegionMotion(
-  object3d,
-  isOutSideXZ,
-  getCenterXZ,
-  signedDistanceOutsideY
-) {
-  return {
-    getYaw: getStayWithinAreaYaw(object3d, isOutSideXZ, getCenterXZ),
-    getPitch: getStayWithinYPitch(signedDistanceOutsideY),
-  };
-}
-
 export function getStayWithinBoxMotion(object3d, center, sides) {
   const isOutsideXZ = () => {
     return (
@@ -108,44 +96,25 @@ export function getStayWithinBoxMotion(object3d, center, sides) {
     }
     return 0;
   };
-  return getStayWithinRegionMotion(
-    object3d,
-    isOutsideXZ,
-    getCenterXZ,
-    signedDistanceOutsideY
-  );
-}
-
-export function noRotationVelocityMotion() {
-  const noRotationVelocity = (time, state, target) => {
-    return { rotation: state.rotation, rotationVelocity: 0 };
-  };
   return {
-    getYaw: noRotationVelocity,
-    getPitch: noRotationVelocity,
+    getTargetYaw: getStayWithinAreaYaw(object3d, isOutsideXZ, getCenterXZ),
+    getTargetPitch: getStayWithinYPitch(signedDistanceOutsideY),
   };
 }
 
-export function identityMotion() {
-  const identityMotion = (time, state, target) => state;
-  return {
-    getYaw: identityMotion,
-    getPitch: identityMotion,
-  };
+export function getNoRotationVelocityTarget(time, state, target) {
+  return { rotation: state.rotation, rotationVelocity: 0 };
 }
 
-function chainTargetFunctions(targetFunctions) {
+export function getIdentityTarget(time, state, target) {
+  return state;
+}
+
+function chainGetTargetRotations(getTargetRotations) {
   return (time, state, target) => {
-    const chainer = (reducedTarget, motion) =>
-      motion(time, state, reducedTarget);
-    return targetFunctions.reduce(chainer, target);
-  };
-}
-
-export function chainMotions(motions) {
-  return {
-    getYaw: chainTargetFunctions(motions.map((motion) => motion.getYaw)),
-    getPitch: chainTargetFunctions(motions.map((motion) => motion.getPitch)),
+    const chainer = (reducedTarget, getTargetRotation) =>
+      getTargetRotation(time, state, reducedTarget);
+    return getTargetRotations.reduce(chainer, target);
   };
 }
 
@@ -161,16 +130,25 @@ export function getMotionCallback(object3d, motion, gains, gui) {
     rotationVelocity: 0,
   };
 
-  motion = chainMotions([identityMotion(), noRotationVelocityMotion(), motion]);
+  const getTargetYaw = chainGetTargetRotations([
+    getIdentityTarget,
+    getNoRotationVelocityTarget,
+    motion.getTargetYaw,
+  ]);
+  const getTargetPitch = chainGetTargetRotations([
+    getIdentityTarget,
+    getNoRotationVelocityTarget,
+    motion.getTargetPitch,
+  ]);
 
   const yawController = new RotationController(
     initialYawState,
-    motion.getYaw,
+    getTargetYaw,
     gains
   );
   const pitchController = new RotationController(
     initialPitchState,
-    motion.getPitch,
+    getTargetPitch,
     gains
   );
 

@@ -90,7 +90,8 @@ const update = THREE_UTILS.getUpdateFunction([
 
       motion_callback = MOTION.getMotionCallback(
         turtle.group,
-        motion,
+        motion.getYaw,
+        motion.getPitch,
         { rotation: 0.5, rotationVelocity: 2 },
         turtleGui.addFolder("motion")
       );
