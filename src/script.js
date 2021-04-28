@@ -6,9 +6,7 @@ import * as dat from "dat.gui";
 
 import * as UTILS from "./js/utils";
 import * as THREE_UTILS from "./js/three/utils";
-import { addTurtle } from "./js/three/models";
-import * as THREE_MOTION from "./js/three/motion";
-import * as MOTION from "./js/motion/motion";
+import { Turtle } from "./js/three/models";
 
 const gui = new dat.GUI();
 gui.closed = true;
@@ -22,7 +20,18 @@ turtleGui.add(turtleMaterial, "wireframe");
 turtleGui.addColor(turtleMaterialParameters, "color").onChange(() => {
   turtleMaterial.color.set(turtleMaterialParameters.color);
 });
-const turtle = addTurtle(scene, turtleMaterial);
+
+const numTurtles = 10;
+const turtles = [];
+for (let i = 0; i < numTurtles; i++) {
+  turtles.push(
+    new Turtle(
+      scene,
+      turtleMaterial,
+      turtleGui.addFolder("turtle" + i.toString())
+    )
+  );
+}
 
 const windowSizes = UTILS.getWindowSizes();
 
@@ -30,7 +39,7 @@ const camera = THREE_UTILS.getPerspectiveCamera(
   { fov: 60, near: 1, far: 50 },
   windowSizes
 );
-camera.position.set(0, 0, 10);
+camera.position.set(0, 0, 15);
 
 const cameraHelper = THREE_UTILS.getFixedCameraHelper(camera);
 THREE_UTILS.addVisibilityToggle(gui, cameraHelper, scene, "cameraHelper");
@@ -53,61 +62,12 @@ gui
 const axesHelper = new THREE.AxesHelper();
 THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axesHelper");
 
-let motionCallback = null;
-
 const update = THREE_UTILS.getUpdateFunction([
   () => {
     renderer.render(scene, camera);
   },
   (time) => {
-    if (turtle.mixer) turtle.mixer.update(time.deltaTime);
-  },
-  (time) => {
-    if (!turtle.group) {
-      return;
-    }
-    if (!motionCallback) {
-      turtle.group.rotation.y = UTILS.randomUniform(0, 2 * Math.PI);
-      turtle.group.rotateOnAxis(
-        new THREE.Vector3(1, 0, 0),
-        UTILS.randomUniform(-Math.PI / 2, Math.PI / 2)
-      );
-
-      const turtleBox = new THREE.BoxGeometry(5, 5, 5);
-      const turtleBoxMesh = new THREE.Mesh(
-        turtleBox,
-        new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true })
-      );
-      THREE_UTILS.addVisibilityToggle(
-        turtleGui,
-        turtleBoxMesh,
-        scene,
-        "boundary"
-      );
-
-      const motion = MOTION.getStayWithinBoxMotion(
-        turtle.group.position,
-        turtleBoxMesh.position,
-        turtleBox.parameters
-      );
-
-      const initialRotations = THREE_MOTION.getInitialRotations(turtle.group);
-      const gains = { rotation: 0.5, rotationVelocity: 2 };
-      motionCallback = MOTION.getMotionCallback(
-        initialRotations,
-        motion,
-        { yaw: gains, pitch: gains },
-        turtleGui.addFolder("motion")
-      );
-    }
-    const rotation = motionCallback(time);
-    THREE_MOTION.updateObject(
-      turtle.group,
-      time,
-      1,
-      rotation.yaw,
-      rotation.pitch
-    );
+    turtles.map((turtle) => turtle.update(time));
   },
 ]);
 
