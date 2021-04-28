@@ -54,28 +54,30 @@ function getStayWithinRegionMotion(
   signedDistanceOutsideY
 ) {
   const getTargetYaw = (time, state, target) => {
-    let rotation = state.rotation;
     if (isOutSideXZ()) {
       const origin = getCenterXZ();
       const deltaX = origin.x - object3d.position.x;
       const deltaZ = origin.z - object3d.position.z;
-      rotation = Math.atan2(deltaX, deltaZ);
+      return {
+        rotation: Math.atan2(deltaX, deltaZ),
+        rotationVelocity: target.rotationVelocity,
+      };
     }
-    return {
-      rotation: rotation,
-      rotationVelocity: 0,
-    };
+    return target;
   };
   const getTargetPitch = (time, state, target) => {
-    let rotation = state.rotation;
     const distance = signedDistanceOutsideY();
     if (Math.abs(distance) > 0) {
-      rotation = THREE.MathUtils.clamp(2 * distance, -Math.PI / 2, Math.PI / 2);
+      return {
+        rotation: THREE.MathUtils.clamp(
+          2 * distance,
+          -Math.PI / 2,
+          Math.PI / 2
+        ),
+        rotationVelocity: target.rotationVelocity,
+      };
     }
-    return {
-      rotation: rotation,
-      rotationVelocity: 0,
-    };
+    return target;
   };
   return {
     getTargetYaw,
@@ -108,6 +110,43 @@ export function getStayWithinBoxMotion(object3d, center, sides) {
   );
 }
 
+export function noRotationVelocityMotion() {
+  const noRotationVelocity = (time, state, target) => {
+    return { rotation: state.rotation, rotationVelocity: 0 };
+  };
+  return {
+    getTargetYaw: noRotationVelocity,
+    getTargetPitch: noRotationVelocity,
+  };
+}
+
+export function identityMotion() {
+  const identityMotion = (time, state, target) => state;
+  return {
+    getTargetYaw: identityMotion,
+    getTargetPitch: identityMotion,
+  };
+}
+
+function chainTargetFunctions(targetFunctions) {
+  return (time, state, target) => {
+    const chainer = (reducedTarget, motion) =>
+      motion(time, state, reducedTarget);
+    return targetFunctions.reduce(chainer, target);
+  };
+}
+
+export function chainMotions(motions) {
+  return {
+    getTargetYaw: chainTargetFunctions(
+      motions.map((motion) => motion.getTargetYaw)
+    ),
+    getTargetPitch: chainTargetFunctions(
+      motions.map((motion) => motion.getTargetPitch)
+    ),
+  };
+}
+
 export function getMotionCallback(object3d, motion, gains, gui) {
   let direction = new THREE.Vector3();
   object3d.getWorldDirection(direction);
@@ -119,6 +158,8 @@ export function getMotionCallback(object3d, motion, gains, gui) {
     rotation: Math.asin(-direction.y / direction.length()),
     rotationVelocity: 0,
   };
+
+  motion = chainMotions([identityMotion(), noRotationVelocityMotion(), motion]);
 
   const yawController = new RotationController(
     initialYawState,
