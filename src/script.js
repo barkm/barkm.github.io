@@ -6,7 +6,7 @@ import * as dat from "dat.gui";
 
 import * as UTILS from "./js/utils";
 import * as THREE_UTILS from "./js/three/utils";
-import { Turtle } from "./js/three/models";
+import { Turtle } from "./js/three/turtle";
 
 const gui = new dat.GUI();
 gui.closed = true;
