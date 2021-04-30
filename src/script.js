@@ -5,6 +5,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as dat from "dat.gui";
 
 import * as UTILS from "./js/utils";
+import * as MOTION from "./js/motion/motion";
 import * as THREE_UTILS from "./js/three/utils";
 import { Turtle } from "./js/three/turtle";
 
@@ -21,16 +22,20 @@ turtleGui.addColor(turtleMaterialParameters, "color").onChange(() => {
   turtleMaterial.color.set(turtleMaterialParameters.color);
 });
 
+const box = new THREE.BoxGeometry(10, 10, 20);
+const mesh = new THREE.Mesh(
+  box,
+  new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true })
+);
+THREE_UTILS.addVisibilityToggle(turtleGui, mesh, scene, "boundary");
+
+const getMotion = (position) =>
+  MOTION.getStayWithinBoxMotion(position, mesh.position, box.parameters);
+
 const numTurtles = 10;
 const turtles = [];
 for (let i = 0; i < numTurtles; i++) {
-  turtles.push(
-    new Turtle(
-      scene,
-      turtleMaterial,
-      turtleGui.addFolder("turtle" + i.toString())
-    )
-  );
+  turtles.push(new Turtle(scene, turtleMaterial, getMotion));
 }
 
 const windowSizes = UTILS.getWindowSizes();

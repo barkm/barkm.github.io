@@ -9,11 +9,11 @@ import * as THREE_MOTION from "./motion";
 import turtleModel from "../../../models/turtle.glb";
 
 export class Turtle {
-  constructor(group, material, gui) {
+  constructor(group, material, getMotion) {
     this.group = group;
     this.material = material;
     this.material.skinning = true;
-    this.gui = gui;
+    this.getMotion = getMotion;
     this.model = null;
     this.mixer = null;
     this.swimCallback = null;
@@ -62,19 +62,7 @@ export class Turtle {
   }
 
   setupSwimming() {
-    const box = new THREE.BoxGeometry(10, 10, 20);
-    const mesh = new THREE.Mesh(
-      box,
-      new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true })
-    );
-    THREE_UTILS.addVisibilityToggle(this.gui, mesh, this.group, "boundary");
-
-    const motion = MOTION.getStayWithinBoxMotion(
-      this.model.position,
-      mesh.position,
-      box.parameters
-    );
-
+    const motion = this.getMotion(this.model.position);
     const initialRotations = THREE_MOTION.getInitialRotations(this.model);
     let gains = { rotation: 0.5, rotationVelocity: 2 };
     gains = { yaw: gains, pitch: gains };
