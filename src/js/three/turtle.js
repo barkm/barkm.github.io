@@ -76,12 +76,12 @@ export class Turtle {
     );
 
     const initialRotations = THREE_MOTION.getInitialRotations(this.model);
-    const gains = { rotation: 0.5, rotationVelocity: 2 };
+    let gains = { rotation: 0.5, rotationVelocity: 2 };
+    gains = { yaw: gains, pitch: gains };
     const motionCallback = MOTION.getMotionCallback(
       initialRotations,
       motion,
-      { yaw: gains, pitch: gains },
-      this.gui.addFolder("motion")
+      gains
     );
 
     this.swimCallback = (time) => {

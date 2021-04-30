@@ -73,11 +73,7 @@ function chainGetTargetRotations(getTargetRotations) {
   };
 }
 
-function getRotationController(initialRotation, getTargetRotation, gains, gui) {
-  if (gui) {
-    gui.add(gains, "rotation").min(0).max(5);
-    gui.add(gains, "rotationVelocity").min(0).max(5);
-  }
+function getRotationController(initialRotation, getTargetRotation, gains) {
   getTargetRotation = chainGetTargetRotations([
     getIdentityTarget,
     getNoRotationVelocityTarget,
@@ -86,23 +82,16 @@ function getRotationController(initialRotation, getTargetRotation, gains, gui) {
   return new RotationController(initialRotation, getTargetRotation, gains);
 }
 
-export function getMotionCallback(
-  initialRotation,
-  getTargetRotation,
-  gain,
-  gui
-) {
+export function getMotionCallback(initialRotation, getTargetRotation, gain) {
   const yawController = getRotationController(
     initialRotation.yaw,
     getTargetRotation.yaw,
-    gain.yaw,
-    gui ? gui.addFolder("gain.yaw") : null
+    gain.yaw
   );
   const pitchController = getRotationController(
     initialRotation.pitch,
     getTargetRotation.pitch,
-    gain.yaw,
-    gui ? gui.addFolder("gain.pitch") : null
+    gain.yaw
   );
   return (time) => ({
     yaw: yawController.update(time),
