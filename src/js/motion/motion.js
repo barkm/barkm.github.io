@@ -2,9 +2,9 @@ import * as THREE from "three";
 
 import { PositionController, RotationController } from "./control";
 
-function getStayWithinAreaYaw(position, isOutSideXZ, getCenterXZ) {
-  return (time, state, target) => {
-    if (isOutSideXZ()) {
+function getStayWithinAreaYaw(isOutSideXZ, getCenterXZ) {
+  return (time, position, state, target) => {
+    if (isOutSideXZ(position)) {
       const origin = getCenterXZ();
       const deltaX = origin.x - position.x;
       const deltaZ = origin.z - position.z;
@@ -18,8 +18,8 @@ function getStayWithinAreaYaw(position, isOutSideXZ, getCenterXZ) {
 }
 
 function getStayWithinYPitch(signedDistanceOutsideY) {
-  return (time, state, target) => {
-    const distance = signedDistanceOutsideY();
+  return (time, position, state, target) => {
+    const distance = signedDistanceOutsideY(position);
     if (Math.abs(distance) > 0) {
       return {
         rotation: THREE.MathUtils.clamp(
@@ -34,8 +34,8 @@ function getStayWithinYPitch(signedDistanceOutsideY) {
   };
 }
 
-export function getStayWithinBoxMotion(position, center, sides) {
-  const isOutsideXZ = () => {
+export function getStayWithinBoxMotion(center, sides) {
+  const isOutsideXZ = (position) => {
     return (
       Math.abs(position.x) > sides.width / 2 ||
       Math.abs(position.z) > sides.depth / 2
@@ -44,7 +44,7 @@ export function getStayWithinBoxMotion(position, center, sides) {
   const getCenterXZ = () => {
     return { x: center.x, z: center.z };
   };
-  const signedDistanceOutsideY = () => {
+  const signedDistanceOutsideY = (position) => {
     const distance = position.y - center.y;
     if (Math.abs(distance) > sides.height / 2) {
       return distance - (sides.height / 2) * Math.sign(position.y);
@@ -52,23 +52,23 @@ export function getStayWithinBoxMotion(position, center, sides) {
     return 0;
   };
   return {
-    yaw: getStayWithinAreaYaw(position, isOutsideXZ, getCenterXZ),
+    yaw: getStayWithinAreaYaw(isOutsideXZ, getCenterXZ),
     pitch: getStayWithinYPitch(signedDistanceOutsideY),
   };
 }
 
-function getNoRotationVelocityTarget(time, state, target) {
+function getNoRotationVelocityTarget(time, position, state, target) {
   return { rotation: state.rotation, rotationVelocity: 0 };
 }
 
-function getIdentityTarget(time, state, target) {
+function getIdentityTarget(time, position, state, target) {
   return state;
 }
 
 function chainGetTargetRotations(getTargetRotations) {
-  return (time, state, target) => {
+  return (time, position, state, target) => {
     const chainer = (reducedTarget, getTargetRotation) =>
-      getTargetRotation(time, state, reducedTarget);
+      getTargetRotation(time, position, state, reducedTarget);
     return getTargetRotations.reduce(chainer, target);
   };
 }
@@ -100,8 +100,8 @@ export function getMotionCallback(
     gain.yaw
   );
   return (time) => {
-    const yaw = yawController.update(time);
-    const pitch = pitchController.update(time);
+    const yaw = yawController.update(time, positionController.position);
+    const pitch = pitchController.update(time, positionController.position);
     return {
       position: positionController.update(time, yaw, pitch),
       yaw,

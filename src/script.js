@@ -29,9 +29,11 @@ const mesh = new THREE.Mesh(
 );
 THREE_UTILS.addVisibilityToggle(turtleGui, mesh, scene, "boundary");
 
-const getMotion = (position) =>
-  MOTION.getStayWithinBoxMotion(position, mesh.position, box.parameters);
-const turtle = new Turtle(scene, turtleMaterial, getMotion);
+const turtle = new Turtle(
+  scene,
+  turtleMaterial,
+  MOTION.getStayWithinBoxMotion(mesh.position, box.parameters)
+);
 
 const windowSizes = UTILS.getWindowSizes();
 

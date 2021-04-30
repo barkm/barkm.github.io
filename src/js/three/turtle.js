@@ -9,11 +9,11 @@ import * as THREE_MOTION from "./motion";
 import turtleModel from "../../../models/turtle.glb";
 
 export class Turtle {
-  constructor(group, material, getMotion) {
+  constructor(group, material, motion) {
     this.group = group;
     this.material = material;
     this.material.skinning = true;
-    this.getMotion = getMotion;
+    this.motion = motion;
     this.model = null;
     this.mixer = null;
     this.swimCallback = null;
@@ -62,17 +62,15 @@ export class Turtle {
   }
 
   setupSwimming() {
-    const motion = this.getMotion(this.model.position);
     const initialRotations = THREE_MOTION.getInitialRotations(this.model);
     let gains = { rotation: 0.5, rotationVelocity: 2 };
     gains = { yaw: gains, pitch: gains };
     const motionCallback = MOTION.getMotionCallback(
       this.model.position.clone(),
       initialRotations,
-      motion,
+      this.motion,
       gains
     );
-
     this.swimCallback = (time) => {
       const rotation = motionCallback(time);
       THREE_MOTION.updateObject(

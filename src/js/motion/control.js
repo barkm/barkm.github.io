@@ -22,8 +22,8 @@ export class RotationController {
     this.target = null;
     this.gains = gains;
   }
-  update(time) {
-    this.target = this.getTarget(time, this.state, this.target);
+  update(time, position) {
+    this.target = this.getTarget(time, position, this.state, this.target);
 
     let errorRotation = modulo(
       this.target.rotation - this.state.rotation,
