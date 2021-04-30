@@ -22,18 +22,20 @@ turtleGui.addColor(turtleMaterialParameters, "color").onChange(() => {
   turtleMaterial.color.set(turtleMaterialParameters.color);
 });
 
-const box = new THREE.BoxGeometry(5, 5, 5);
+const box = new THREE.BoxGeometry(7, 7, 7);
 const mesh = new THREE.Mesh(
   box,
   new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true })
 );
 THREE_UTILS.addVisibilityToggle(turtleGui, mesh, scene, "boundary");
 
-const turtle = new Turtle(
-  scene,
-  turtleMaterial,
-  MOTION.getStayWithinBoxMotion(mesh.position, box.parameters)
+const boxMotion = MOTION.getStayWithinBoxMotion(mesh.position, box.parameters);
+const perturbMotion = MOTION.perturbationMotion(
+  { yaw: 0.5 * Math.PI, pitch: 0.25 * Math.PI },
+  1
 );
+const motion = MOTION.chainMotions([perturbMotion, boxMotion]);
+const turtle = new Turtle(scene, turtleMaterial, motion);
 
 const windowSizes = UTILS.getWindowSizes();
 

@@ -1,5 +1,7 @@
 import * as THREE from "three";
 
+import * as UTILS from "../utils";
+
 import { PositionController, RotationController } from "./control";
 
 function getStayWithinAreaYaw(isOutSideXZ, getCenterXZ) {
@@ -57,12 +59,26 @@ export function getStayWithinBoxMotion(center, sides) {
   };
 }
 
-function getNoRotationVelocityTarget(time, position, state, target) {
-  return { rotation: state.rotation, rotationVelocity: 0 };
+function perturbeRotationTarget(maxPerturbation, interval) {
+  let lastUpdateTime = null;
+  return (time, position, state, target) => {
+    let rotation = target.rotation;
+    if (!lastUpdateTime || time.elapsedTime - lastUpdateTime > interval) {
+      lastUpdateTime = time.elapsedTime;
+      rotation += UTILS.randomUniform(-maxPerturbation, maxPerturbation);
+    }
+    return {
+      rotation: rotation,
+      rotationVelocity: target.rotationVelocity,
+    };
+  };
 }
 
-function getIdentityTarget(time, position, state, target) {
-  return state;
+export function perturbationMotion(maxPerturbation, interval) {
+  return {
+    yaw: perturbeRotationTarget(maxPerturbation.yaw, interval),
+    pitch: perturbeRotationTarget(maxPerturbation.pitch, interval),
+  };
 }
 
 function chainGetTargetRotations(getTargetRotations) {
@@ -73,13 +89,11 @@ function chainGetTargetRotations(getTargetRotations) {
   };
 }
 
-function getRotationController(initialRotation, getTargetRotation, gains) {
-  getTargetRotation = chainGetTargetRotations([
-    getIdentityTarget,
-    getNoRotationVelocityTarget,
-    getTargetRotation,
-  ]);
-  return new RotationController(initialRotation, getTargetRotation, gains);
+export function chainMotions(motions) {
+  return {
+    yaw: chainGetTargetRotations(motions.map((m) => m.yaw)),
+    pitch: chainGetTargetRotations(motions.map((m) => m.pitch)),
+  };
 }
 
 export function getMotionCallback(
@@ -89,15 +103,15 @@ export function getMotionCallback(
   gain
 ) {
   const positionController = new PositionController(intialPosition);
-  const yawController = getRotationController(
+  const yawController = new RotationController(
     initialRotation.yaw,
     getTargetRotation.yaw,
     gain.yaw
   );
-  const pitchController = getRotationController(
+  const pitchController = new RotationController(
     initialRotation.pitch,
     getTargetRotation.pitch,
-    gain.yaw
+    gain.pitch
   );
   return (time) => {
     const yaw = yawController.update(time, positionController.position);
