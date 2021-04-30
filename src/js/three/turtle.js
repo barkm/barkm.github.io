@@ -34,9 +34,9 @@ export class Turtle {
       this.group.add(gltf.scene);
 
       this.model.position.set(
-        UTILS.randomUniform(-5, 5),
-        UTILS.randomUniform(-5, 5),
-        UTILS.randomUniform(-10, 10)
+        UTILS.randomUniform(-2.5, 2.5),
+        UTILS.randomUniform(-2.5, 2.5),
+        UTILS.randomUniform(-2.5, 2.5)
       );
       this.model.rotation.y = UTILS.randomUniform(0, 2 * Math.PI);
       this.model.rotateX(UTILS.randomUniform(-Math.PI / 2, Math.PI / 2));
@@ -67,6 +67,7 @@ export class Turtle {
     let gains = { rotation: 0.5, rotationVelocity: 2 };
     gains = { yaw: gains, pitch: gains };
     const motionCallback = MOTION.getMotionCallback(
+      this.model.position.clone(),
       initialRotations,
       motion,
       gains
@@ -76,8 +77,7 @@ export class Turtle {
       const rotation = motionCallback(time);
       THREE_MOTION.updateObject(
         this.model,
-        time,
-        1,
+        rotation.position,
         rotation.yaw,
         rotation.pitch
       );

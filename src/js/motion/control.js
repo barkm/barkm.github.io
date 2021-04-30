@@ -1,5 +1,20 @@
 import { modulo } from "../utils";
 
+export class PositionController {
+  constructor(initialPosition) {
+    this.position = initialPosition;
+  }
+  update(time, yaw, pitch) {
+    const dx = Math.cos(pitch.rotation) * Math.sin(yaw.rotation);
+    const dy = Math.sin(pitch.rotation);
+    const dz = Math.cos(pitch.rotation) * Math.cos(yaw.rotation);
+    this.position.x += dx * time.deltaTime;
+    this.position.y -= dy * time.deltaTime;
+    this.position.z += dz * time.deltaTime;
+    return this.position;
+  }
+}
+
 export class RotationController {
   constructor(initialState, getTarget, gains) {
     this.getTarget = getTarget;

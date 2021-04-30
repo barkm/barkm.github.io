@@ -22,7 +22,7 @@ turtleGui.addColor(turtleMaterialParameters, "color").onChange(() => {
   turtleMaterial.color.set(turtleMaterialParameters.color);
 });
 
-const box = new THREE.BoxGeometry(10, 10, 20);
+const box = new THREE.BoxGeometry(5, 5, 5);
 const mesh = new THREE.Mesh(
   box,
   new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true })
@@ -31,12 +31,7 @@ THREE_UTILS.addVisibilityToggle(turtleGui, mesh, scene, "boundary");
 
 const getMotion = (position) =>
   MOTION.getStayWithinBoxMotion(position, mesh.position, box.parameters);
-
-const numTurtles = 10;
-const turtles = [];
-for (let i = 0; i < numTurtles; i++) {
-  turtles.push(new Turtle(scene, turtleMaterial, getMotion));
-}
+const turtle = new Turtle(scene, turtleMaterial, getMotion);
 
 const windowSizes = UTILS.getWindowSizes();
 
@@ -44,7 +39,7 @@ const camera = THREE_UTILS.getPerspectiveCamera(
   { fov: 60, near: 1, far: 50 },
   windowSizes
 );
-camera.position.set(0, 0, 15);
+camera.position.set(0, 0, 10);
 
 const cameraHelper = THREE_UTILS.getFixedCameraHelper(camera);
 THREE_UTILS.addVisibilityToggle(gui, cameraHelper, scene, "cameraHelper");
@@ -72,7 +67,7 @@ const update = THREE_UTILS.getUpdateFunction([
     renderer.render(scene, camera);
   },
   (time) => {
-    turtles.map((turtle) => turtle.update(time));
+    turtle.update(time);
   },
 ]);
 

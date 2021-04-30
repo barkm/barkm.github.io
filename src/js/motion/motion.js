@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { RotationController } from "./control";
+import { PositionController, RotationController } from "./control";
 
 function getStayWithinAreaYaw(position, isOutSideXZ, getCenterXZ) {
   return (time, state, target) => {
@@ -82,7 +82,13 @@ function getRotationController(initialRotation, getTargetRotation, gains) {
   return new RotationController(initialRotation, getTargetRotation, gains);
 }
 
-export function getMotionCallback(initialRotation, getTargetRotation, gain) {
+export function getMotionCallback(
+  intialPosition,
+  initialRotation,
+  getTargetRotation,
+  gain
+) {
+  const positionController = new PositionController(intialPosition);
   const yawController = getRotationController(
     initialRotation.yaw,
     getTargetRotation.yaw,
@@ -93,8 +99,13 @@ export function getMotionCallback(initialRotation, getTargetRotation, gain) {
     getTargetRotation.pitch,
     gain.yaw
   );
-  return (time) => ({
-    yaw: yawController.update(time),
-    pitch: pitchController.update(time),
-  });
+  return (time) => {
+    const yaw = yawController.update(time);
+    const pitch = pitchController.update(time);
+    return {
+      position: positionController.update(time, yaw, pitch),
+      yaw,
+      pitch,
+    };
+  };
 }
