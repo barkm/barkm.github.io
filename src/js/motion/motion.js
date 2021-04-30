@@ -59,6 +59,15 @@ export function getStayWithinBoxMotion(center, sides) {
   };
 }
 
+function clampRotationTarget(min, max) {
+  return (time, position, state, target) => {
+    return {
+      rotation: THREE.MathUtils.clamp(target.rotation, min, max),
+      rotationVelocity: target.rotationVelocity,
+    };
+  };
+}
+
 function perturbeRotationTarget(maxPerturbation, interval) {
   let lastUpdateTime = null;
   return (time, position, state, target) => {
@@ -110,7 +119,10 @@ export function getMotionCallback(
   );
   const pitchController = new RotationController(
     initialRotation.pitch,
-    getTargetRotation.pitch,
+    chainGetTargetRotations([
+      getTargetRotation.pitch,
+      clampRotationTarget(-Math.PI / 2, Math.PI / 2),
+    ]),
     gain.pitch
   );
   return (time) => {

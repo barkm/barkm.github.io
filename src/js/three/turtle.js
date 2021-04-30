@@ -3,7 +3,6 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import * as UTILS from "../utils";
 import * as MOTION from "../motion/motion";
-import * as THREE_UTILS from "./utils";
 import * as THREE_MOTION from "./motion";
 
 import turtleModel from "../../../models/turtle.glb";
