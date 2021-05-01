@@ -1,28 +1,39 @@
 import { modulo } from "../utils";
+import { Time } from "../three/utils";
+import { Position, Rotation, TargetFunction } from "./types";
 
 export class PositionController {
-  constructor(initialPosition) {
+  position: Position;
+  constructor(initialPosition: Position) {
     this.position = initialPosition;
   }
-  update(time, yaw, pitch) {
+  update(time: Time, yaw: Rotation, pitch: Rotation) {
     const dx = Math.cos(pitch.rotation) * Math.sin(yaw.rotation);
     const dy = Math.sin(pitch.rotation);
     const dz = Math.cos(pitch.rotation) * Math.cos(yaw.rotation);
-    this.position.x += dx * time.deltaTime;
-    this.position.y -= dy * time.deltaTime;
-    this.position.z += dz * time.deltaTime;
+    this.position.x += dx * time.delta;
+    this.position.y -= dy * time.delta;
+    this.position.z += dz * time.delta;
     return this.position;
   }
 }
 
 export class RotationController {
-  constructor(initialState, getTarget, gains) {
+  state: Rotation;
+  target: Rotation;
+  getTarget: TargetFunction;
+  gains: Rotation;
+  constructor(
+    initialState: Rotation,
+    getTarget: TargetFunction,
+    gains: Rotation
+  ) {
     this.getTarget = getTarget;
     this.state = initialState;
     this.target = this.state;
     this.gains = gains;
   }
-  update(time, position) {
+  update(time: Time, position: Position) {
     this.target = this.getTarget(time, position, this.state, this.target);
     let errorRotation = modulo(
       this.target.rotation - this.state.rotation,
@@ -40,8 +51,8 @@ export class RotationController {
       this.gains.rotationVelocity * errorRotationVelocity;
 
     this.state.rotationVelocity +=
-      time.deltaTime * (inputRotation + inputRotationVelocity);
-    this.state.rotation += time.deltaTime * this.state.rotationVelocity;
+      time.delta * (inputRotation + inputRotationVelocity);
+    this.state.rotation += time.delta * this.state.rotationVelocity;
 
     return this.state;
   }

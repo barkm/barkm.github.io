@@ -3,19 +3,29 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import * as UTILS from "../utils";
 import * as MOTION from "../motion/motion";
+import * as THREE_UTILS from "./utils";
 import * as THREE_MOTION from "./motion";
 
 import turtleModel from "../../../models/turtle.glb";
+import { Motion } from "../motion/types";
 
 export class Turtle {
-  constructor(group, material, motion) {
-    this.group = group;
+  groupOrScene: THREE_UTILS.GroupOrScene;
+  material: THREE.MeshBasicMaterial;
+  model?: THREE.Group;
+  mixer?: THREE.AnimationMixer;
+  motion: Motion;
+  swim?: (time: THREE_UTILS.Time) => void;
+
+  constructor(
+    groupOrScene: THREE_UTILS.GroupOrScene,
+    material: THREE.MeshBasicMaterial,
+    motion: Motion
+  ) {
+    this.groupOrScene = groupOrScene;
     this.material = material;
     this.material.skinning = true;
     this.motion = motion;
-    this.model = null;
-    this.mixer = null;
-    this.swimCallback = null;
     this.load();
   }
 
@@ -26,11 +36,11 @@ export class Turtle {
       this.mixer = new THREE.AnimationMixer(gltf.scene);
       this.mixer.clipAction(gltf.animations[1]).play();
       gltf.scene.traverse((obj) => {
-        if (obj.isMesh) {
+        if (obj instanceof THREE.Mesh) {
           obj.material = this.material;
         }
       });
-      this.group.add(gltf.scene);
+      this.groupOrScene.add(gltf.scene);
 
       this.model.position.set(
         UTILS.randomUniform(-2.5, 2.5),
@@ -43,40 +53,31 @@ export class Turtle {
     });
   }
 
-  update(time) {
-    this.animate(time);
-    this.swim(time);
-  }
-
-  animate(time) {
+  update(time: THREE_UTILS.Time) {
     if (this.mixer) {
-      this.mixer.update(time.deltaTime);
+      this.mixer.update(time.delta);
     }
-  }
-
-  swim(time) {
-    if (this.swimCallback) {
-      this.swimCallback(time);
+    if (this.swim) {
+      this.swim(time);
     }
   }
 
   setupSwimming() {
-    const initialRotations = THREE_MOTION.getInitialRotations(this.model);
-    let gains = { rotation: 0.5, rotationVelocity: 2 };
-    gains = { yaw: gains, pitch: gains };
+    const initialRotations = THREE_MOTION.getInitialRotations(this.model!);
+    const gain = { rotation: 0.5, rotationVelocity: 2 };
+    const gains = { yaw: gain, pitch: gain };
     const motionCallback = MOTION.getMotionCallback(
-      this.model.position.clone(),
+      this.model!.position.clone(),
       initialRotations,
       this.motion,
       gains
     );
-    this.swimCallback = (time) => {
-      const rotation = motionCallback(time);
+    this.swim = (time) => {
+      const motionState = motionCallback(time);
       THREE_MOTION.updateObject(
-        this.model,
-        rotation.position,
-        rotation.yaw,
-        rotation.pitch
+        this.model!,
+        motionState.position,
+        motionState.rotations
       );
     };
   }

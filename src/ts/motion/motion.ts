@@ -1,10 +1,25 @@
 import * as THREE from "three";
 
 import * as UTILS from "../utils";
+import { Time } from "../three/utils";
+import {
+  Motion,
+  Orientation,
+  Position,
+  Rotation,
+  TargetFunction,
+} from "./types";
 
 import { PositionController, RotationController } from "./control";
 
-function getStayWithinAreaYaw(isOutSideXZ, getCenterXZ) {
+interface CenterXZ {
+  x: number;
+  z: number;
+}
+function getStayWithinAreaYaw(
+  isOutSideXZ: (pos: Position) => boolean,
+  getCenterXZ: () => CenterXZ
+): TargetFunction {
   return (time, position, state, target) => {
     if (isOutSideXZ(position)) {
       const origin = getCenterXZ();
@@ -19,7 +34,9 @@ function getStayWithinAreaYaw(isOutSideXZ, getCenterXZ) {
   };
 }
 
-function getStayWithinYPitch(signedDistanceOutsideY) {
+function getStayWithinYPitch(
+  signedDistanceOutsideY: (pos: Position) => number
+): TargetFunction {
   return (time, position, state, target) => {
     const distance = signedDistanceOutsideY(position);
     if (Math.abs(distance) > 0) {
@@ -36,17 +53,22 @@ function getStayWithinYPitch(signedDistanceOutsideY) {
   };
 }
 
-export function getStayWithinBoxMotion(center, sides) {
-  const isOutsideXZ = (position) => {
+interface Sides {
+  width: number;
+  height: number;
+  depth: number;
+}
+export function getStayWithinBoxMotion(center: Position, sides: Sides): Motion {
+  const isOutsideXZ = (position: Position): boolean => {
     return (
       Math.abs(position.x) > sides.width / 2 ||
       Math.abs(position.z) > sides.depth / 2
     );
   };
-  const getCenterXZ = () => {
-    return { x: center.x, z: center.z };
+  const getCenterXZ = (): CenterXZ => {
+    return center;
   };
-  const signedDistanceOutsideY = (position) => {
+  const signedDistanceOutsideY = (position: Position) => {
     const distance = position.y - center.y;
     if (Math.abs(distance) > sides.height / 2) {
       return distance - (sides.height / 2) * Math.sign(position.y);
@@ -59,7 +81,7 @@ export function getStayWithinBoxMotion(center, sides) {
   };
 }
 
-function clampRotationTarget(min, max) {
+function clampRotationTarget(min: number, max: number): TargetFunction {
   return (time, position, state, target) => {
     return {
       rotation: THREE.MathUtils.clamp(target.rotation, min, max),
@@ -68,12 +90,15 @@ function clampRotationTarget(min, max) {
   };
 }
 
-function perturbeRotationTarget(maxPerturbation, interval) {
-  let lastUpdateTime = null;
+function perturbeRotationTarget(
+  maxPerturbation: number,
+  interval: number
+): TargetFunction {
+  let lastUpdateTime: number | null = null;
   return (time, position, state, target) => {
     let rotation = target.rotation;
-    if (!lastUpdateTime || time.elapsedTime - lastUpdateTime > interval) {
-      lastUpdateTime = time.elapsedTime;
+    if (!lastUpdateTime || time.elapsed - lastUpdateTime > interval) {
+      lastUpdateTime = time.elapsed;
       rotation += UTILS.randomUniform(-maxPerturbation, maxPerturbation);
     }
     return {
@@ -83,22 +108,29 @@ function perturbeRotationTarget(maxPerturbation, interval) {
   };
 }
 
-export function perturbationMotion(maxPerturbation, interval) {
+export function perturbationMotion(
+  maxPerturbation: Orientation<number>,
+  interval: number
+): Motion {
   return {
     yaw: perturbeRotationTarget(maxPerturbation.yaw, interval),
     pitch: perturbeRotationTarget(maxPerturbation.pitch, interval),
   };
 }
 
-function chainGetTargetRotations(getTargetRotations) {
+function chainGetTargetRotations(
+  getTargetRotations: Array<TargetFunction>
+): TargetFunction {
   return (time, position, state, target) => {
-    const chainer = (reducedTarget, getTargetRotation) =>
-      getTargetRotation(time, position, state, reducedTarget);
+    const chainer = (
+      reducedTarget: Rotation,
+      getTargetRotation: TargetFunction
+    ) => getTargetRotation(time, position, state, reducedTarget);
     return getTargetRotations.reduce(chainer, target);
   };
 }
 
-export function chainMotions(motions) {
+export function chainMotions(motions: Array<Motion>): Motion {
   return {
     yaw: chainGetTargetRotations(motions.map((m) => m.yaw)),
     pitch: chainGetTargetRotations(motions.map((m) => m.pitch)),
@@ -106,11 +138,11 @@ export function chainMotions(motions) {
 }
 
 export function getMotionCallback(
-  intialPosition,
-  initialRotation,
-  getTargetRotation,
-  gain
-) {
+  intialPosition: Position,
+  initialRotation: Orientation<Rotation>,
+  getTargetRotation: Orientation<TargetFunction>,
+  gain: Orientation<Rotation>
+): (t: Time) => { position: Position; rotations: Orientation<Rotation> } {
   const positionController = new PositionController(intialPosition);
   const yawController = new RotationController(
     initialRotation.yaw,
@@ -130,8 +162,7 @@ export function getMotionCallback(
     const pitch = pitchController.update(time, positionController.position);
     return {
       position: positionController.update(time, yaw, pitch),
-      yaw,
-      pitch,
+      rotations: { yaw, pitch },
     };
   };
 }
