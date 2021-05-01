@@ -3,8 +3,6 @@ import * as dat from "dat.gui";
 
 import * as UTILS from "../utils";
 
-export type GroupOrScene = THREE.Group | THREE.Scene;
-
 export function getPerspectiveCamera(
   fov: number,
   near: number,
@@ -38,18 +36,18 @@ export function getFixedCameraHelper(camera: THREE.Camera): THREE.CameraHelper {
 export function addVisibilityToggle(
   gui: dat.GUI,
   object3d: THREE.Object3D,
-  groupOrScene: GroupOrScene,
+  parent: THREE.Group | THREE.Scene,
   name: string
 ): void {
   const toggle = () => {
-    if (object3d.parent == groupOrScene) {
-      groupOrScene.remove(object3d);
+    if (object3d.parent == parent) {
+      parent.remove(object3d);
     } else {
-      groupOrScene.add(object3d);
+      parent.add(object3d);
     }
   };
   gui
-    .add({ show: object3d.parent == groupOrScene }, "show")
+    .add({ show: object3d.parent == parent }, "show")
     .name(name)
     .onChange(toggle);
 }

@@ -21,12 +21,10 @@ export class PositionController {
 export class RotationController {
   state: Rotation;
   target: Rotation;
-  getTarget: TargetFunction;
-  gains: Rotation;
   constructor(
     initialState: Rotation,
-    getTarget: TargetFunction,
-    gains: Rotation
+    public getTarget: TargetFunction,
+    public gains: Rotation
   ) {
     this.getTarget = getTarget;
     this.state = initialState;

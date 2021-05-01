@@ -10,19 +10,16 @@ import turtleModel from "../../../models/turtle.glb";
 import { Motion } from "../motion/types";
 
 export class Turtle {
-  groupOrScene: THREE_UTILS.GroupOrScene;
-  material: THREE.MeshBasicMaterial;
   model?: THREE.Group;
   mixer?: THREE.AnimationMixer;
-  motion: Motion;
   swim?: (time: THREE_UTILS.Time) => void;
 
   constructor(
-    groupOrScene: THREE_UTILS.GroupOrScene,
-    material: THREE.MeshBasicMaterial,
-    motion: Motion
+    public parent: THREE.Group | THREE.Scene,
+    public material: THREE.MeshBasicMaterial,
+    public motion: Motion
   ) {
-    this.groupOrScene = groupOrScene;
+    this.parent = parent;
     this.material = material;
     this.material.skinning = true;
     this.motion = motion;
@@ -40,7 +37,7 @@ export class Turtle {
           obj.material = this.material;
         }
       });
-      this.groupOrScene.add(gltf.scene);
+      this.parent.add(gltf.scene);
 
       this.model.position.set(
         UTILS.randomUniform(-2.5, 2.5),
