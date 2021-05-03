@@ -16,10 +16,12 @@ export class Turtle {
 
   constructor(
     public parent: THREE.Group | THREE.Scene,
+    public position: THREE.Vector3,
     public material: THREE.MeshBasicMaterial,
     public motion: Motion
   ) {
     this.parent = parent;
+    this.position = position;
     this.material = material;
     this.material.skinning = true;
     this.motion = motion;
@@ -40,9 +42,9 @@ export class Turtle {
       this.parent.add(gltf.scene);
 
       this.model.position.set(
-        UTILS.randomUniform(-2.5, 2.5),
-        UTILS.randomUniform(-2.5, 2.5),
-        UTILS.randomUniform(-2.5, 2.5)
+        this.position.x,
+        this.position.y,
+        this.position.z
       );
       this.model.rotation.y = UTILS.randomUniform(0, 2 * Math.PI);
       this.model.rotateX(UTILS.randomUniform(-Math.PI / 2, Math.PI / 2));

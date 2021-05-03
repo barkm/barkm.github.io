@@ -27,6 +27,11 @@ module.exports = {
         use: [MiniCSSExtractPlugin.loader, "css-loader"],
       },
       {
+        test: /\.glsl$/,
+        exclude: /node_modules/,
+        use: ["raw-loader"],
+      },
+      {
         test: /\.glb$/,
         type: "asset/resource",
         generator: {
