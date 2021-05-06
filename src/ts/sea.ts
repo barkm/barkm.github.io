@@ -14,10 +14,11 @@ function getSurface(geometry: THREE.PlaneGeometry) {
     uniforms: {
       uTime: { value: 0 },
     },
+    transparent: true,
   });
   const surface = new THREE.Mesh(geometry, material);
   surface.position.z = -15;
-  surface.rotation.x = -Math.PI / 2;
+  surface.rotation.x = Math.PI / 2;
   return surface;
 }
 
@@ -25,11 +26,11 @@ export function addSurface(
   scene: THREE.Scene,
   gui: dat.GUI
 ): (t: THREE_UTILS.Time) => void {
-  const surfaceGeometry = new THREE.PlaneGeometry(40, 50, 64, 64);
+  const surfaceGeometry = new THREE.PlaneGeometry(40, 50, 32, 32);
 
   const surfaceBackground = getSurface(surfaceGeometry);
   surfaceBackground.material.uniforms.uColor = {
-    value: new THREE.Color("#ffffff"),
+    value: new THREE.Color("#8888ff"),
   };
   surfaceBackground.position.y += 0.05;
   scene.add(surfaceBackground);

@@ -59,7 +59,7 @@ export function getRenderer(windowSize: UTILS.WindowSize): THREE.WebGLRenderer {
     canvas.className = "webgl";
     document.body.appendChild(canvas);
   }
-  const renderer = new THREE.WebGLRenderer({ canvas: canvas });
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
   renderer.setSize(windowSize.width, windowSize.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   window.addEventListener("resize", () => {

@@ -40,8 +40,6 @@ controls.target.set(0, -3, 0);
 controls.saveState();
 controls.update();
 
-console.log(controls.target);
-
 const axesHelper = new THREE.AxesHelper();
 THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axesHelper");
 
