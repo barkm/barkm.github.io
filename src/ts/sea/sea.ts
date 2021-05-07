@@ -27,7 +27,7 @@ class Subscribable<Type> {
   }
 }
 export interface SeaParameters {
-  seaColor: Subscribable<string>;
+  color: Subscribable<string>;
   visibility: {
     min: Subscribable<number>;
     max: Subscribable<number>;
@@ -40,16 +40,16 @@ export function addSea(
   gui: dat.GUI
 ): (time: Time) => void {
   const parameters: SeaParameters = {
-    seaColor: new Subscribable("#ffffff"),
+    color: new Subscribable("#ffffff"),
     visibility: { min: new Subscribable(5.0), max: new Subscribable(30.0) },
   };
 
-  renderer.setClearColor(parameters.seaColor.value);
-  parameters.seaColor.subscribe((v) => {
+  renderer.setClearColor(parameters.color.value);
+  parameters.color.subscribe((v) => {
     renderer.setClearColor(v);
   });
 
-  gui.addColor(parameters.seaColor, "value").name("color");
+  gui.addColor(parameters.color, "value").name("color");
   const visibilityGui = gui.addFolder("visibility");
   visibilityGui
     .add(parameters.visibility.min, "value")

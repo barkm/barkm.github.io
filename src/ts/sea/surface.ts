@@ -16,7 +16,7 @@ function getSurface(
     fragmentShader: surfaceFragmentShader,
     uniforms: {
       uTime: { value: 0 },
-      uSeaColor: { value: new THREE.Color(seaParameters.seaColor.value) },
+      uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
       uMinVisibility: { value: seaParameters.visibility.min.value },
       uMaxVisibility: { value: seaParameters.visibility.max.value },
     },
@@ -26,7 +26,7 @@ function getSurface(
   surface.position.z = -15;
   surface.rotation.x = Math.PI / 2;
 
-  seaParameters.seaColor.subscribe((v) => {
+  seaParameters.color.subscribe((v) => {
     material.uniforms.uSeaColor.value = new THREE.Color(v);
   });
   seaParameters.visibility.min.subscribe((v) => {

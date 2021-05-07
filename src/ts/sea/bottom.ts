@@ -33,7 +33,7 @@ export function addBottom(
         uCausticScale: { value: 10.0 },
         uCausticIterations: { value: 3 },
         uTime: { value: 0 },
-        uSeaColor: { value: new THREE.Color(seaParameters.seaColor.value) },
+        uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
       },
     })
   );
@@ -41,7 +41,7 @@ export function addBottom(
   bottom.position.y = -8;
   scene.add(bottom);
 
-  seaParameters.seaColor.subscribe((v) => {
+  seaParameters.color.subscribe((v) => {
     bottom.material.uniforms.uSeaColor.value = new THREE.Color(v);
   });
   seaParameters.visibility.min.subscribe((v) => {
