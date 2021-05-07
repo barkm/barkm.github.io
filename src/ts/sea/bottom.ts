@@ -23,8 +23,8 @@ export function addBottom(
       vertexShader: bottomVertexShader,
       fragmentShader: bottomFragmentShader,
       uniforms: {
-        uMinVisibility: { value: seaParameters.visibility.min },
-        uMaxVisibility: { value: seaParameters.visibility.max },
+        uMinVisibility: { value: seaParameters.visibility.min.value },
+        uMaxVisibility: { value: seaParameters.visibility.max.value },
         uBottomColor: { value: new THREE.Color(parameters.bottomColor) },
         uCausticColor: { value: new THREE.Color(parameters.causticsColor) },
         uCausticStrength: { value: 3.0 },
@@ -33,13 +33,23 @@ export function addBottom(
         uCausticScale: { value: 10.0 },
         uCausticIterations: { value: 3 },
         uTime: { value: 0 },
-        uSeaColor: { value: new THREE.Color(seaParameters.seaColor) },
+        uSeaColor: { value: new THREE.Color(seaParameters.seaColor.value) },
       },
     })
   );
   bottom.rotation.x = -Math.PI / 2;
   bottom.position.y = -8;
   scene.add(bottom);
+
+  seaParameters.seaColor.subscribe((v) => {
+    bottom.material.uniforms.uSeaColor.value = new THREE.Color(v);
+  });
+  seaParameters.visibility.min.subscribe((v) => {
+    bottom.material.uniforms.uMinVisibility.value = v;
+  });
+  seaParameters.visibility.max.subscribe((v) => {
+    bottom.material.uniforms.uMaxVisibility.value = v;
+  });
 
   gui
     .addColor(parameters, "bottomColor")
@@ -91,13 +101,6 @@ export function addBottom(
     .name("scale");
 
   return (time) => {
-    bottom.material.uniforms.uSeaColor.value = new THREE.Color(
-      seaParameters.seaColor
-    );
-    bottom.material.uniforms.uMinVisibility.value =
-      seaParameters.visibility.min;
-    bottom.material.uniforms.uMaxVisibility.value =
-      seaParameters.visibility.max;
     bottom.material.uniforms.uTime.value = time.elapsed;
   };
 }

@@ -16,15 +16,26 @@ function getSurface(
     fragmentShader: surfaceFragmentShader,
     uniforms: {
       uTime: { value: 0 },
-      uSeaColor: { value: new THREE.Color(seaParameters.seaColor) },
-      uMinVisibility: { value: seaParameters.visibility.min },
-      uMaxVisibility: { value: seaParameters.visibility.max },
+      uSeaColor: { value: new THREE.Color(seaParameters.seaColor.value) },
+      uMinVisibility: { value: seaParameters.visibility.min.value },
+      uMaxVisibility: { value: seaParameters.visibility.max.value },
     },
     transparent: true,
   });
   const surface = new THREE.Mesh(geometry, material);
   surface.position.z = -15;
   surface.rotation.x = Math.PI / 2;
+
+  seaParameters.seaColor.subscribe((v) => {
+    material.uniforms.uSeaColor.value = new THREE.Color(v);
+  });
+  seaParameters.visibility.min.subscribe((v) => {
+    material.uniforms.uMinVisibility.value = v;
+  });
+  seaParameters.visibility.max.subscribe((v) => {
+    material.uniforms.uMaxVisibility.value = v;
+  });
+
   return surface;
 }
 
@@ -66,23 +77,6 @@ export function addSurface(
   });
 
   return (time) => {
-    surfaceBackground.material.uniforms.uSeaColor.value = new THREE.Color(
-      seaParameters.seaColor
-    );
-    surfaceForeGround.material.uniforms.uSeaColor.value = new THREE.Color(
-      seaParameters.seaColor
-    );
-
-    surfaceBackground.material.uniforms.uMinVisibility.value =
-      seaParameters.visibility.min;
-    surfaceForeGround.material.uniforms.uMinVisibility.value =
-      seaParameters.visibility.min;
-
-    surfaceBackground.material.uniforms.uMaxVisibility.value =
-      seaParameters.visibility.max;
-    surfaceForeGround.material.uniforms.uMaxVisibility.value =
-      seaParameters.visibility.max;
-
     surfaceBackground.material.uniforms.uTime.value = time.elapsed;
     surfaceForeGround.material.uniforms.uTime.value = time.elapsed;
   };
