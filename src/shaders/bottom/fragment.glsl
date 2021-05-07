@@ -1,34 +1,40 @@
 #pragma glslify: simplexNoise = require(glsl-noise/simplex/3d) 
 
-uniform vec3 uColor;
+uniform vec3 uBottomColor;
+uniform vec3 uCausticColor;
+uniform float uCausticStrength;
+uniform float uCausticOffset;
+uniform float uCausticScale;
+uniform float uCausticSpeed;
+uniform int uCausticIterations;
+uniform vec3 uSeaColor;
 uniform float uTime;
 
 varying vec2 vUv;
 varying float vVisibility;
 
-float getCausticsMultiplier(vec2 coord, float time) {
-    float caustics = simplexNoise(vec3(coord, time));
-    caustics = abs(caustics);
-    caustics = 1.0 - caustics;
-    caustics = pow(caustics, 2.0);
-    return caustics;
+float getCausticMultiplier(vec2 coord, float time) {
+    float caustic = simplexNoise(vec3(coord, time));
+    caustic = abs(caustic);
+    caustic = 1.0 - caustic;
+    caustic = pow(caustic, 2.0);
+    return caustic;
 }
 
-float getCaustics(vec2 coord, float time, int iterations, float timeOffset) {
-    float caustics = 1.0;
+float getCaustic(vec2 coord, float time, int iterations, float timeOffset) {
+    float caustic = 1.0;
     for (int i = 0; i < iterations; i++) {
-        caustics *= getCausticsMultiplier(coord, timeOffset * float(i) + time);
+        caustic *= getCausticMultiplier(coord, timeOffset * float(i) + time);
     }
-    return caustics;
+    return caustic;
 }
 
 void main() {
 
-    float caustics = 2.0 * getCaustics(10.0 * vUv, 0.05 * uTime, 3, 100.0);
+    float caustic = uCausticStrength * getCaustic(uCausticScale * (vUv - 0.5), uCausticSpeed * uTime, uCausticIterations, uCausticOffset);
 
-    const vec3 waterColor = vec3(1.0);
-    vec3 color = mix(waterColor, uColor, caustics);
-    color = mix(waterColor, color, vVisibility);
+    vec3 color = mix(uBottomColor, uCausticColor, caustic);
+    color = mix(uSeaColor, color, vVisibility);
 
     gl_FragColor = vec4(color, 1.0);
 }

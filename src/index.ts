@@ -18,13 +18,10 @@ const windowSize = UTILS.getWindowSize();
 const camera = THREE_UTILS.getPerspectiveCamera(60, 1, 50, windowSize);
 camera.position.set(0, -3, 10);
 
-const updateSea = addSea(scene, gui);
-
 const cameraHelper = THREE_UTILS.getFixedCameraHelper(camera);
 THREE_UTILS.addVisibilityToggle(gui, cameraHelper, scene, "cameraHelper");
 
 const renderer = THREE_UTILS.getRenderer(windowSize);
-renderer.setClearColor(0xffffff);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enabled = false;
@@ -40,6 +37,8 @@ controls.update();
 
 const axesHelper = new THREE.AxesHelper();
 THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axesHelper");
+
+const updateSea = addSea(renderer, scene, gui.addFolder("sea"));
 
 const update = THREE_UTILS.getUpdate([
   () => {
