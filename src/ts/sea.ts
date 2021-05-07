@@ -6,6 +6,8 @@ import { Turtle } from "./three/turtle";
 
 import surfaceVertexShader from "../shaders/surface/vertex.glsl";
 import surfaceFragmentShader from "../shaders/surface/fragment.glsl";
+import bottomVertexShader from "../shaders/bottom/vertex.glsl";
+import bottomFragmentShader from "../shaders/bottom/fragment.glsl";
 
 function getSurface(geometry: THREE.PlaneGeometry) {
   const material = new THREE.ShaderMaterial({
@@ -45,6 +47,26 @@ export function addSurface(
   return (time) => {
     surfaceBackground.material.uniforms.uTime.value = time.elapsed;
     surfaceForeGround.material.uniforms.uTime.value = time.elapsed;
+  };
+}
+
+export function addBottom(scene: THREE.Scene): (t: THREE_UTILS.Time) => void {
+  const bottom = new THREE.Mesh(
+    new THREE.PlaneGeometry(40, 50),
+    new THREE.ShaderMaterial({
+      vertexShader: bottomVertexShader,
+      fragmentShader: bottomFragmentShader,
+      uniforms: {
+        uColor: { value: new THREE.Color("blue") },
+        uTime: { value: 0 },
+      },
+    })
+  );
+  bottom.rotation.x = -Math.PI / 2;
+  bottom.position.y = -8;
+  scene.add(bottom);
+  return (time) => {
+    bottom.material.uniforms.uTime.value = time.elapsed;
   };
 }
 
