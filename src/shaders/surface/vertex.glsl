@@ -1,9 +1,11 @@
+#pragma glslify: fogLinear = require(glsl-fog/linear)
+
 uniform float uTime;
 
 varying float vVisibility;
 
 float getVisibility(const float dist, const float minDist, const float maxDist) {
-  return clamp((maxDist - dist) / (maxDist - minDist), 0.0, 1.0);
+  return 1.0 - fogLinear(dist, minDist, maxDist);
 }
 
 void main() {
@@ -17,5 +19,5 @@ void main() {
     gl_Position = projectedPosition;
 
     float distanceFromCamera = distance(modelPosition.xyz, cameraPosition);
-    vVisibility = getVisibility(0.3 * distanceFromCamera, 1.0, 6.0);
+    vVisibility = 1.0 - fogLinear(0.3 * distanceFromCamera, 1.0, 6.0);
 }
