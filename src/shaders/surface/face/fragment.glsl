@@ -1,13 +1,11 @@
 uniform vec3 uSeaColor;
 uniform vec3 uSkyColor;
-uniform float uIndicesOfRefractionRatio;
 
 varying float vVisibility;
-varying vec3 vModelPosition;
+varying vec3 vRefraction;
 
 void main() {
-    vec3 indicent = normalize(vModelPosition - cameraPosition);
-    vec3 refraction = refract(indicent, vec3(0.0, 1.0, 0.0), uIndicesOfRefractionRatio);
+    vec3 refraction = vRefraction;
     float totalReflection = 1.0 - length(refraction);
 
     vec3 color = mix(uSkyColor, uSeaColor, totalReflection);
