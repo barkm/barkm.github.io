@@ -2,26 +2,18 @@ import * as THREE from "three";
 
 import * as THREE_UTILS from "../three/utils";
 
-import surfaceVertexShader from "../../shaders/surface/vertex.glsl";
-import surfaceFragmentShader from "../../shaders/surface/fragment.glsl";
+import surfaceFaceVertexShader from "../../shaders/surface/face/vertex.glsl";
+import surfaceFaceFragmentShader from "../../shaders/surface/face/fragment.glsl";
+import surfaceEdgeVertexShader from "../../shaders/surface/edge/vertex.glsl";
+import surfaceEdgeFragmentShader from "../../shaders/surface/edge/fragment.glsl";
 
 import { SeaParameters } from "./sea";
 
 function getSurface(
   seaParameters: SeaParameters,
+  material: THREE.ShaderMaterial,
   geometry: THREE.PlaneGeometry
 ) {
-  const material = new THREE.ShaderMaterial({
-    vertexShader: surfaceVertexShader,
-    fragmentShader: surfaceFragmentShader,
-    uniforms: {
-      uTime: { value: 0 },
-      uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
-      uMinVisibility: { value: seaParameters.visibility.min.value },
-      uMaxVisibility: { value: seaParameters.visibility.max.value },
-    },
-    transparent: true,
-  });
   const surface = new THREE.Mesh(geometry, material);
   surface.position.z = -15;
   surface.rotation.x = Math.PI / 2;
@@ -39,45 +31,94 @@ function getSurface(
   return surface;
 }
 
+function getFaces(
+  seaParameters: SeaParameters,
+  surfaceGeometry: THREE.PlaneGeometry,
+  gui: dat.GUI
+) {
+  const parameters = {
+    skyColor: "#ffffff",
+  };
+  const faceMaterial = new THREE.ShaderMaterial({
+    vertexShader: surfaceFaceVertexShader,
+    fragmentShader: surfaceFaceFragmentShader,
+    uniforms: {
+      uTime: { value: 0 },
+      uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
+      uSkyColor: { value: new THREE.Color(parameters.skyColor) },
+      uIndicesOfRefractionRatio: {
+        value: 1.05,
+      },
+      uMinVisibility: { value: seaParameters.visibility.min.value },
+      uMaxVisibility: { value: seaParameters.visibility.max.value },
+    },
+  });
+  const faces = getSurface(seaParameters, faceMaterial, surfaceGeometry);
+  faces.position.y += 0.05;
+
+  gui.addColor(parameters, "skyColor").onChange(() => {
+    faces.material.uniforms.uSkyColor.value = new THREE.Color(
+      parameters.skyColor
+    );
+  });
+  gui
+    .add(faces.material.uniforms.uIndicesOfRefractionRatio, "value")
+    .min(1.0)
+    .max(1.5)
+    .step(0.01)
+    .name("refraction ratio");
+
+  return faces;
+}
+
+function getEdges(
+  seaParameters: SeaParameters,
+  surfaceGeometry: THREE.PlaneGeometry,
+  gui: dat.GUI
+) {
+  const parameters = {
+    skyColor: "#ffffff",
+    edgeColor: "#0000ff",
+  };
+  const edgeMaterial = new THREE.ShaderMaterial({
+    vertexShader: surfaceEdgeVertexShader,
+    fragmentShader: surfaceEdgeFragmentShader,
+    uniforms: {
+      uTime: { value: 0 },
+      uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
+      uEdgeColor: { value: new THREE.Color(parameters.edgeColor) },
+      uMinVisibility: { value: seaParameters.visibility.min.value },
+      uMaxVisibility: { value: seaParameters.visibility.max.value },
+    },
+    wireframe: true,
+  });
+  const edges = getSurface(seaParameters, edgeMaterial, surfaceGeometry);
+
+  gui.addColor(parameters, "edgeColor").onChange(() => {
+    edges.material.uniforms.uEdgeColor.value = new THREE.Color(
+      parameters.edgeColor
+    );
+  });
+
+  return edges;
+}
+
 export function addSurface(
   seaParameters: SeaParameters,
   scene: THREE.Scene,
   gui: dat.GUI
 ): (t: THREE_UTILS.Time) => void {
-  const parameters = {
-    faceColor: "#8888ff",
-    edgeColor: "#0000ff",
-  };
-
   const surfaceGeometry = new THREE.PlaneGeometry(40, 50, 32, 32);
 
-  const surfaceBackground = getSurface(seaParameters, surfaceGeometry);
-  surfaceBackground.material.uniforms.uColor = {
-    value: new THREE.Color(parameters.faceColor),
-  };
-  surfaceBackground.position.y += 0.05;
-  scene.add(surfaceBackground);
+  const faces = getFaces(seaParameters, surfaceGeometry, gui);
+  scene.add(faces);
 
-  const surfaceForeGround = getSurface(seaParameters, surfaceGeometry);
-  surfaceForeGround.material.wireframe = true;
-  surfaceForeGround.material.uniforms.uColor = {
-    value: new THREE.Color(parameters.edgeColor),
-  };
-  scene.add(surfaceForeGround);
-
-  gui.addColor(parameters, "faceColor").onChange(() => {
-    surfaceBackground.material.uniforms.uColor.value = new THREE.Color(
-      parameters.faceColor
-    );
-  });
-  gui.addColor(parameters, "edgeColor").onChange(() => {
-    surfaceForeGround.material.uniforms.uColor.value = new THREE.Color(
-      parameters.edgeColor
-    );
-  });
+  const edges = getEdges(seaParameters, surfaceGeometry, gui);
+  THREE_UTILS.addVisibilityToggle(gui, edges, scene, "edges");
+  scene.add(edges);
 
   return (time) => {
-    surfaceBackground.material.uniforms.uTime.value = time.elapsed;
-    surfaceForeGround.material.uniforms.uTime.value = time.elapsed;
+    faces.material.uniforms.uTime.value = time.elapsed;
+    edges.material.uniforms.uTime.value = time.elapsed;
   };
 }

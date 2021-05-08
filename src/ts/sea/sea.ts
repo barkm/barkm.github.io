@@ -40,7 +40,7 @@ export function addSea(
   gui: dat.GUI
 ): (time: Time) => void {
   const parameters: SeaParameters = {
-    color: new Subscribable("#ffffff"),
+    color: new Subscribable("#7696ff"),
     visibility: { min: new Subscribable(5.0), max: new Subscribable(30.0) },
   };
 
