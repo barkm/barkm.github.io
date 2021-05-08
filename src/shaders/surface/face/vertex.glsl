@@ -5,7 +5,6 @@ uniform float uMinVisibility;
 uniform float uMaxVisibility;
 
 varying float vVisibility;
-varying float vDisplacement;
 varying vec3 vModelPosition;
 
 float getVisibility(const vec3 pos) {
