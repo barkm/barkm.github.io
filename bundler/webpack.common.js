@@ -30,7 +30,7 @@ module.exports = {
         test: /\.glsl$/,
         exclude: /node_modules/,
         type: "asset/source",
-        use: ["glslify-loader"],
+        use: ["glslify-loader", "webpack-glsl-loader"],
       },
       {
         test: /\.glb$/,
