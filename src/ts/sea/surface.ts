@@ -46,9 +46,6 @@ function getFaces(
       uTime: { value: 0 },
       uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
       uSkyColor: { value: new THREE.Color(parameters.skyColor) },
-      uIndicesOfRefractionRatio: {
-        value: 1.05,
-      },
       uMinVisibility: { value: seaParameters.visibility.min.value },
       uMaxVisibility: { value: seaParameters.visibility.max.value },
     },
@@ -61,12 +58,6 @@ function getFaces(
       parameters.skyColor
     );
   });
-  gui
-    .add(faces.material.uniforms.uIndicesOfRefractionRatio, "value")
-    .min(1.0)
-    .max(1.5)
-    .step(0.01)
-    .name("refraction ratio");
 
   return faces;
 }

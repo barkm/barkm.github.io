@@ -1,11 +1,13 @@
+#define REFRACTIVE_INDEX_WATER 1.333
+
 #pragma glslify: faceNormal = require('glsl-face-normal')
 
 uniform vec3 uBottomColor;
 uniform vec3 uCausticColor;
 uniform float uCausticStrength;
 uniform vec3 uSeaColor;
-uniform float uIndicesOfRefractionRatio;
 uniform float uTime;
+uniform float uDistanceToSurface;
 
 varying float vVisibility;
 varying vec3 vModelPosition;
@@ -31,13 +33,13 @@ vec3 getNormal(){
 vec3 getRefraction() {
     vec3 normal = getNormal();
     vec3 incident = vec3(0.0, -1.0, 0.0);
-    return refract(incident, normal, 0.9);
+    return refract(incident, normal, 1.0 / REFRACTIVE_INDEX_WATER);
 }
 
 vec3 getRefractedPosition() {
     vec3 refraction = 1.0 * getRefraction();
     vec3 position = vModelPosition;
-    position.xz += refraction.xz;
+    position.xz += (uDistanceToSurface / refraction.y) * refraction.xz;
     return position;
 }
 

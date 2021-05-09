@@ -1,8 +1,9 @@
+#define REFRACTIVE_INDEX_WATER 1.333
+
 #pragma glslify: faceNormal = require('glsl-face-normal')
 
 uniform vec3 uSeaColor;
 uniform vec3 uSkyColor;
-uniform float uIndicesOfRefractionRatio;
 
 varying float vVisibility;
 varying vec3 vModelPosition;
@@ -10,7 +11,7 @@ varying vec3 vModelPosition;
 vec3 getRefaction() {
     vec3 normal = faceNormal(vModelPosition);
     vec3 incident = normalize(vModelPosition - cameraPosition);
-    return refract(incident, normal, uIndicesOfRefractionRatio);
+    return refract(incident, normal, REFRACTIVE_INDEX_WATER);
 }
 
 void main() {

@@ -9,6 +9,7 @@ export function getRefractionMaterial(gui: dat.GUI): THREE.ShaderMaterial {
     fragmentShader: fragmentShader,
     uniforms: {
       uCausticStrength: { value: 0.5 },
+      uDistanceToSurface: { value: 2.0 },
     },
     extensions: {
       derivatives: true,
@@ -21,6 +22,12 @@ export function getRefractionMaterial(gui: dat.GUI): THREE.ShaderMaterial {
     .max(1)
     .step(0.01)
     .name("strength");
+  gui
+    .add(material.uniforms.uDistanceToSurface, "value")
+    .min(0)
+    .max(50)
+    .step(0.01)
+    .name("distance");
 
   return material;
 }

@@ -12,10 +12,11 @@ export function addBottom(
   gui: dat.GUI
 ): (t: THREE_UTILS.Time) => void {
   const parameters = {
-    bottomColor: "#ffffff",
-    causticColor: "#0000ff",
+    bottomColor: seaParameters.color.value,
+    causticColor: "#ffffff",
   };
-  const material = getRefractionMaterial(gui);
+  const causticGui = gui.addFolder("caustic");
+  const material = getRefractionMaterial(causticGui);
   material.uniforms.uMinVisibility = {
     value: seaParameters.visibility.min.value,
   };
@@ -52,7 +53,7 @@ export function addBottom(
           parameters.bottomColor
         ))
     );
-  gui
+  causticGui
     .addColor(parameters, "causticColor")
     .name("color")
     .onChange(
