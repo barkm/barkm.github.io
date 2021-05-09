@@ -1,87 +1,10 @@
 import * as THREE from "three";
 
 import * as THREE_UTILS from "../three/utils";
-
-import bottomVertexShader from "../../shaders/bottom/vertex.glsl";
-import bottomFragmentShader from "../../shaders/bottom/fragment.glsl";
-import newBottomVertexShader from "../../shaders/new_bottom/vertex.glsl";
-import newBottomFragmentShader from "../../shaders/new_bottom/fragment.glsl";
-
 import { SeaParameters } from "./sea";
 
-export function addNewBottom(
-  seaParameters: SeaParameters,
-  scene: THREE.Scene,
-  gui: dat.GUI
-): (t: THREE_UTILS.Time) => void {
-  const parameters = {
-    bottomColor: "#ffffff",
-    causticsColor: "#0000ff",
-  };
-
-  const bottom = new THREE.Mesh(
-    new THREE.PlaneGeometry(40, 50, 32, 32),
-    new THREE.ShaderMaterial({
-      vertexShader: newBottomVertexShader,
-      fragmentShader: newBottomFragmentShader,
-      uniforms: {
-        uMinVisibility: { value: seaParameters.visibility.min.value },
-        uMaxVisibility: { value: seaParameters.visibility.max.value },
-        uBottomColor: { value: new THREE.Color(parameters.bottomColor) },
-        uCausticColor: { value: new THREE.Color(parameters.causticsColor) },
-        uCausticStrength: { value: 0.5 },
-        uTime: { value: 0 },
-        uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
-      },
-      extensions: {
-        derivatives: true,
-      },
-    })
-  );
-  bottom.rotation.x = -Math.PI / 2;
-  bottom.position.y = -8;
-  scene.add(bottom);
-
-  seaParameters.color.subscribe((v) => {
-    bottom.material.uniforms.uSeaColor.value = new THREE.Color(v);
-  });
-  seaParameters.visibility.min.subscribe((v) => {
-    bottom.material.uniforms.uMinVisibility.value = v;
-  });
-  seaParameters.visibility.max.subscribe((v) => {
-    bottom.material.uniforms.uMaxVisibility.value = v;
-  });
-
-  gui
-    .addColor(parameters, "bottomColor")
-    .name("color")
-    .onChange(
-      () =>
-        (bottom.material.uniforms.uBottomColor.value = new THREE.Color(
-          parameters.bottomColor
-        ))
-    );
-  const causticGui = gui.addFolder("caustic");
-  causticGui
-    .addColor(parameters, "causticsColor")
-    .name("color")
-    .onChange(
-      () =>
-        (bottom.material.uniforms.uCausticColor.value = new THREE.Color(
-          parameters.causticsColor
-        ))
-    );
-  causticGui
-    .add(bottom.material.uniforms.uCausticStrength, "value")
-    .min(0)
-    .max(1)
-    .step(0.01)
-    .name("strength");
-
-  return (time) => {
-    bottom.material.uniforms.uTime.value = time.elapsed;
-  };
-}
+import { getNoiseMaterial } from "./caustic/noise";
+import { getRefractionMaterial } from "./caustic/refraction";
 
 export function addBottom(
   seaParameters: SeaParameters,
@@ -90,41 +13,34 @@ export function addBottom(
 ): (t: THREE_UTILS.Time) => void {
   const parameters = {
     bottomColor: "#ffffff",
-    causticsColor: "#0000ff",
+    causticColor: "#0000ff",
   };
-
-  const bottom = new THREE.Mesh(
-    new THREE.PlaneGeometry(40, 50),
-    new THREE.ShaderMaterial({
-      vertexShader: bottomVertexShader,
-      fragmentShader: bottomFragmentShader,
-      uniforms: {
-        uMinVisibility: { value: seaParameters.visibility.min.value },
-        uMaxVisibility: { value: seaParameters.visibility.max.value },
-        uBottomColor: { value: new THREE.Color(parameters.bottomColor) },
-        uCausticColor: { value: new THREE.Color(parameters.causticsColor) },
-        uCausticStrength: { value: 3.0 },
-        uCausticSpeed: { value: 0.05 },
-        uCausticOffset: { value: 100.0 },
-        uCausticScale: { value: 10.0 },
-        uCausticIterations: { value: 3 },
-        uTime: { value: 0 },
-        uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
-      },
-    })
-  );
-  bottom.rotation.x = -Math.PI / 2;
-  bottom.position.y = -8;
-  scene.add(bottom);
+  const material = getRefractionMaterial(gui);
+  material.uniforms.uMinVisibility = {
+    value: seaParameters.visibility.min.value,
+  };
+  material.uniforms.uMaxVisibility = {
+    value: seaParameters.visibility.max.value,
+  };
+  material.uniforms.uSeaColor = {
+    value: new THREE.Color(seaParameters.color.value),
+  };
+  material.uniforms.uBottomColor = {
+    value: new THREE.Color(parameters.bottomColor),
+  };
+  material.uniforms.uCausticColor = {
+    value: new THREE.Color(parameters.causticColor),
+  };
+  material.uniforms.uTime = { value: 0 };
 
   seaParameters.color.subscribe((v) => {
-    bottom.material.uniforms.uSeaColor.value = new THREE.Color(v);
+    material.uniforms.uSeaColor.value = new THREE.Color(v);
   });
   seaParameters.visibility.min.subscribe((v) => {
-    bottom.material.uniforms.uMinVisibility.value = v;
+    material.uniforms.uMinVisibility.value = v;
   });
   seaParameters.visibility.max.subscribe((v) => {
-    bottom.material.uniforms.uMaxVisibility.value = v;
+    material.uniforms.uMaxVisibility.value = v;
   });
 
   gui
@@ -132,51 +48,30 @@ export function addBottom(
     .name("color")
     .onChange(
       () =>
-        (bottom.material.uniforms.uBottomColor.value = new THREE.Color(
+        (material.uniforms.uBottomColor.value = new THREE.Color(
           parameters.bottomColor
         ))
     );
-  const causticGui = gui.addFolder("caustic");
-  causticGui
-    .addColor(parameters, "causticsColor")
+  gui
+    .addColor(parameters, "causticColor")
     .name("color")
     .onChange(
       () =>
-        (bottom.material.uniforms.uCausticColor.value = new THREE.Color(
-          parameters.causticsColor
+        (material.uniforms.uCausticColor.value = new THREE.Color(
+          parameters.causticColor
         ))
     );
-  causticGui
-    .add(bottom.material.uniforms.uCausticStrength, "value")
-    .min(0)
-    .max(50)
-    .step(0.1)
-    .name("strength");
-  causticGui
-    .add(bottom.material.uniforms.uCausticSpeed, "value")
-    .min(0)
-    .max(0.5)
-    .step(0.01)
-    .name("speed");
-  causticGui
-    .add(bottom.material.uniforms.uCausticOffset, "value")
-    .min(0)
-    .max(200)
-    .name("offset");
-  causticGui
-    .add(bottom.material.uniforms.uCausticIterations, "value")
-    .min(0)
-    .max(10)
-    .step(1)
-    .name("iterations");
-  causticGui
-    .add(bottom.material.uniforms.uCausticScale, "value")
-    .min(0)
-    .max(50)
-    .step(0.01)
-    .name("scale");
+
+  const bottom = new THREE.Mesh(
+    new THREE.PlaneGeometry(40, 50, 32, 32),
+    material
+  );
+  bottom.rotation.x = -Math.PI / 2;
+  bottom.position.y = -8;
+
+  scene.add(bottom);
 
   return (time) => {
-    bottom.material.uniforms.uTime.value = time.elapsed;
+    material.uniforms.uTime.value = time.elapsed;
   };
 }

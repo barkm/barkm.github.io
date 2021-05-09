@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 import { Time } from "../three/utils";
 
-import { addBottom, addNewBottom } from "./bottom";
+import { addBottom } from "./bottom";
 import { addSurface } from "./surface";
 import { addTurtle } from "./turtle";
 
@@ -62,7 +62,7 @@ export function addSea(
     .max(50)
     .name("max");
 
-  const updateBottom = addNewBottom(parameters, scene, gui.addFolder("bottom"));
+  const updateBottom = addBottom(parameters, scene, gui.addFolder("bottom"));
   const updateSurface = addSurface(parameters, scene, gui.addFolder("surface"));
   // const updateTurtle = addTurtle(parameters, scene, gui.addFolder("turtle"));
   return (time: Time): void => {
