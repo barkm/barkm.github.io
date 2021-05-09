@@ -64,10 +64,10 @@ export function addSea(
 
   const updateBottom = addBottom(parameters, scene, gui.addFolder("bottom"));
   const updateSurface = addSurface(parameters, scene, gui.addFolder("surface"));
-  // const updateTurtle = addTurtle(parameters, scene, gui.addFolder("turtle"));
+  const updateTurtle = addTurtle(parameters, scene, gui.addFolder("turtle"));
   return (time: Time): void => {
     updateBottom(time);
     updateSurface(time);
-    // updateTurtle(time);
+    updateTurtle(time);
   };
 }
