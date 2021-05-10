@@ -4,6 +4,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as UTILS from "../utils";
 import * as MOTION from "../motion/motion";
 import * as THREE_UTILS from "./utils";
+import { setBarycentricCoordinateAttribute } from "./barycentric";
 import * as THREE_MOTION from "./motion";
 
 import turtleModel from "../../../models/turtle.glb";
@@ -17,7 +18,7 @@ export class Turtle {
   constructor(
     public parent: THREE.Group | THREE.Scene,
     public position: THREE.Vector3,
-    public material: THREE.MeshBasicMaterial,
+    public material: THREE.ShaderMaterial,
     public motion: Motion
   ) {
     this.parent = parent;
@@ -36,6 +37,7 @@ export class Turtle {
       this.mixer.clipAction(gltf.animations[1]).play();
       gltf.scene.traverse((obj) => {
         if (obj instanceof THREE.Mesh) {
+          setBarycentricCoordinateAttribute(obj.geometry);
           obj.material = this.material;
         }
       });

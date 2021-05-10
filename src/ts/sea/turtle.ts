@@ -6,18 +6,14 @@ import { Turtle } from "../three/turtle";
 
 import { SeaParameters } from "./sea";
 
+import vertexShader from "../../shaders/turtle/vertex.glsl";
+import fragmentShader from "../../shaders/turtle/fragment.glsl";
+
 export function addTurtle(
-  parameters: SeaParameters,
+  seaParameters: SeaParameters,
   scene: THREE.Scene,
   gui: dat.GUI
 ): (time: THREE_UTILS.Time) => void {
-  const turtleMaterialParameters = { color: 0x4d46cf, wireframe: true };
-  const turtleMaterial = new THREE.MeshBasicMaterial(turtleMaterialParameters);
-  gui.add(turtleMaterial, "wireframe");
-  gui.addColor(turtleMaterialParameters, "color").onChange(() => {
-    turtleMaterial.color.set(turtleMaterialParameters.color);
-  });
-
   const box = new THREE.BoxGeometry(6, 2, 20);
   const mesh = new THREE.Mesh(
     box,
@@ -34,6 +30,30 @@ export function addTurtle(
     1
   );
   const motion = MOTION.chainMotions([perturbMotion, boxMotion]);
+
+  const parameters = { color: "#4d46cf", wireframe: true };
+  const turtleMaterial = new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: {
+      uColor: { value: new THREE.Color(parameters.color) },
+      uLineThickness: { value: 1.0 },
+    },
+    side: THREE.DoubleSide,
+    alphaToCoverage: true,
+    extensions: {
+      derivatives: true,
+    },
+  });
+  gui.addColor(parameters, "color").onChange(() => {
+    turtleMaterial.uniforms.uColor.value.set(parameters.color);
+  });
+  gui
+    .add(turtleMaterial.uniforms.uLineThickness, "value")
+    .min(0)
+    .max(2)
+    .step(0.01)
+    .name("lineThickness");
 
   const turtle = new Turtle(scene, mesh.position, turtleMaterial, motion);
   return (time) => {
