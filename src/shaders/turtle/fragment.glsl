@@ -3,12 +3,6 @@ uniform float uLineThickness;
 
 varying vec3 vBarycentricCoordinate;
 
-float edgeFactor() {
-  vec3 d = fwidth(vBarycentricCoordinate);
-  vec3 f = step(d * 1.0, vBarycentricCoordinate);
-  return min(min(f.x, f.y), f.z);
-}
-
 void main() {
     vec3 w = fwidth(vBarycentricCoordinate);
     vec3 edge3 = smoothstep((uLineThickness - 1.0) * w, uLineThickness * w, vBarycentricCoordinate);

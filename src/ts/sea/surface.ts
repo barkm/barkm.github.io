@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
 import * as THREE_UTILS from "../three/utils";
+import { setBarycentricCoordinateAttribute } from "../three/barycentric";
 
 import surfaceFaceVertexShader from "../../shaders/surface/face/vertex.glsl";
 import surfaceFaceFragmentShader from "../../shaders/surface/face/fragment.glsl";
@@ -38,6 +39,7 @@ function getFaces(
 ) {
   const parameters = {
     skyColor: "#ffffff",
+    edgeColor: "#0000ff",
   };
   const faceMaterial = new THREE.ShaderMaterial({
     vertexShader: surfaceFaceVertexShader,
@@ -46,52 +48,26 @@ function getFaces(
       uTime: { value: 0 },
       uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
       uSkyColor: { value: new THREE.Color(parameters.skyColor) },
+      uEdgeColor: { value: new THREE.Color(parameters.edgeColor) },
+      uEdgeThickness: { value: 1.0 },
       uMinVisibility: { value: seaParameters.visibility.min.value },
       uMaxVisibility: { value: seaParameters.visibility.max.value },
     },
   });
   const faces = getSurface(seaParameters, faceMaterial, surfaceGeometry);
-  faces.position.y += 0.05;
 
   gui.addColor(parameters, "skyColor").onChange(() => {
     faces.material.uniforms.uSkyColor.value = new THREE.Color(
       parameters.skyColor
     );
   });
-
-  return faces;
-}
-
-function getEdges(
-  seaParameters: SeaParameters,
-  surfaceGeometry: THREE.PlaneGeometry,
-  gui: dat.GUI
-) {
-  const parameters = {
-    skyColor: "#ffffff",
-    edgeColor: "#0000ff",
-  };
-  const edgeMaterial = new THREE.ShaderMaterial({
-    vertexShader: surfaceEdgeVertexShader,
-    fragmentShader: surfaceEdgeFragmentShader,
-    uniforms: {
-      uTime: { value: 0 },
-      uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
-      uEdgeColor: { value: new THREE.Color(parameters.edgeColor) },
-      uMinVisibility: { value: seaParameters.visibility.min.value },
-      uMaxVisibility: { value: seaParameters.visibility.max.value },
-    },
-    wireframe: true,
-  });
-  const edges = getSurface(seaParameters, edgeMaterial, surfaceGeometry);
-
   gui.addColor(parameters, "edgeColor").onChange(() => {
-    edges.material.uniforms.uEdgeColor.value = new THREE.Color(
+    faces.material.uniforms.uEdgeColor.value = new THREE.Color(
       parameters.edgeColor
     );
   });
 
-  return edges;
+  return faces;
 }
 
 export function addSurface(
@@ -100,16 +76,12 @@ export function addSurface(
   gui: dat.GUI
 ): (t: THREE_UTILS.Time) => void {
   const surfaceGeometry = new THREE.PlaneGeometry(40, 50, 32, 32);
+  setBarycentricCoordinateAttribute(surfaceGeometry);
 
   const faces = getFaces(seaParameters, surfaceGeometry, gui);
   scene.add(faces);
 
-  const edges = getEdges(seaParameters, surfaceGeometry, gui);
-  THREE_UTILS.addVisibilityToggle(gui, edges, scene, "edges");
-  scene.add(edges);
-
   return (time) => {
     faces.material.uniforms.uTime.value = time.elapsed;
-    edges.material.uniforms.uTime.value = time.elapsed;
   };
 }
