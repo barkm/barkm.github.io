@@ -22,3 +22,7 @@ export function getWindowSize(): WindowSize {
   });
   return windowSize;
 }
+
+export function range(n: number): Array<number> {
+  return [...Array(n).keys()];
+}

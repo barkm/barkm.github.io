@@ -1,5 +1,7 @@
 import * as THREE from "three";
 
+import * as UTILS from "../utils";
+
 type Assignment = 0 | 1 | 2;
 
 function getBarycentricCoordinates(
@@ -36,13 +38,31 @@ function getIndependentTrianglesAssignments(
   return assignments;
 }
 
+function getPlaneGeometryAssignments(
+  geometry: THREE.PlaneGeometry
+): Array<Assignment> {
+  const numVertices = geometry.getAttribute("position").count;
+  const columns = geometry.parameters.widthSegments + 1;
+  return UTILS.range(numVertices).map((n) => {
+    const row = Math.floor(n / columns);
+    const column = n % columns;
+    return UTILS.modulo(column - row, 3) as Assignment;
+  });
+}
+
 export function setBarycentricCoordinateAttribute(
   geometry: THREE.BufferGeometry
 ): void {
-  const assignments = getIndependentTrianglesAssignments(geometry);
-  if (!assignments) {
-    return;
+  let assignments;
+  if (geometry instanceof THREE.PlaneGeometry) {
+    assignments = getPlaneGeometryAssignments(geometry);
+  } else {
+    assignments = getIndependentTrianglesAssignments(geometry);
+    if (!assignments) {
+      return;
+    }
   }
+
   const barycentricCoordinates = getBarycentricCoordinates(assignments);
   geometry.setAttribute(
     "aBarycentricCoordinate",
