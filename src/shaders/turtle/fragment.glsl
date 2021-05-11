@@ -3,10 +3,10 @@ uniform float uLineThickness;
 
 varying vec3 vBarycentricCoordinate;
 
+#include "../wireframe.glsl";
+
 void main() {
-    vec3 w = fwidth(vBarycentricCoordinate);
-    vec3 edge3 = smoothstep((uLineThickness - 1.0) * w, uLineThickness * w, vBarycentricCoordinate);
-    float edge = 1.0 - min(min(edge3.x, edge3.y), edge3.z);
+    float wireframeStrength = getWireframeStrength(vBarycentricCoordinate, uLineThickness);
     float strength = gl_FrontFacing ? 0.0 : 0.5;
-    gl_FragColor = vec4(uColor, edge - strength);
+    gl_FragColor = vec4(uColor, wireframeStrength - strength);
 }
