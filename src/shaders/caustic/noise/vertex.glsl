@@ -18,6 +18,6 @@ void main() {
     vec4 projectedPosition = projectionMatrix * viewPosition;
     gl_Position = projectedPosition;
 
-    vVisibility = getVisibility(modelPosition.xyz);
+    vVisibility = getVisibility(viewPosition.xyz);
     vUv = uv;
 }

@@ -1,8 +1,7 @@
 #pragma glslify: fogLinear = require(glsl-fog/linear)
 
-float getVisibility(const vec3 pos, float minVisibleDistance, float maxVisibleDistance) {
-  float distanceFromCamera = distance(pos, cameraPosition);
-  return 1.0 - fogLinear(distanceFromCamera, minVisibleDistance, maxVisibleDistance);
+float getVisibility(const vec3 viewPosition, float minVisibleDistance, float maxVisibleDistance) {
+  return 1.0 - fogLinear(length(viewPosition), minVisibleDistance, maxVisibleDistance);
 }
 
 float getYDisplacement(float x, float z, float t) {
