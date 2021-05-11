@@ -3,8 +3,8 @@ import * as THREE from "three";
 import * as THREE_UTILS from "../three/utils";
 import { setBarycentricCoordinateAttribute } from "../three/barycentric";
 
-import surfaceFaceVertexShader from "../../shaders/surface/face/vertex.glsl";
-import surfaceFaceFragmentShader from "../../shaders/surface/face/fragment.glsl";
+import vertexShader from "../../shaders/surface/vertex.glsl";
+import fragmentShader from "../../shaders/surface/fragment.glsl";
 
 import { SeaParameters } from "./sea";
 
@@ -18,8 +18,8 @@ function getMaterial(
   };
 
   const material = new THREE.ShaderMaterial({
-    vertexShader: surfaceFaceVertexShader,
-    fragmentShader: surfaceFaceFragmentShader,
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
     uniforms: {
       uTime: { value: 0 },
       uSeaColor: { value: new THREE.Color(seaParameters.color.value) },

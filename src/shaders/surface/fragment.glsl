@@ -11,7 +11,7 @@ varying float vVisibility;
 varying vec3 vModelPosition;
 varying vec3 vBarycentricCoordinate;
 
-#include "../../wireframe.glsl";
+#include "../wireframe.glsl";
 
 vec3 getRefaction() {
     vec3 normal = faceNormal(vModelPosition);
