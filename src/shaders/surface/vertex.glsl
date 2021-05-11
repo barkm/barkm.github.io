@@ -12,7 +12,8 @@ varying float vVisibility;
 varying vec3 vModelPosition;
 varying vec3 vBarycentricCoordinate;
 
-#include "../common.glsl";
+#include "../surface.glsl";
+#include "../visibility.glsl";
 
 void main() {
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
