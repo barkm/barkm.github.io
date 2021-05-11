@@ -38,6 +38,9 @@ export function addTurtle(
     uniforms: {
       uColor: { value: new THREE.Color(parameters.color) },
       uLineThickness: { value: 1.0 },
+      uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
+      uMinVisibility: { value: seaParameters.visibility.min.value },
+      uMaxVisibility: { value: seaParameters.visibility.max.value },
     },
     side: THREE.DoubleSide,
     alphaToCoverage: true,
@@ -54,6 +57,16 @@ export function addTurtle(
     .max(2)
     .step(0.01)
     .name("lineThickness");
+
+  seaParameters.color.subscribe((v) => {
+    turtleMaterial.uniforms.uSeaColor.value = new THREE.Color(v);
+  });
+  seaParameters.visibility.min.subscribe((v) => {
+    turtleMaterial.uniforms.uMinVisibility.value = v;
+  });
+  seaParameters.visibility.max.subscribe((v) => {
+    turtleMaterial.uniforms.uMaxVisibility.value = v;
+  });
 
   const turtle = new Turtle(scene, mesh.position, turtleMaterial, motion);
   return (time) => {
