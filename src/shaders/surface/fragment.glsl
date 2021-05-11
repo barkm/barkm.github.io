@@ -1,3 +1,5 @@
+#include "../precision.glsl";
+
 #define REFRACTIVE_INDEX_WATER 1.333
 
 #pragma glslify: faceNormal = require('glsl-face-normal')

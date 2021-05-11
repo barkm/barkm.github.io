@@ -1,3 +1,5 @@
+#include "../precision.glsl";
+
 uniform vec3 uColor;
 uniform float uLineThickness;
 

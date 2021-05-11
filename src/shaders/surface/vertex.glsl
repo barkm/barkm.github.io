@@ -1,3 +1,5 @@
+#include "../precision.glsl";
+
 #pragma glslify: fogLinear = require(glsl-fog/linear)
 
 attribute vec3 aBarycentricCoordinate;

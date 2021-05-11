@@ -1,3 +1,5 @@
+#include "../precision.glsl";
+
 attribute vec3 aBarycentricCoordinate;
 
 varying vec3 vBarycentricCoordinate;
