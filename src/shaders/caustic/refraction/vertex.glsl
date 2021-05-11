@@ -1,3 +1,5 @@
+#include "../../precision.glsl";
+
 uniform float uTime;
 uniform float uMinVisibility;
 uniform float uMaxVisibility;

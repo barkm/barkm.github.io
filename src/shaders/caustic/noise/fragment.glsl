@@ -1,4 +1,4 @@
-#include "../precision.glsl";
+#include "../../precision.glsl";
 
 #pragma glslify: simplexNoise = require(glsl-noise/simplex/3d) 
 

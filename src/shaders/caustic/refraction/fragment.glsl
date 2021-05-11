@@ -1,5 +1,7 @@
 #define REFRACTIVE_INDEX_WATER 1.333
 
+#include "../../precision.glsl";
+
 #pragma glslify: faceNormal = require('glsl-face-normal')
 
 uniform vec3 uBottomColor;

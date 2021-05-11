@@ -16,7 +16,7 @@ export function addBottom(
     causticColor: "#ffffff",
   };
   const causticGui = gui.addFolder("caustic");
-  const material = getRefractionMaterial(causticGui);
+  const material = getNoiseMaterial(causticGui);
   material.uniforms.uMinVisibility = {
     value: seaParameters.visibility.min.value,
   };
@@ -64,10 +64,11 @@ export function addBottom(
     );
 
   const bottom = new THREE.Mesh(
-    new THREE.PlaneGeometry(40, 50, 32, 32),
+    new THREE.PlaneGeometry(50, 50, 32, 32),
     material
   );
   bottom.rotation.x = -Math.PI / 2;
+  bottom.position.z = -15;
   bottom.position.y = -8;
 
   scene.add(bottom);

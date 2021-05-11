@@ -1,4 +1,4 @@
-#include "../precision.glsl";
+#include "../../precision.glsl";
 
 #pragma glslify: fogLinear = require(glsl-fog/linear)
 

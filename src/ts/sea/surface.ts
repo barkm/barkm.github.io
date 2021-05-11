@@ -58,7 +58,7 @@ export function addSurface(
 ): (t: THREE_UTILS.Time) => void {
   const material = getMaterial(seaParameters, gui);
 
-  const geometry = new THREE.PlaneGeometry(40, 50, 32, 32);
+  const geometry = new THREE.PlaneGeometry(50, 50, 32, 32);
   setBarycentricCoordinateAttribute(geometry);
 
   const surface = new THREE.Mesh(geometry, material);
