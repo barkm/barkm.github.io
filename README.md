@@ -9,4 +9,4 @@ npm run dev
 
 ## Deploying
 
-Push tag with pattern `v*`
+Run the [`deploy`](https://github.com/barkm/barkm.github.io/actions/workflows/deploy.yaml) workflow from GitHub.
