@@ -15,6 +15,8 @@ uniform float uTime;
 varying vec2 vUv;
 varying float vVisibility;
 
+const int maxCausticIterations = 5;
+
 float getCausticMultiplier(vec2 coord, float time) {
     float caustic = simplexNoise(vec3(coord, time));
     caustic = abs(caustic);
@@ -25,7 +27,10 @@ float getCausticMultiplier(vec2 coord, float time) {
 
 float getCaustic(vec2 coord, float time, int iterations, float timeOffset) {
     float caustic = 1.0;
-    for (int i = 0; i < iterations; i++) {
+    for (int i = 0; i < maxCausticIterations; i++) {
+        if (i >= uCausticIterations) {
+            break;
+        }
         caustic *= getCausticMultiplier(coord, timeOffset * float(i) + time);
     }
     return caustic;

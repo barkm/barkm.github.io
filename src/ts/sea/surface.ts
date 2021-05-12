@@ -29,6 +29,9 @@ function getMaterial(
       uMinVisibility: { value: seaParameters.visibility.min.value },
       uMaxVisibility: { value: seaParameters.visibility.max.value },
     },
+    extensions: {
+      derivatives: true,
+    },
   });
 
   seaParameters.color.subscribe((v) => {
