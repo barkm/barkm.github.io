@@ -8,7 +8,7 @@ export function getNoiseMaterial(gui: dat.GUI): THREE.ShaderMaterial {
     vertexShader: vertexShader,
     fragmentShader: bottomFragmentShader,
     uniforms: {
-      uCausticStrength: { value: 3.0 },
+      uCausticStrength: { value: 1.0 },
       uCausticSpeed: { value: 0.1 },
       uCausticLacunarity: { value: 1.2 },
       uCausticPersistance: { value: 0.75 },
