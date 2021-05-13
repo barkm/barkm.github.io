@@ -5,7 +5,8 @@
 uniform vec3 uBottomColor;
 uniform vec3 uCausticColor;
 uniform float uCausticStrength;
-uniform float uCausticOffset;
+uniform float uCausticLacunarity;
+uniform float uCausticPersistance;
 uniform float uCausticScale;
 uniform float uCausticSpeed;
 uniform int uCausticIterations;
@@ -17,28 +18,24 @@ varying float vVisibility;
 
 const int maxCausticIterations = 5;
 
-float getCausticMultiplier(vec2 coord, float time) {
-    float caustic = simplexNoise(vec3(coord, time));
-    caustic = abs(caustic);
-    caustic = 1.0 - caustic;
-    caustic = pow(caustic, 2.0);
-    return caustic;
-}
-
-float getCaustic(vec2 coord, float time, int iterations, float timeOffset) {
-    float caustic = 1.0;
+float getCaustic(vec2 coord, float time, int iterations) {
+    float totalCaustic = 1.0;
     for (int i = 0; i < maxCausticIterations; i++) {
         if (i >= uCausticIterations) {
             break;
         }
-        caustic *= getCausticMultiplier(coord, timeOffset * float(i) + time);
+        float frequency = pow(uCausticLacunarity, float(i));
+        float amplitude = pow(uCausticPersistance, float(i));
+        float caustic = amplitude * simplexNoise(vec3(frequency * coord, frequency * time));
+        caustic = 1.0 - abs(caustic);
+        totalCaustic *= caustic;
     }
-    return caustic;
+    return totalCaustic;
 }
 
 void main() {
 
-    float caustic = uCausticStrength * getCaustic(uCausticScale * (vUv - 0.5), uCausticSpeed * uTime, uCausticIterations, uCausticOffset);
+    float caustic = uCausticStrength * getCaustic(uCausticScale * (vUv - 0.5), uCausticSpeed * uTime, uCausticIterations);
 
     vec3 color = mix(uBottomColor, uCausticColor, caustic);
     color = mix(uSeaColor, color, vVisibility);

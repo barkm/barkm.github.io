@@ -10,7 +10,8 @@ export function getNoiseMaterial(gui: dat.GUI): THREE.ShaderMaterial {
     uniforms: {
       uCausticStrength: { value: 3.0 },
       uCausticSpeed: { value: 0.1 },
-      uCausticOffset: { value: 100.0 },
+      uCausticLacunarity: { value: 1.2 },
+      uCausticPersistance: { value: 0.75 },
       uCausticScale: { value: 20.0 },
       uCausticIterations: { value: 3 },
     },
@@ -29,10 +30,15 @@ export function getNoiseMaterial(gui: dat.GUI): THREE.ShaderMaterial {
     .step(0.01)
     .name("speed");
   gui
-    .add(material.uniforms.uCausticOffset, "value")
+    .add(material.uniforms.uCausticLacunarity, "value")
     .min(0)
-    .max(200)
-    .name("offset");
+    .max(5)
+    .name("lacunarity");
+  gui
+    .add(material.uniforms.uCausticPersistance, "value")
+    .min(0)
+    .max(1)
+    .name("persistance");
   gui
     .add(material.uniforms.uCausticIterations, "value")
     .min(0)
