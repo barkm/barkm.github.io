@@ -47,7 +47,7 @@ function getNewPositions(
   positions: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
   parameters: TerrainParameters
 ): THREE.BufferAttribute {
-  const simplex = new SimplexNoise();
+  const simplex = new SimplexNoise("seed");
   const newPositions = positions.clone();
   for (let i = 0; i < positions.count; i++) {
     let x = positions.getX(i);
