@@ -26,3 +26,7 @@ export function getWindowSize(): WindowSize {
 export function range(n: number): Array<number> {
   return [...Array(n).keys()];
 }
+
+export function sum(array: Array<number>): number {
+  return array.reduce((a, b) => a + b);
+}
