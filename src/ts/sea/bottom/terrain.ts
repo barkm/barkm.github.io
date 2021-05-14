@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import SimplexNoise from "simplex-noise";
 
-import { range, sum } from "../../utils";
+import { range, sum, Subscribable } from "../../utils";
 
 function getElevationOctave(
   x: number,
@@ -17,11 +17,11 @@ function getElevationOctave(
 }
 
 interface TerrainParameters {
-  amplitude: number;
-  scale: number;
-  persistence: number;
-  lacunarity: number;
-  octaves: number;
+  amplitude: Subscribable<number>;
+  scale: Subscribable<number>;
+  persistence: Subscribable<number>;
+  lacunarity: Subscribable<number>;
+  octaves: Subscribable<number>;
 }
 
 function getElevation(
@@ -30,17 +30,17 @@ function getElevation(
   parameters: TerrainParameters,
   simplex: SimplexNoise
 ): number {
-  const elevations = range(parameters.octaves).map((octave) =>
+  const elevations = range(parameters.octaves.value).map((octave) =>
     getElevationOctave(
-      x,
-      y,
-      parameters.persistence,
-      parameters.lacunarity,
+      parameters.scale.value * x,
+      parameters.scale.value * y,
+      parameters.persistence.value,
+      parameters.lacunarity.value,
       octave,
       simplex
     )
   );
-  return sum(elevations);
+  return parameters.amplitude.value * sum(elevations);
 }
 
 function getNewPositions(
@@ -53,20 +53,15 @@ function getNewPositions(
     let x = positions.getX(i);
     let y = positions.getY(i);
     let z = positions.getZ(i);
-    let elevation =
-      parameters.amplitude *
-      getElevation(
-        parameters.scale * x,
-        parameters.scale * y,
-        parameters,
-        simplex
-      );
+    let elevation = getElevation(x, y, parameters, simplex);
     newPositions.setZ(i, z + elevation);
   }
   return newPositions;
 }
 
-export function getTerrain(gui: dat.GUI): THREE.PlaneGeometry {
+function getTerrainGeometry(
+  parameters: TerrainParameters
+): THREE.PlaneGeometry {
   const geometry = new THREE.PlaneGeometry(50, 50, 128, 128);
   const positions = geometry.getAttribute("position").clone();
   const update = () => {
@@ -74,18 +69,23 @@ export function getTerrain(gui: dat.GUI): THREE.PlaneGeometry {
     geometry.setAttribute("position", newPositions);
     geometry.getAttribute("position").needsUpdate = true;
   };
-  const parameters = {
-    amplitude: 2,
-    scale: 0.1,
-    persistence: 1,
-    lacunarity: 1,
-    octaves: 1,
-  };
   update();
-  gui.add(parameters, "amplitude").min(0).max(5).onFinishChange(update);
-  gui.add(parameters, "scale").min(0).max(0.5).onFinishChange(update);
-  gui.add(parameters, "persistence").min(0).max(1).onFinishChange(update);
-  gui.add(parameters, "lacunarity").min(0).max(3).onFinishChange(update);
-  gui.add(parameters, "octaves").min(1).max(5).step(1).onFinishChange(update);
+  Object.values(parameters).map((p) => p.subscribe(update));
   return geometry;
+}
+
+export function getTerrain(gui: dat.GUI): THREE.PlaneGeometry {
+  const parameters = {
+    amplitude: new Subscribable(2),
+    scale: new Subscribable(0.1),
+    persistence: new Subscribable(1),
+    lacunarity: new Subscribable(1),
+    octaves: new Subscribable(1),
+  };
+  gui.add(parameters.amplitude, "value").min(0).max(5).name("amplitude");
+  gui.add(parameters.scale, "value").min(0).max(0.5).name("scale");
+  gui.add(parameters.persistence, "value").min(0).max(1).name("persistence");
+  gui.add(parameters.lacunarity, "value").min(0).max(3).name("lacunarity");
+  gui.add(parameters.octaves, "value").min(1).max(5).step(1).name("octaves");
+  return getTerrainGeometry(parameters);
 }

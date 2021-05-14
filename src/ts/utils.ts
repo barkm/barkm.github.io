@@ -30,3 +30,24 @@ export function range(n: number): Array<number> {
 export function sum(array: Array<number>): number {
   return array.reduce((a, b) => a + b);
 }
+
+export class Subscribable<Type> {
+  subscribers: Array<(v: Type) => void>;
+  value_: Type;
+  constructor(value_: Type) {
+    this.subscribers = [];
+    this.value_ = value_;
+  }
+
+  subscribe(subsriber: (v: Type) => void) {
+    this.subscribers.push(subsriber);
+  }
+
+  set value(v: Type) {
+    this.value_ = v;
+    this.subscribers.map((s) => s(v));
+  }
+  get value() {
+    return this.value_;
+  }
+}
