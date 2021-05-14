@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
-import vertexShader from "../../../shaders/caustic/noise/vertex.glsl";
-import bottomFragmentShader from "../../../shaders/caustic/noise/fragment.glsl";
+import vertexShader from "../../../../shaders/caustic/noise/vertex.glsl";
+import bottomFragmentShader from "../../../../shaders/caustic/noise/fragment.glsl";
 
 export function getNoiseMaterial(gui: dat.GUI): THREE.ShaderMaterial {
   const material = new THREE.ShaderMaterial({

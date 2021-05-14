@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import SimplexNoise from "simplex-noise";
 
-import { range, sum } from "../utils";
-import * as THREE_UTILS from "../three/utils";
-import { SeaParameters } from "./sea";
+import { range, sum } from "../../utils";
+import * as THREE_UTILS from "../../three/utils";
+import { SeaParameters } from "../sea";
 
 import { getNoiseMaterial } from "./caustic/noise";
 import { getRefractionMaterial } from "./caustic/refraction";

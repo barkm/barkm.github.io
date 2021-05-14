@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 import { Time } from "../three/utils";
 
-import { addBottom } from "./bottom";
+import { addBottom } from "./bottom/bottom";
 import { addSurface } from "./surface";
 import { addTurtle } from "./turtle";
 

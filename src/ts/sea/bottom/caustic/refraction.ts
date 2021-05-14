@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
-import vertexShader from "../../../shaders/caustic/refraction/vertex.glsl";
-import fragmentShader from "../../../shaders/caustic/refraction/fragment.glsl";
+import vertexShader from "../../../../shaders/caustic/refraction/vertex.glsl";
+import fragmentShader from "../../../../shaders/caustic/refraction/fragment.glsl";
 
 export function getRefractionMaterial(gui: dat.GUI): THREE.ShaderMaterial {
   const material = new THREE.ShaderMaterial({
