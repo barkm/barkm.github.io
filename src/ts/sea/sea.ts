@@ -13,6 +13,7 @@ export interface SeaParameters {
     min: Subscribable<number>;
     max: Subscribable<number>;
   };
+  depth: Subscribable<number>;
 }
 
 export function addSea(
@@ -23,6 +24,7 @@ export function addSea(
   const parameters: SeaParameters = {
     color: new Subscribable("#7696ff"),
     visibility: { min: new Subscribable(5.0), max: new Subscribable(30.0) },
+    depth: new Subscribable(8),
   };
 
   renderer.setClearColor(parameters.color.value);
@@ -31,6 +33,7 @@ export function addSea(
   });
 
   gui.addColor(parameters.color, "value").name("color");
+  gui.add(parameters.depth, "value").min(5).max(15).name("depth");
   const visibilityGui = gui.addFolder("visibility");
   visibilityGui
     .add(parameters.visibility.min, "value")

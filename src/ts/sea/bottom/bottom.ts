@@ -67,7 +67,8 @@ export function addBottom(
   const terrain = getTerrain(gui.addFolder("terrain"));
 
   const bottom = new THREE.Mesh(terrain.geometry, material);
-  bottom.position.y = -8;
+  bottom.position.y = -seaParameters.depth.value;
+  seaParameters.depth.subscribe((d) => (bottom.position.y = -d));
 
   scene.add(bottom);
 

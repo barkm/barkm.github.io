@@ -45,7 +45,12 @@ export function addCorals(
     mesh.position.x = 20 * (Math.random() - 0.5) * 2;
     mesh.position.z = 20 * (Math.random() - 0.5) * 2;
     mesh.position.y =
-      -8 + getElevation(mesh.position.x, mesh.position.z, terrainParameters);
+      getElevation(mesh.position.x, mesh.position.z, terrainParameters) -
+      seaParameters.depth.value;
+    seaParameters.depth.subscribe((d) => {
+      mesh.position.y =
+        getElevation(mesh.position.x, mesh.position.z, terrainParameters) - d;
+    });
 
     parent.add(mesh);
   }
