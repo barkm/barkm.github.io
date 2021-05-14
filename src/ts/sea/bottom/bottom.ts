@@ -1,11 +1,11 @@
 import * as THREE from "three";
 
-import { Subscribable } from "../../utils";
 import * as THREE_UTILS from "../../three/utils";
 import { SeaParameters } from "../sea";
 
 import { getNoiseMaterial } from "./caustic/noise";
 import { getTerrain } from "./terrain";
+import { addCorals } from "./corals";
 
 export function addBottom(
   seaParameters: SeaParameters,
@@ -64,14 +64,14 @@ export function addBottom(
         ))
     );
 
-  const geometry = getTerrain(gui.addFolder("terrain"));
+  const terrain = getTerrain(gui.addFolder("terrain"));
 
-  const bottom = new THREE.Mesh(geometry, material);
-  bottom.rotation.x = -Math.PI / 2;
-  bottom.position.z = -15;
+  const bottom = new THREE.Mesh(terrain.geometry, material);
   bottom.position.y = -8;
 
   scene.add(bottom);
+
+  addCorals(scene, seaParameters, terrain.parameters);
 
   return (time) => {
     material.uniforms.uTime.value = time.elapsed;

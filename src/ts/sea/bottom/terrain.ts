@@ -5,7 +5,7 @@ import { range, sum, Subscribable } from "../../utils";
 
 function getElevationOctave(
   x: number,
-  y: number,
+  z: number,
   persistence: number,
   lacunarity: number,
   octave: number,
@@ -13,10 +13,10 @@ function getElevationOctave(
 ): number {
   const amplitude = Math.pow(persistence, octave);
   const frequency = Math.pow(lacunarity, octave);
-  return amplitude * (simplex.noise2D(frequency * x, frequency * y) + 1) * 0.5;
+  return amplitude * (simplex.noise2D(frequency * x, frequency * z) + 1) * 0.5;
 }
 
-interface TerrainParameters {
+export interface TerrainParameters {
   amplitude: Subscribable<number>;
   scale: Subscribable<number>;
   persistence: Subscribable<number>;
@@ -24,16 +24,16 @@ interface TerrainParameters {
   octaves: Subscribable<number>;
 }
 
-function getElevation(
+export function getElevation(
   x: number,
-  y: number,
-  parameters: TerrainParameters,
-  simplex: SimplexNoise
+  z: number,
+  parameters: TerrainParameters
 ): number {
+  const simplex = new SimplexNoise("seed");
   const elevations = range(parameters.octaves.value).map((octave) =>
     getElevationOctave(
       parameters.scale.value * x,
-      parameters.scale.value * y,
+      parameters.scale.value * z,
       parameters.persistence.value,
       parameters.lacunarity.value,
       octave,
@@ -47,14 +47,13 @@ function getNewPositions(
   positions: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
   parameters: TerrainParameters
 ): THREE.BufferAttribute {
-  const simplex = new SimplexNoise("seed");
   const newPositions = positions.clone();
   for (let i = 0; i < positions.count; i++) {
     let x = positions.getX(i);
     let y = positions.getY(i);
     let z = positions.getZ(i);
-    let elevation = getElevation(x, y, parameters, simplex);
-    newPositions.setZ(i, z + elevation);
+    let elevation = getElevation(x, z, parameters);
+    newPositions.setY(i, y + elevation);
   }
   return newPositions;
 }
@@ -63,6 +62,7 @@ function getTerrainGeometry(
   parameters: TerrainParameters
 ): THREE.PlaneGeometry {
   const geometry = new THREE.PlaneGeometry(50, 50, 128, 128);
+  geometry.rotateX(-Math.PI / 2);
   const positions = geometry.getAttribute("position").clone();
   const update = () => {
     const newPositions = getNewPositions(positions, parameters);
@@ -74,7 +74,9 @@ function getTerrainGeometry(
   return geometry;
 }
 
-export function getTerrain(gui: dat.GUI): THREE.PlaneGeometry {
+export function getTerrain(
+  gui: dat.GUI
+): { geometry: THREE.PlaneGeometry; parameters: TerrainParameters } {
   const parameters = {
     amplitude: new Subscribable(2),
     scale: new Subscribable(0.1),
@@ -87,5 +89,8 @@ export function getTerrain(gui: dat.GUI): THREE.PlaneGeometry {
   gui.add(parameters.persistence, "value").min(0).max(1).name("persistence");
   gui.add(parameters.lacunarity, "value").min(0).max(3).name("lacunarity");
   gui.add(parameters.octaves, "value").min(1).max(5).step(1).name("octaves");
-  return getTerrainGeometry(parameters);
+  return {
+    geometry: getTerrainGeometry(parameters),
+    parameters: parameters,
+  };
 }
