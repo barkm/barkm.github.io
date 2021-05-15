@@ -1,57 +1,77 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import { TerrainParameters, getElevation } from "./terrain";
 import { SeaParameters } from "../sea";
+import { setBarycentricCoordinateAttribute } from "../../three/barycentric";
 
 import vertexShader from "../../../shaders/coral/vertex.glsl";
 import fragmentShader from "../../../shaders/coral/fragment.glsl";
-import { setBarycentricCoordinateAttribute } from "../../three/barycentric";
+import coralModel from "../../../../models/corals/coral1.glb";
+import { range } from "../../utils";
+
+function addCoral(
+  parent: THREE.Scene | THREE.Group,
+  seaParameters: SeaParameters,
+  terrainParameters: TerrainParameters,
+  geometry: THREE.BufferGeometry
+) {
+  const hue = 100 * Math.random();
+  const color = `hsl(${hue}, 100%, 85%)`;
+
+  const material = new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: {
+      uMinVisibility: { value: seaParameters.visibility.min.value },
+      uMaxVisibility: { value: seaParameters.visibility.max.value },
+      uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
+      uColor: { value: new THREE.Color(color) },
+      uLineThickness: { value: 1.5 },
+    },
+    side: THREE.DoubleSide,
+    alphaToCoverage: true,
+    extensions: {
+      derivatives: true,
+    },
+  });
+
+  const mesh = new THREE.Mesh(geometry!, material);
+  const scale = Math.random() + 0.5;
+  mesh.scale.set(scale, scale, scale);
+  mesh.rotateY(2 * Math.PI * Math.random());
+  mesh.position.x = 20 * (Math.random() - 0.5) * 2;
+  mesh.position.z = 20 * (Math.random() - 0.5) * 2;
+  mesh.position.y =
+    getElevation(mesh.position.x, mesh.position.z, terrainParameters) -
+    seaParameters.depth.value;
+  seaParameters.depth.subscribe((d) => {
+    mesh.position.y =
+      getElevation(mesh.position.x, mesh.position.z, terrainParameters) - d;
+  });
+  seaParameters.color.subscribe((c) => {
+    material.uniforms.uSeaColor.value.set(c);
+  });
+  parent.add(mesh);
+}
 
 export function addCorals(
   parent: THREE.Scene | THREE.Group,
   seaParameters: SeaParameters,
   terrainParameters: TerrainParameters
 ): void {
-  const geometry = new THREE.PlaneGeometry(0.5, 0.5, 5, 5);
-  const numCorals = 3000;
-
-  setBarycentricCoordinateAttribute(geometry);
-
-  for (let i = 0; i < numCorals; i++) {
-    const hue = 100 * Math.random();
-    const color = `hsl(${hue}, 100%, 85%)`;
-
-    const material = new THREE.ShaderMaterial({
-      vertexShader: vertexShader,
-      fragmentShader: fragmentShader,
-      uniforms: {
-        uMinVisibility: { value: seaParameters.visibility.min.value },
-        uMaxVisibility: { value: seaParameters.visibility.max.value },
-        uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
-        uColor: { value: new THREE.Color(color) },
-        uLineThickness: { value: 1.5 },
-      },
-      side: THREE.DoubleSide,
-      alphaToCoverage: true,
-      extensions: {
-        derivatives: true,
-      },
+  const numCorals = 5000;
+  const gltfLoader = new GLTFLoader();
+  gltfLoader.load(coralModel, (gltf) => {
+    let geometry: THREE.BufferGeometry | null = null;
+    gltf.scene.traverse((obj) => {
+      if (obj instanceof THREE.Mesh) {
+        geometry = obj.geometry;
+        setBarycentricCoordinateAttribute(geometry!);
+      }
     });
-
-    const mesh = new THREE.Mesh(geometry, material);
-    const scale = Math.random() + 0.5;
-    mesh.scale.set(scale, scale, scale);
-
-    mesh.position.x = 20 * (Math.random() - 0.5) * 2;
-    mesh.position.z = 20 * (Math.random() - 0.5) * 2;
-    mesh.position.y =
-      getElevation(mesh.position.x, mesh.position.z, terrainParameters) -
-      seaParameters.depth.value;
-    seaParameters.depth.subscribe((d) => {
-      mesh.position.y =
-        getElevation(mesh.position.x, mesh.position.z, terrainParameters) - d;
+    range(numCorals).map(() => {
+      addCoral(parent, seaParameters, terrainParameters, geometry!);
     });
-
-    parent.add(mesh);
-  }
+  });
 }
