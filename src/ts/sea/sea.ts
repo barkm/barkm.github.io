@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { Subscribable } from "../utils";
+import { Subscribable, addSubscribable, addSubscribableColor } from "../utils";
 import { Time } from "../three/utils";
 
 import { addBottom } from "./bottom/bottom";
@@ -32,19 +32,11 @@ export function addSea(
     renderer.setClearColor(v);
   });
 
-  gui.addColor(parameters.color, "value").name("color");
-  gui.add(parameters.depth, "value").min(5).max(15).name("depth");
+  addSubscribableColor(gui, parameters.color, "color");
+  addSubscribable(gui, parameters.depth, "depth", 5, 15);
   const visibilityGui = gui.addFolder("visibility");
-  visibilityGui
-    .add(parameters.visibility.min, "value")
-    .min(0)
-    .max(10)
-    .name("min");
-  visibilityGui
-    .add(parameters.visibility.max, "value")
-    .min(10)
-    .max(50)
-    .name("max");
+  addSubscribable(visibilityGui, parameters.visibility.min, "min", 0, 10);
+  addSubscribable(visibilityGui, parameters.visibility.max, "max", 10, 50);
 
   const updateBottom = addBottom(parameters, scene, gui.addFolder("bottom"));
   const updateSurface = addSurface(parameters, scene, gui.addFolder("surface"));

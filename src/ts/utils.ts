@@ -33,21 +33,53 @@ export function sum(array: Array<number>): number {
 
 export class Subscribable<Type> {
   subscribers: Array<(v: Type) => void>;
-  value_: Type;
-  constructor(value_: Type) {
+  constructor(public value: Type) {
     this.subscribers = [];
-    this.value_ = value_;
+    this.value = value;
   }
-
   subscribe(subsriber: (v: Type) => void) {
     this.subscribers.push(subsriber);
   }
+}
 
-  set value(v: Type) {
-    this.value_ = v;
-    this.subscribers.map((s) => s(v));
-  }
-  get value() {
-    return this.value_;
-  }
+function setupSubscribableController<Type>(
+  subscribable: Subscribable<Type>,
+  name: string,
+  controller: dat.GUIController
+) {
+  return controller
+    .name(name)
+    .onChange((v) => {
+      subscribable.subscribers.forEach((f) => f(v));
+    })
+    .onFinishChange((v) => {
+      subscribable.subscribers.forEach((f) => f(v));
+    });
+}
+
+export function addSubscribableColor<Type>(
+  gui: dat.GUI,
+  subscribable: Subscribable<Type>,
+  name: string
+) {
+  return setupSubscribableController(
+    subscribable,
+    name,
+    gui.addColor(subscribable, "value")
+  );
+}
+
+export function addSubscribable<Type>(
+  gui: dat.GUI,
+  subscribable: Subscribable<Type>,
+  name: string,
+  min?: number,
+  max?: number,
+  step?: number
+): dat.GUIController {
+  return setupSubscribableController(
+    subscribable,
+    name,
+    gui.add(subscribable, "value", min, max, step)
+  );
 }

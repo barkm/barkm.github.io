@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import SimplexNoise from "simplex-noise";
 
-import { range, sum, Subscribable } from "../../utils";
+import { range, sum, Subscribable, addSubscribable } from "../../utils";
 
 function getElevationOctave(
   x: number,
@@ -84,11 +84,11 @@ export function getTerrain(
     lacunarity: new Subscribable(1),
     octaves: new Subscribable(1),
   };
-  gui.add(parameters.amplitude, "value").min(0).max(5).name("amplitude");
-  gui.add(parameters.scale, "value").min(0).max(0.5).name("scale");
-  gui.add(parameters.persistence, "value").min(0).max(1).name("persistence");
-  gui.add(parameters.lacunarity, "value").min(0).max(3).name("lacunarity");
-  gui.add(parameters.octaves, "value").min(1).max(5).step(1).name("octaves");
+  addSubscribable(gui, parameters.amplitude, "amplitude", 0, 5);
+  addSubscribable(gui, parameters.scale, "scale", 0, 0.5);
+  addSubscribable(gui, parameters.persistence, "persistence", 0, 1);
+  addSubscribable(gui, parameters.lacunarity, "lacunarity", 0, 3);
+  addSubscribable(gui, parameters.octaves, "ocataves", 1, 5, 1);
   return {
     geometry: getTerrainGeometry(parameters),
     parameters: parameters,
