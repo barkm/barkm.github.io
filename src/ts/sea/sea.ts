@@ -1,6 +1,10 @@
 import * as THREE from "three";
 
-import { Subscribable, addSubscribable, addSubscribableColor } from "../utils";
+import {
+  Subscribable,
+  addSubscribable,
+  addSubscribableColor,
+} from "../subscribable";
 import { Time } from "../three/utils";
 
 import { addBottom } from "./bottom/bottom";

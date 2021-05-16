@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import SimplexNoise from "simplex-noise";
 
-import { range, sum, Subscribable, addSubscribable } from "../../utils";
+import { range, sum } from "../../utils";
+import { Subscribable, addSubscribable } from "../../subscribable";
 
 function getElevationOctave(
   x: number,
