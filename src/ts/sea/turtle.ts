@@ -58,13 +58,13 @@ export function addTurtle(
     .step(0.01)
     .name("lineThickness");
 
-  seaParameters.color.subscribe((v) => {
+  seaParameters.color.subscribeOnChange((v) => {
     turtleMaterial.uniforms.uSeaColor.value = new THREE.Color(v);
   });
-  seaParameters.visibility.min.subscribe((v) => {
+  seaParameters.visibility.min.subscribeOnChange((v) => {
     turtleMaterial.uniforms.uMinVisibility.value = v;
   });
-  seaParameters.visibility.max.subscribe((v) => {
+  seaParameters.visibility.max.subscribeOnChange((v) => {
     turtleMaterial.uniforms.uMaxVisibility.value = v;
   });
 

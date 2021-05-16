@@ -32,13 +32,18 @@ export function sum(array: Array<number>): number {
 }
 
 export class Subscribable<Type> {
-  subscribers: Array<(v: Type) => void>;
+  onChangeSubscribers: Array<(v: Type) => void>;
+  onFinishChangeSubscribers: Array<(v: Type) => void>;
   constructor(public value: Type) {
-    this.subscribers = [];
+    this.onChangeSubscribers = [];
+    this.onFinishChangeSubscribers = [];
     this.value = value;
   }
-  subscribe(subsriber: (v: Type) => void) {
-    this.subscribers.push(subsriber);
+  subscribeOnChange(subscriber: (v: Type) => void) {
+    this.onChangeSubscribers.push(subscriber);
+  }
+  subscribeOnFinishChange(subscriber: (v: Type) => void) {
+    this.onFinishChangeSubscribers.push(subscriber);
   }
 }
 
@@ -50,10 +55,10 @@ function setupSubscribableController<Type>(
   return controller
     .name(name)
     .onChange((v) => {
-      subscribable.subscribers.forEach((f) => f(v));
+      subscribable.onChangeSubscribers.forEach((f) => f(v));
     })
     .onFinishChange((v) => {
-      subscribable.subscribers.forEach((f) => f(v));
+      subscribable.onFinishChangeSubscribers.forEach((f) => f(v));
     });
 }
 

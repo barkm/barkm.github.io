@@ -28,7 +28,7 @@ export function addSea(
   };
 
   renderer.setClearColor(parameters.color.value);
-  parameters.color.subscribe((v) => {
+  parameters.color.subscribeOnChange((v) => {
     renderer.setClearColor(v);
   });
 

@@ -35,13 +35,13 @@ export function addBottom(
   };
   material.uniforms.uTime = { value: 0 };
 
-  seaParameters.color.subscribe((v) => {
+  seaParameters.color.subscribeOnChange((v) => {
     material.uniforms.uSeaColor.value = new THREE.Color(v);
   });
-  seaParameters.visibility.min.subscribe((v) => {
+  seaParameters.visibility.min.subscribeOnChange((v) => {
     material.uniforms.uMinVisibility.value = v;
   });
-  seaParameters.visibility.max.subscribe((v) => {
+  seaParameters.visibility.max.subscribeOnChange((v) => {
     material.uniforms.uMaxVisibility.value = v;
   });
 
@@ -68,7 +68,7 @@ export function addBottom(
 
   const bottom = new THREE.Mesh(terrain.geometry, material);
   bottom.position.y = -seaParameters.depth.value;
-  seaParameters.depth.subscribe((d) => (bottom.position.y = -d));
+  seaParameters.depth.subscribeOnChange((d) => (bottom.position.y = -d));
 
   scene.add(bottom);
 

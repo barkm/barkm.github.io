@@ -70,7 +70,7 @@ function getTerrainGeometry(
     geometry.getAttribute("position").needsUpdate = true;
   };
   update();
-  Object.values(parameters).map((p) => p.subscribe(update));
+  Object.values(parameters).map((p) => p.subscribeOnChange(update));
   return geometry;
 }
 

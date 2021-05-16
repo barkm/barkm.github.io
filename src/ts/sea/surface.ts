@@ -34,13 +34,13 @@ function getMaterial(
     },
   });
 
-  seaParameters.color.subscribe((v) => {
+  seaParameters.color.subscribeOnChange((v) => {
     material.uniforms.uSeaColor.value = new THREE.Color(v);
   });
-  seaParameters.visibility.min.subscribe((v) => {
+  seaParameters.visibility.min.subscribeOnChange((v) => {
     material.uniforms.uMinVisibility.value = v;
   });
-  seaParameters.visibility.max.subscribe((v) => {
+  seaParameters.visibility.max.subscribeOnChange((v) => {
     material.uniforms.uMaxVisibility.value = v;
   });
 
