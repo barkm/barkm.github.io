@@ -72,7 +72,7 @@ export function addBottom(
 
   scene.add(bottom);
 
-  addCorals(scene, seaParameters, terrain.parameters);
+  addCorals(scene, seaParameters, terrain.parameters, gui.addFolder("corals"));
 
   return (time) => {
     material.uniforms.uTime.value = time.elapsed;

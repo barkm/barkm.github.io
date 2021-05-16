@@ -55,12 +55,28 @@ function addCoral(
   parent.add(mesh);
 }
 
+function removeCorals(group: THREE.Group): void {
+  const toRemove: Array<THREE.Mesh> = [];
+  group.traverse((obj) => {
+    if (obj instanceof THREE.Mesh) {
+      obj.material.dispose();
+      toRemove.push(obj);
+    }
+  });
+  toRemove.forEach((mesh) => group.remove(mesh));
+}
+
 export function addCorals(
   parent: THREE.Scene | THREE.Group,
   seaParameters: SeaParameters,
-  terrainParameters: TerrainParameters
+  terrainParameters: TerrainParameters,
+  gui: dat.GUI
 ): void {
-  const numCorals = 5000;
+  const parameters = {
+    numCorals: 5000,
+  };
+
+  const group = new THREE.Group();
   const gltfLoader = new GLTFLoader();
   gltfLoader.load(coralModel, (gltf) => {
     let geometry: THREE.BufferGeometry | null = null;
@@ -70,8 +86,25 @@ export function addCorals(
         setBarycentricCoordinateAttribute(geometry!);
       }
     });
-    range(numCorals).map(() => {
-      addCoral(parent, seaParameters, terrainParameters, geometry!);
-    });
+    const removeAndAddCorals = () => {
+      removeCorals(group);
+      range(parameters.numCorals).map(() => {
+        addCoral(group, seaParameters, terrainParameters, geometry!);
+      });
+    };
+    removeAndAddCorals();
+    parent.add(group);
+
+    gui
+      .add(parameters, "numCorals")
+      .min(0)
+      .max(10000)
+      .step(500)
+      .onFinishChange(removeAndAddCorals);
+    terrainParameters.amplitude.subscribe(removeAndAddCorals);
+    terrainParameters.scale.subscribe(removeAndAddCorals);
+    terrainParameters.persistence.subscribe(removeAndAddCorals);
+    terrainParameters.lacunarity.subscribe(removeAndAddCorals);
+    terrainParameters.octaves.subscribe(removeAndAddCorals);
   });
 }
