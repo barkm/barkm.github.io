@@ -42,16 +42,24 @@ function addCoral(
   mesh.rotateY(2 * Math.PI * Math.random());
   mesh.position.x = 20 * (Math.random() - 0.5) * 2;
   mesh.position.z = 20 * (Math.random() - 0.5) * 2;
-  mesh.position.y =
-    getElevation(mesh.position.x, mesh.position.z, terrainParameters) -
-    seaParameters.depth.value;
-  seaParameters.depth.subscribeOnFinishChange((d) => {
+
+  const setElevation = () => {
     mesh.position.y =
-      getElevation(mesh.position.x, mesh.position.z, terrainParameters) - d;
-  });
+      getElevation(mesh.position.x, mesh.position.z, terrainParameters) -
+      seaParameters.depth.value;
+  };
+  setElevation();
+
+  seaParameters.depth.subscribeOnFinishChange(setElevation);
   seaParameters.color.subscribeOnChange((c) => {
     material.uniforms.uSeaColor.value.set(c);
   });
+  terrainParameters.amplitude.subscribeOnFinishChange(setElevation);
+  terrainParameters.scale.subscribeOnFinishChange(setElevation);
+  terrainParameters.persistence.subscribeOnFinishChange(setElevation);
+  terrainParameters.lacunarity.subscribeOnFinishChange(setElevation);
+  terrainParameters.octaves.subscribeOnFinishChange(setElevation);
+
   parent.add(mesh);
 }
 
@@ -101,10 +109,5 @@ export function addCorals(
       .max(10000)
       .step(500)
       .onFinishChange(removeAndAddCorals);
-    terrainParameters.amplitude.subscribeOnFinishChange(removeAndAddCorals);
-    terrainParameters.scale.subscribeOnFinishChange(removeAndAddCorals);
-    terrainParameters.persistence.subscribeOnFinishChange(removeAndAddCorals);
-    terrainParameters.lacunarity.subscribeOnFinishChange(removeAndAddCorals);
-    terrainParameters.octaves.subscribeOnFinishChange(removeAndAddCorals);
   });
 }
