@@ -63,6 +63,12 @@ function addCoral(
   seaParameters.color.subscribeOnChange((c) => {
     material.uniforms.uSeaColor.value.set(c);
   });
+  seaParameters.visibility.min.subscribeOnChange((v) => {
+    material.uniforms.uMinVisibility.value = v;
+  });
+  seaParameters.visibility.max.subscribeOnChange((v) => {
+    material.uniforms.uMaxVisibility.value = v;
+  });
   terrainParameters.amplitude.subscribeOnFinishChange(setElevation);
   terrainParameters.scale.subscribeOnFinishChange(setElevation);
   terrainParameters.persistence.subscribeOnFinishChange(setElevation);
