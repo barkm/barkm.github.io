@@ -5,16 +5,16 @@ import * as UTILS from "../utils";
 type Assignment = 0 | 1 | 2;
 
 function getBarycentricCoordinates(
-  asssignents: Array<Assignment>
+  assignments: Array<Assignment>
 ): Float32Array {
-  const barycentricCoordinates = new Float32Array(asssignents.length * 3);
+  const barycentricCoordinates = new Float32Array(assignments.length * 3);
   const corners = [
     new THREE.Vector3(1, 0, 0),
     new THREE.Vector3(0, 1, 0),
     new THREE.Vector3(0, 0, 1),
   ];
-  for (let i = 0; i < asssignents.length; i++) {
-    corners[asssignents[i]].toArray(barycentricCoordinates, i * 3);
+  for (let i = 0; i < assignments.length; i++) {
+    corners[assignments[i]].toArray(barycentricCoordinates, i * 3);
   }
   return barycentricCoordinates;
 }

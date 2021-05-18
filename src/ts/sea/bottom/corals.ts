@@ -1,19 +1,28 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
+import { range, randomUniformInt } from "../../utils";
+import { addSubscribable, Subscribable } from "../../subscribable";
 import { TerrainParameters, getElevation } from "./terrain";
 import { SeaParameters } from "../sea";
 import { setBarycentricCoordinateAttribute } from "../../three/barycentric";
+import { loadModel } from "../../three/utils";
 
 import vertexShader from "../../../shaders/coral/vertex.glsl";
 import fragmentShader from "../../../shaders/coral/fragment.glsl";
-import coralModel from "../../../../models/corals/coral1.glb";
-import { range } from "../../utils";
+import coralModel1 from "../../../../models/corals/coral1.glb";
+import coralModel2 from "../../../../models/corals/coral2.glb";
+
+interface CoralParameters {
+  numCorals: number;
+  edgeThickness: Subscribable<number>;
+}
 
 function addCoral(
   parent: THREE.Scene | THREE.Group,
   seaParameters: SeaParameters,
   terrainParameters: TerrainParameters,
+  parameters: CoralParameters,
   geometry: THREE.BufferGeometry
 ) {
   const hue = 100 * Math.random();
@@ -27,7 +36,7 @@ function addCoral(
       uMaxVisibility: { value: seaParameters.visibility.max.value },
       uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
       uColor: { value: new THREE.Color(color) },
-      uLineThickness: { value: 1.5 },
+      uLineThickness: { value: parameters.edgeThickness.value },
     },
     side: THREE.DoubleSide,
     alphaToCoverage: true,
@@ -60,6 +69,10 @@ function addCoral(
   terrainParameters.lacunarity.subscribeOnFinishChange(setElevation);
   terrainParameters.octaves.subscribeOnFinishChange(setElevation);
 
+  parameters.edgeThickness.subscribeOnFinishChange((v) => {
+    material.uniforms.uLineThickness.value = v;
+  });
+
   parent.add(mesh);
 }
 
@@ -74,6 +87,28 @@ function removeCorals(group: THREE.Group): void {
   toRemove.forEach((mesh) => group.remove(mesh));
 }
 
+async function loadCoralGeometry(
+  loader: GLTFLoader,
+  path: string
+): Promise<THREE.BufferGeometry> {
+  const model = await loadModel(loader, path);
+  let geometry: THREE.BufferGeometry | null = null;
+  model.scene.traverse((obj: any) => {
+    if (obj instanceof THREE.Mesh) {
+      geometry = obj.geometry;
+      setBarycentricCoordinateAttribute(geometry!);
+    }
+  });
+  return geometry!;
+}
+
+function loadCoralGeometries() {
+  const loader = new GLTFLoader();
+  const promise1 = loadCoralGeometry(loader, coralModel1);
+  const promise2 = loadCoralGeometry(loader, coralModel2);
+  return Promise.all([promise1, promise2]);
+}
+
 export function addCorals(
   parent: THREE.Scene | THREE.Group,
   seaParameters: SeaParameters,
@@ -81,23 +116,23 @@ export function addCorals(
   gui: dat.GUI
 ): void {
   const parameters = {
-    numCorals: 5000,
+    numCorals: 3000,
+    edgeThickness: new Subscribable(1),
   };
 
-  const group = new THREE.Group();
-  const gltfLoader = new GLTFLoader();
-  gltfLoader.load(coralModel, (gltf) => {
-    let geometry: THREE.BufferGeometry | null = null;
-    gltf.scene.traverse((obj) => {
-      if (obj instanceof THREE.Mesh) {
-        geometry = obj.geometry;
-        setBarycentricCoordinateAttribute(geometry!);
-      }
-    });
+  loadCoralGeometries().then((geometries) => {
+    const group = new THREE.Group();
     const removeAndAddCorals = () => {
       removeCorals(group);
       range(parameters.numCorals).map(() => {
-        addCoral(group, seaParameters, terrainParameters, geometry!);
+        const coralIndex = randomUniformInt(0, geometries.length);
+        addCoral(
+          group,
+          seaParameters,
+          terrainParameters,
+          parameters,
+          geometries[coralIndex]
+        );
       });
     };
     removeAndAddCorals();
@@ -109,5 +144,6 @@ export function addCorals(
       .max(10000)
       .step(500)
       .onFinishChange(removeAndAddCorals);
+    addSubscribable(gui, parameters.edgeThickness, "edgeThickness", 0, 2);
   });
 }

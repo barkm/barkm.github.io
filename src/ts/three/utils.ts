@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as dat from "dat.gui";
 
 import * as UTILS from "../utils";
@@ -88,4 +89,17 @@ export function getUpdate(updateFunctions: Array<(time: Time) => any>) {
     window.requestAnimationFrame(update);
   };
   return update;
+}
+
+export interface GltfModel {
+  scene: THREE.Group;
+}
+
+export function loadModel(
+  loader: GLTFLoader,
+  path: string
+): Promise<GltfModel> {
+  return new Promise((resolve) => {
+    loader.load(path, resolve);
+  });
 }
