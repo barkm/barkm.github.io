@@ -61,11 +61,16 @@ export function addSurface(
 ): (t: THREE_UTILS.Time) => void {
   const material = getMaterial(seaParameters, gui);
 
-  const geometry = new THREE.PlaneGeometry(50, 50, 32, 32);
+  const geometry = new THREE.PlaneGeometry(
+    seaParameters.width,
+    seaParameters.height,
+    32,
+    (32 * seaParameters.height) / seaParameters.width
+  );
   setBarycentricCoordinateAttribute(geometry);
 
   const surface = new THREE.Mesh(geometry, material);
-  surface.position.z = -15;
+  surface.position.z = -seaParameters.height / 2;
   surface.rotation.x = Math.PI / 2;
   scene.add(surface);
 

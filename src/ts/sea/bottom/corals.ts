@@ -37,6 +37,7 @@ function addCoral(
       uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
       uColor: { value: new THREE.Color(color) },
       uLineThickness: { value: parameters.edgeThickness.value },
+      uTime: { value: 0 },
     },
     side: THREE.DoubleSide,
     alphaToCoverage: true,
@@ -46,11 +47,11 @@ function addCoral(
   });
 
   const mesh = new THREE.Mesh(geometry!, material);
-  const scale = Math.random() + 0.5;
+  const scale = 0.3 * Math.random() + 1;
   mesh.scale.set(scale, scale, scale);
   mesh.rotateY(2 * Math.PI * Math.random());
-  mesh.position.x = 20 * (Math.random() - 0.5) * 2;
-  mesh.position.z = 20 * (Math.random() - 0.5) * 2;
+  mesh.position.x = seaParameters.width * (Math.random() - 0.5);
+  mesh.position.z = -seaParameters.height * Math.random();
 
   const setElevation = () => {
     mesh.position.y =
@@ -122,8 +123,8 @@ export function addCorals(
   gui: dat.GUI
 ): void {
   const parameters = {
-    numCorals: 3000,
-    edgeThickness: new Subscribable(1),
+    numCorals: 1000,
+    edgeThickness: new Subscribable(1.5),
   };
 
   loadCoralGeometries().then((geometries) => {

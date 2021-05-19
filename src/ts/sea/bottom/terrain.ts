@@ -3,6 +3,7 @@ import SimplexNoise from "simplex-noise";
 
 import { range, sum } from "../../utils";
 import { Subscribable, addSubscribable } from "../../subscribable";
+import { SeaParameters } from "../sea";
 
 function getElevationOctave(
   x: number,
@@ -60,10 +61,17 @@ function getNewPositions(
 }
 
 function getTerrainGeometry(
+  seaParameters: SeaParameters,
   parameters: TerrainParameters
 ): THREE.PlaneGeometry {
-  const geometry = new THREE.PlaneGeometry(50, 50, 128, 128);
+  const geometry = new THREE.PlaneGeometry(
+    seaParameters.width,
+    seaParameters.height,
+    128,
+    (128 * seaParameters.height) / seaParameters.width
+  );
   geometry.rotateX(-Math.PI / 2);
+  geometry.translate(0, 0, -seaParameters.height / 2);
   const positions = geometry.getAttribute("position").clone();
   const update = () => {
     const newPositions = getNewPositions(positions, parameters);
@@ -76,6 +84,7 @@ function getTerrainGeometry(
 }
 
 export function getTerrain(
+  seaParameters: SeaParameters,
   gui: dat.GUI
 ): { geometry: THREE.PlaneGeometry; parameters: TerrainParameters } {
   const parameters = {
@@ -91,7 +100,7 @@ export function getTerrain(
   addSubscribable(gui, parameters.lacunarity, "lacunarity", 0, 3);
   addSubscribable(gui, parameters.octaves, "ocataves", 1, 5, 1);
   return {
-    geometry: getTerrainGeometry(parameters),
+    geometry: getTerrainGeometry(seaParameters, parameters),
     parameters: parameters,
   };
 }
