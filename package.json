@@ -12,12 +12,14 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
+    "animejs": "^3.2.1",
     "dat.gui": "^0.7.7",
     "glslify": "^7.1.1",
     "simplex-noise": "^2.4.0",
     "three": "^0.128.0"
   },
   "devDependencies": {
+    "@types/animejs": "^3.1.3",
     "@types/dat.gui": "^0.7.6",
     "@types/three": "^0.127.1",
     "clean-webpack-plugin": "*",
