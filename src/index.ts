@@ -16,7 +16,7 @@ const scene = new THREE.Scene();
 const windowSize = UTILS.getWindowSize();
 
 const camera = THREE_UTILS.getPerspectiveCamera(60, 1, 50, windowSize);
-camera.position.set(0, -3, 0);
+camera.position.set(0, -15, 0);
 
 const cameraHelper = THREE_UTILS.getFixedCameraHelper(camera);
 THREE_UTILS.addVisibilityToggle(gui, cameraHelper, scene, "cameraHelper");
@@ -31,7 +31,7 @@ gui
   .onChange(() => {
     if (!controls.enabled) controls.reset();
   });
-controls.target.set(0, -3, -10);
+controls.target.set(0, camera.position.y, -10);
 controls.saveState();
 controls.update();
 

@@ -88,11 +88,11 @@ export function getTerrain(
   gui: dat.GUI
 ): { geometry: THREE.PlaneGeometry; parameters: TerrainParameters } {
   const parameters = {
-    amplitude: new Subscribable(2),
+    amplitude: new Subscribable(1.5),
     scale: new Subscribable(0.1),
-    persistence: new Subscribable(1),
-    lacunarity: new Subscribable(1),
-    octaves: new Subscribable(1),
+    persistence: new Subscribable(0.6),
+    lacunarity: new Subscribable(1.8),
+    octaves: new Subscribable(3),
   };
   addSubscribable(gui, parameters.amplitude, "amplitude", 0, 5);
   addSubscribable(gui, parameters.scale, "scale", 0, 0.5);

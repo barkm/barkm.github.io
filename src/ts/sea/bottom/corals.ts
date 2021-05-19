@@ -123,7 +123,7 @@ export function addCorals(
   gui: dat.GUI
 ): void {
   const parameters = {
-    numCorals: 1000,
+    numCorals: 2000,
     edgeThickness: new Subscribable(1.5),
   };
 

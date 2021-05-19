@@ -29,7 +29,7 @@ export function addSea(
 ): (time: Time) => void {
   const parameters: SeaParameters = {
     color: new Subscribable("#7696ff"),
-    visibility: { min: new Subscribable(5.0), max: new Subscribable(30.0) },
+    visibility: { min: new Subscribable(5.0), max: new Subscribable(25.0) },
     depth: new Subscribable(20),
     width: 40,
     height: 30,
