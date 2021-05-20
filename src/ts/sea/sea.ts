@@ -41,7 +41,7 @@ export function addSea(
   });
 
   addSubscribableColor(gui, parameters.color, "color");
-  addSubscribable(gui, parameters.depth, "depth", 5, 15);
+  addSubscribable(gui, parameters.depth, "depth", 5, 30);
   const visibilityGui = gui.addFolder("visibility");
   addSubscribable(visibilityGui, parameters.visibility.min, "min", 0, 10);
   addSubscribable(visibilityGui, parameters.visibility.max, "max", 10, 50);

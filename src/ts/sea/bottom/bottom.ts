@@ -6,6 +6,7 @@ import { SeaParameters } from "../sea";
 import { getNoiseMaterial } from "./caustic/noise";
 import { getTerrain } from "./terrain";
 import { addCorals } from "./corals";
+import { addBubbles } from "./bubbles";
 
 export function addBottom(
   seaParameters: SeaParameters,
@@ -73,8 +74,14 @@ export function addBottom(
   scene.add(bottom);
 
   addCorals(scene, seaParameters, terrain.parameters, gui.addFolder("corals"));
+  const updateBubbles = addBubbles(
+    scene,
+    seaParameters,
+    gui.addFolder("bubbles")
+  );
 
   return (time) => {
     material.uniforms.uTime.value = time.elapsed;
+    updateBubbles(time);
   };
 }
