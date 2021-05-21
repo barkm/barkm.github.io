@@ -20,7 +20,7 @@ export function addTurtle(
     new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true })
   );
   mesh.position.z = -box.parameters.depth / 2;
-  mesh.position.y -= 3 + box.parameters.height / 2;
+  mesh.position.y -= 2 + box.parameters.height / 2;
   THREE_UTILS.addVisibilityToggle(gui, mesh, scene, "boundary");
   const boxMotion = MOTION.getStayWithinBoxMotion(
     mesh.position,

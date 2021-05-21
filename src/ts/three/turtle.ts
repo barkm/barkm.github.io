@@ -49,7 +49,7 @@ export class Turtle {
         this.position.z
       );
       this.model.rotation.y = UTILS.randomUniform(0, 2 * Math.PI);
-      this.model.rotateX(UTILS.randomUniform(-Math.PI / 2, Math.PI / 2));
+      this.model.rotateX(UTILS.randomUniform(-Math.PI / 4, Math.PI / 4));
       this.setupSwimming();
     });
   }
@@ -71,7 +71,8 @@ export class Turtle {
       this.model!.position.clone(),
       initialRotations,
       this.motion,
-      gains
+      gains,
+      0.8
     );
     this.swim = (time) => {
       const motionState = motionCallback(time);

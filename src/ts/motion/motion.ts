@@ -141,9 +141,10 @@ export function getMotionCallback(
   intialPosition: Position,
   initialRotation: Orientation<Rotation>,
   getTargetRotation: Orientation<TargetFunction>,
-  gain: Orientation<Rotation>
+  gain: Orientation<Rotation>,
+  speed: number
 ): (t: Time) => { position: Position; rotations: Orientation<Rotation> } {
-  const positionController = new PositionController(intialPosition);
+  const positionController = new PositionController(intialPosition, speed);
   const yawController = new RotationController(
     initialRotation.yaw,
     getTargetRotation.yaw,

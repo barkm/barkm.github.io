@@ -17,7 +17,7 @@ const scene = new THREE.Scene();
 const windowSize = UTILS.getWindowSize();
 
 const camera = THREE_UTILS.getPerspectiveCamera(60, 1, 50, windowSize);
-camera.position.set(0, -16, 0);
+camera.position.set(0, -3, 0);
 
 const cameraHelper = THREE_UTILS.getFixedCameraHelper(camera);
 THREE_UTILS.addVisibilityToggle(gui, cameraHelper, scene, "cameraHelper");
@@ -40,23 +40,6 @@ const axesHelper = new THREE.AxesHelper();
 THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axesHelper");
 
 const updateSea = addSea(renderer, scene, gui.addFolder("sea"));
-
-const animation = anime({
-  targets: [camera.position, cameraHelper.position, controls.target],
-  duration: 6 * 1000,
-  y: -3,
-  easing: "cubicBezier(.3, .0, .7, 1.0)",
-  autoplay: false,
-});
-
-const playAndReverse = () => {
-  animation.play();
-  animation.finished.then(() => {
-    animation.reverse();
-  });
-};
-window.addEventListener("dblclick", playAndReverse);
-window.addEventListener("touchstart", playAndReverse);
 
 const update = THREE_UTILS.getUpdate([
   () => {

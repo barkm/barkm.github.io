@@ -4,16 +4,16 @@ import { Position, Rotation, TargetFunction } from "./types";
 
 export class PositionController {
   position: Position;
-  constructor(initialPosition: Position) {
+  constructor(initialPosition: Position, public speed: number) {
     this.position = initialPosition;
   }
   update(time: Time, yaw: Rotation, pitch: Rotation) {
     const dx = Math.cos(pitch.rotation) * Math.sin(yaw.rotation);
     const dy = Math.sin(pitch.rotation);
     const dz = Math.cos(pitch.rotation) * Math.cos(yaw.rotation);
-    this.position.x += dx * time.delta;
-    this.position.y -= dy * time.delta;
-    this.position.z += dz * time.delta;
+    this.position.x += this.speed * dx * time.delta;
+    this.position.y -= this.speed * dy * time.delta;
+    this.position.z += this.speed * dz * time.delta;
     return this.position;
   }
 }
