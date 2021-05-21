@@ -4,8 +4,11 @@ uniform float uMinVisibility;
 uniform float uMaxVisibility;
 uniform float uTime;
 
+attribute vec3 aColor;
+
 varying vec3 vBarycentricCoordinate;
 varying float vVisibility;
+varying vec3 vColor;
 
 #include "../visibility.glsl";
 
@@ -20,4 +23,5 @@ void main() {
 
     vBarycentricCoordinate = aBarycentricCoordinate;
 	vVisibility = getVisibility(viewPosition.xyz, uMinVisibility, uMaxVisibility);
+    vColor = aColor;
 }

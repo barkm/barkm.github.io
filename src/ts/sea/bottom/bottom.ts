@@ -73,7 +73,12 @@ export function addBottom(
 
   scene.add(bottom);
 
-  addCorals(scene, seaParameters, terrain.parameters, gui.addFolder("corals"));
+  const updateCorals = addCorals(
+    scene,
+    seaParameters,
+    terrain.parameters,
+    gui.addFolder("corals")
+  );
   const updateBubbles = addBubbles(
     scene,
     seaParameters,
@@ -83,5 +88,6 @@ export function addBottom(
   return (time) => {
     material.uniforms.uTime.value = time.elapsed;
     updateBubbles(time);
+    updateCorals(time);
   };
 }
