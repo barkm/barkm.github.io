@@ -75,6 +75,9 @@ export class Turtle {
       0.8
     );
     this.swim = (time) => {
+      if (time.delta > 1) {
+        return;
+      }
       const motionState = motionCallback(time);
       THREE_MOTION.updateObject(
         this.model!,

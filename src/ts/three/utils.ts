@@ -76,11 +76,9 @@ export interface Time {
 
 export function getUpdate(updateFunctions: Array<(time: Time) => any>) {
   const clock = new THREE.Clock();
-  let previousTime = 0;
   const update = () => {
+    const delta = clock.getDelta();
     const elapsed = clock.getElapsedTime();
-    const delta = elapsed - previousTime;
-    previousTime = elapsed;
     if (updateFunctions) {
       updateFunctions.map((f) => {
         f({ elapsed, delta });
