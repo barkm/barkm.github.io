@@ -29,10 +29,18 @@ export function getWindowSize(): WindowSize {
   return windowSize;
 }
 
+export function subsample(array: Array<any>, step: number) {
+  return array.filter((e, i) => i % step === step - 1);
+}
+
 export function range(n: number): Array<number> {
   return [...Array(n).keys()];
 }
 
 export function sum(array: Array<number>): number {
   return array.reduce((a, b) => a + b);
+}
+
+export function cartesian(...a: Array<Array<any>>) {
+  return a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
 }

@@ -1,8 +1,13 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import gaussian from "gaussian";
 
-import { range, randomUniformInt, randomUniform } from "../../utils";
+import {
+  range,
+  randomUniformInt,
+  randomUniform,
+  cartesian,
+  subsample,
+} from "../../utils";
 import { addSubscribable, Subscribable } from "../../subscribable";
 import { TerrainParameters, getElevation } from "./terrain";
 import { SeaParameters } from "../sea";
@@ -29,31 +34,14 @@ interface CoralParameters {
 
 function getParticlePositionAttribute(count: number, boundingBox: THREE.Box3) {
   const positions = new Float32Array(3 * count);
-  const localPositions = new Float32Array(3 * count);
   const boundingBoxSize = new THREE.Vector3();
   boundingBox.getSize(boundingBoxSize);
   for (let i = 0; i < positions.length; i += 3) {
     positions[i] = randomUniform(boundingBox.min.x, boundingBox.max.x);
     positions[i + 1] = randomUniform(boundingBox.min.y, boundingBox.max.y);
     positions[i + 2] = randomUniform(boundingBox.min.z, boundingBox.max.z);
-    localPositions[i] = positions[i] / boundingBoxSize.x;
-    localPositions[i + 1] = positions[i + 1] / boundingBoxSize.y;
-    localPositions[i + 2] = positions[i + 2] / boundingBoxSize.z;
   }
-  return {
-    position: new THREE.BufferAttribute(positions, 3),
-    localPosition: new THREE.BufferAttribute(localPositions, 3),
-  };
-}
-
-function getParticleColorAttribute(count: number, color: THREE.Color) {
-  const colors = new Float32Array(3 * count);
-  for (let i = 0; i < colors.length; i += 3) {
-    colors[i] = color.r;
-    colors[i + 1] = color.g;
-    colors[i + 2] = color.b;
-  }
-  return new THREE.BufferAttribute(colors, 3);
+  return new THREE.BufferAttribute(positions, 3);
 }
 
 function getParticleSizeAttribute(
@@ -113,11 +101,9 @@ function getParticlesMaterial(seaParameters: SeaParameters, gui: dat.GUI) {
   return { material, update };
 }
 
-function getParticles(
+function getParticlesGeometry(
   parameters: ParticlesParameters,
-  boundingBox: THREE.Box3,
-  color: THREE.Color,
-  material: THREE.ShaderMaterial
+  boundingBox: THREE.Box3
 ) {
   const geometry = new THREE.BufferGeometry();
   const setPositionAttribute = () => {
@@ -125,14 +111,7 @@ function getParticles(
       parameters.numPerCoral.value,
       boundingBox
     );
-    geometry.setAttribute("position", position.position);
-    geometry.setAttribute("aLocalPosition", position.localPosition);
-  };
-  const setColorPosition = () => {
-    geometry.setAttribute(
-      "aColor",
-      getParticleColorAttribute(parameters.numPerCoral.value, color)
-    );
+    geometry.setAttribute("position", position);
   };
   const setSizeAttribute = () => {
     geometry.setAttribute(
@@ -144,18 +123,21 @@ function getParticles(
       )
     );
   };
-  const setAttributes = () => {
-    setPositionAttribute();
-    setColorPosition();
-    setSizeAttribute();
-  };
-  setAttributes();
-
-  parameters.numPerCoral.subscribeOnFinishChange(setAttributes);
+  setPositionAttribute();
+  setSizeAttribute();
   parameters.minSize.subscribeOnFinishChange(setSizeAttribute);
   parameters.maxSize.subscribeOnFinishChange(setSizeAttribute);
+  return geometry;
+}
 
-  return new THREE.Points(geometry, material);
+function setColorAttribute(geometry: THREE.BufferGeometry, color: THREE.Color) {
+  const colors = new Float32Array(3 * geometry.getAttribute("position").count);
+  for (let i = 0; i < colors.length; i += 3) {
+    colors[i] = color.r;
+    colors[i + 1] = color.g;
+    colors[i + 2] = color.b;
+  }
+  geometry.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
 }
 
 function getCoralMaterial(
@@ -197,52 +179,12 @@ function getCoralMaterial(
   return material;
 }
 
-function getCoral(
-  seaParameters: SeaParameters,
-  terrainParameters: TerrainParameters,
-  material: THREE.ShaderMaterial,
-  color: THREE.Color,
-  geometry: THREE.BufferGeometry
-) {
-  const colors = new Float32Array(
-    geometry.getAttribute("position").array.length
-  );
-  for (let i = 0; i < colors.length; i += 3) {
-    colors[i] = color.r;
-    colors[i + 1] = color.g;
-    colors[i + 2] = color.b;
-  }
-
-  geometry.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
-
-  const coral = new THREE.Mesh(geometry!, material);
-  const scale = 0.3 * Math.random() + 1;
-  coral.scale.set(scale, scale, scale);
-  coral.rotateY(2 * Math.PI * Math.random());
-  coral.position.x = gaussian(0, seaParameters.width).ppf(Math.random());
-  coral.position.z = -seaParameters.height * Math.random();
-
-  const setElevation = () => {
-    coral.position.y = getElevation(
-      coral.position.x,
-      coral.position.z,
-      terrainParameters
-    );
-  };
-  setElevation();
-
-  terrainParameters.amplitude.subscribeOnFinishChange(setElevation);
-  terrainParameters.scale.subscribeOnFinishChange(setElevation);
-  terrainParameters.persistence.subscribeOnFinishChange(setElevation);
-  terrainParameters.lacunarity.subscribeOnFinishChange(setElevation);
-  terrainParameters.octaves.subscribeOnFinishChange(setElevation);
-
-  return coral;
-}
-
 function removeGroup(group: THREE.Group): void {
   const toRemove: Array<THREE.Mesh | THREE.Points> = [];
   group.traverse((obj) => {
+    if (obj instanceof THREE.Group && obj != group) {
+      removeGroup(obj);
+    }
     if (obj instanceof THREE.Mesh || obj instanceof THREE.Points) {
       toRemove.push(obj);
     }
@@ -272,6 +214,96 @@ function loadCoralGeometries() {
   return Promise.all([promise1, promise2]);
 }
 
+function getBoundingBoxFromBufferGeometry(geometry: THREE.BufferGeometry) {
+  const positionAttribute = geometry.getAttribute(
+    "position"
+  ) as THREE.BufferAttribute;
+  return new THREE.Box3().setFromBufferAttribute(positionAttribute);
+}
+
+async function loadCoralGeometryTemplates(
+  particleParameters: ParticlesParameters
+) {
+  const modelGeometries = await loadCoralGeometries();
+  return modelGeometries.map((modelGeometry) => {
+    const boundingBox = getBoundingBoxFromBufferGeometry(modelGeometry);
+    const particlesGeometry = getParticlesGeometry(
+      particleParameters,
+      boundingBox
+    );
+    return {
+      modelGeometry,
+      particlesGeometry,
+    };
+  });
+}
+
+async function loadColoredCoralGeometryTemplates(
+  particleParameters: ParticlesParameters,
+  colors: Array<THREE.Color>
+) {
+  const geometryTemplates = await loadCoralGeometryTemplates(
+    particleParameters
+  );
+  return cartesian(geometryTemplates, colors).map((product) => {
+    const geometryTemplate = product[0];
+    const color = product[1];
+    const modelGeometry = geometryTemplate.modelGeometry.clone();
+    const particlesGeometry = geometryTemplate.particlesGeometry.clone();
+    setColorAttribute(modelGeometry, color);
+    setColorAttribute(particlesGeometry, color);
+    return { modelGeometry, particlesGeometry };
+  });
+}
+
+async function getCorals(
+  particleParameters: ParticlesParameters,
+  colors: Array<THREE.Color>,
+  modelMaterial: THREE.ShaderMaterial,
+  particlesMaterial: THREE.ShaderMaterial
+) {
+  const geometries = await loadColoredCoralGeometryTemplates(
+    particleParameters,
+    colors
+  );
+  return geometries.map((geometry) => {
+    const mesh = new THREE.Mesh(geometry.modelGeometry, modelMaterial);
+    const points = new THREE.Points(
+      geometry.particlesGeometry,
+      particlesMaterial
+    );
+    return new THREE.Group().add(mesh, points);
+  });
+}
+
+function placeCoral(
+  seaParameters: SeaParameters,
+  terrainParameters: TerrainParameters,
+  coral: THREE.Group
+) {
+  const scale = 0.3 * Math.random() + 1;
+  coral.scale.set(scale, scale, scale);
+  coral.rotateY(2 * Math.PI * Math.random());
+  coral.position.x = randomUniform(
+    -seaParameters.width / 2,
+    seaParameters.width / 2
+  );
+  coral.position.z = randomUniform(-seaParameters.height, 0);
+  const setElevation = () => {
+    coral.position.y = getElevation(
+      coral.position.x,
+      coral.position.z,
+      terrainParameters
+    );
+  };
+  setElevation();
+  terrainParameters.amplitude.subscribeOnFinishChange(setElevation);
+  terrainParameters.scale.subscribeOnFinishChange(setElevation);
+  terrainParameters.persistence.subscribeOnFinishChange(setElevation);
+  terrainParameters.lacunarity.subscribeOnFinishChange(setElevation);
+  terrainParameters.octaves.subscribeOnFinishChange(setElevation);
+}
+
 export function addCorals(
   parent: THREE.Scene | THREE.Group,
   seaParameters: SeaParameters,
@@ -279,7 +311,7 @@ export function addCorals(
   gui: dat.GUI
 ): (t: Time) => void {
   const coralParameters = {
-    numCorals: 700,
+    numCorals: 2000,
     edgeThickness: new Subscribable(1.5),
   };
   const particleParameters = {
@@ -293,54 +325,28 @@ export function addCorals(
 
   const particlesMaterial = getParticlesMaterial(seaParameters, particlesGui);
   const coralMaterial = getCoralMaterial(seaParameters, coralParameters, gui);
+  const hues = subsample(range(100), 10);
+  const colors = hues.map((hue) => new THREE.Color(`hsl(${hue}, 100%, 85%)`));
 
-  loadCoralGeometries().then((geometries) => {
-    const coralGroup = new THREE.Group();
-    const particlesGroup = new THREE.Group();
-
+  getCorals(
+    particleParameters,
+    colors,
+    coralMaterial,
+    particlesMaterial.material
+  ).then((corals) => {
+    const group = new THREE.Group();
     const removeAndAddCorals = () => {
-      removeGroup(coralGroup);
-      removeGroup(particlesGroup);
-      const corals = range(coralParameters.numCorals).map(() => {
-        const color = new THREE.Color(`hsl(${100 * Math.random()}, 100%, 85%)`);
-        const coralIndex = randomUniformInt(0, geometries.length);
-        const coral = getCoral(
-          seaParameters,
-          terrainParameters,
-          coralMaterial,
-          color,
-          geometries[coralIndex].clone()
-        );
-        const particles = getParticles(
-          particleParameters,
-          new THREE.Box3().setFromObject(coral),
-          color,
-          particlesMaterial.material
-        );
-        return { coral, particles };
-      });
-      corals.map((coral) => {
-        coralGroup.add(coral.coral);
-        particlesGroup.add(coral.particles);
+      removeGroup(group);
+      range(coralParameters.numCorals).map(() => {
+        const coral = corals[randomUniformInt(0, corals.length)].clone();
+        placeCoral(seaParameters, terrainParameters, coral);
+        group.add(coral);
       });
     };
-
-    let prevHeightOffset = 0;
-    const updateHeightOffset = (offset: number) => {
-      particlesGroup.translateY(offset - prevHeightOffset);
-      prevHeightOffset = offset;
-    };
-    updateHeightOffset(particleParameters.heightOffset.value);
-    particleParameters.heightOffset.subscribeOnChange(updateHeightOffset);
-
-    let prevDepth = 0;
-    const updateDepth = (depth: number) => {
-      coralGroup.translateY(prevDepth - depth);
-      particlesGroup.translateY(prevDepth - depth);
-      prevDepth = depth;
-    };
-    updateDepth(seaParameters.depth.value);
-    seaParameters.depth.subscribeOnChange(updateDepth);
+    group.position.y = -seaParameters.depth.value;
+    seaParameters.depth.subscribeOnChange((depth) => {
+      group.position.y = -depth;
+    });
 
     gui
       .add(coralParameters, "numCorals")
@@ -349,8 +355,7 @@ export function addCorals(
       .step(100)
       .onFinishChange(removeAndAddCorals);
     removeAndAddCorals();
-    parent.add(coralGroup);
-    parent.add(particlesGroup);
+    parent.add(group);
   });
 
   addSubscribable(

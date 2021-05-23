@@ -8,7 +8,6 @@ uniform float uScale;
 
 attribute float aSize;
 attribute vec3 aColor;
-attribute vec3 aLocalPosition;
 
 varying float vVisibility;
 varying vec3 vColor;
@@ -19,9 +18,9 @@ varying vec3 vColor;
 void main() {
 	vec4 modelPosition = modelMatrix * vec4(position, 1.0);
 
-    modelPosition.x += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * aLocalPosition.xyz, uSpeed * uTime));
-    modelPosition.y += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * aLocalPosition.zxy, uSpeed * uTime));
-    modelPosition.z += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * aLocalPosition.yxz, uSpeed * uTime));
+    modelPosition.x += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * position.xyz, uSpeed * uTime));
+    modelPosition.y += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * position.zxy, uSpeed * uTime));
+    modelPosition.z += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * position.yxz, uSpeed * uTime));
 
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * viewPosition;

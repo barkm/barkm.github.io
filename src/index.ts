@@ -3,7 +3,6 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as dat from "dat.gui";
-import anime from "animejs";
 
 import * as UTILS from "./ts/utils";
 import * as THREE_UTILS from "./ts/three/utils";
