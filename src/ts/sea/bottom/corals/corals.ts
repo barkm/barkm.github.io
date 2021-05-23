@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import {
   range,
@@ -15,6 +14,7 @@ import {
   Time,
   removeGroup,
   getBoundingBoxFromBufferGeometry,
+  setColorAttribute,
 } from "../../../three/utils";
 
 import { loadMeshGeometries, getMeshMaterial } from "./mesh";
@@ -24,44 +24,22 @@ import {
   getParticlesGeometry,
 } from "./points";
 
-function setColorAttribute(geometry: THREE.BufferGeometry, color: THREE.Color) {
-  const colors = new Float32Array(3 * geometry.getAttribute("position").count);
-  for (let i = 0; i < colors.length; i += 3) {
-    colors[i] = color.r;
-    colors[i + 1] = color.g;
-    colors[i + 2] = color.b;
-  }
-  geometry.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
-}
-
-async function getCoralGeometries(particleParameters: ParticlesParameters) {
-  const modelGeometries = await loadMeshGeometries();
-  return modelGeometries.map((modelGeometry) => {
-    const boundingBox = getBoundingBoxFromBufferGeometry(modelGeometry);
-    const particlesGeometry = getParticlesGeometry(
-      particleParameters,
-      boundingBox
-    );
-    return {
-      modelGeometry,
-      particlesGeometry,
-    };
-  });
-}
-
 async function getColoredCoralGeometries(
   particleParameters: ParticlesParameters,
   colors: Array<THREE.Color>
 ) {
-  const geometryTemplates = await getCoralGeometries(particleParameters);
-  return cartesian(geometryTemplates, colors).map((product) => {
-    const geometryTemplate = product[0];
+  const meshGeometries = await loadMeshGeometries();
+  return cartesian(meshGeometries, colors).map((product) => {
+    const meshGeometry = product[0].clone();
     const color = product[1];
-    const modelGeometry = geometryTemplate.modelGeometry.clone();
-    const particlesGeometry = geometryTemplate.particlesGeometry.clone();
-    setColorAttribute(modelGeometry, color);
-    setColorAttribute(particlesGeometry, color);
-    return { modelGeometry, particlesGeometry };
+    const boundingBox = getBoundingBoxFromBufferGeometry(meshGeometry);
+    const particlesGeometry = getParticlesGeometry(
+      particleParameters,
+      boundingBox,
+      color
+    );
+    setColorAttribute(meshGeometry, color);
+    return { meshGeometry, particlesGeometry };
   });
 }
 
@@ -76,7 +54,7 @@ async function getCorals(
     colors
   );
   return geometries.map((geometry) => {
-    const mesh = new THREE.Mesh(geometry.modelGeometry, modelMaterial);
+    const mesh = new THREE.Mesh(geometry.meshGeometry, modelMaterial);
     const points = new THREE.Points(
       geometry.particlesGeometry,
       particlesMaterial
@@ -120,7 +98,7 @@ export function addCorals(
   gui: dat.GUI
 ): (t: Time) => void {
   const parameters = {
-    numCorals: 100,
+    numCorals: 1000,
   };
   const particleParameters = {
     numPerCoral: new Subscribable(10),

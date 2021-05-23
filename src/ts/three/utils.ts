@@ -123,3 +123,16 @@ export function getBoundingBoxFromBufferGeometry(
   ) as THREE.BufferAttribute;
   return new THREE.Box3().setFromBufferAttribute(positionAttribute);
 }
+
+export function setColorAttribute(
+  geometry: THREE.BufferGeometry,
+  color: THREE.Color
+) {
+  const colors = new Float32Array(3 * geometry.getAttribute("position").count);
+  for (let i = 0; i < colors.length; i += 3) {
+    colors[i] = color.r;
+    colors[i + 1] = color.g;
+    colors[i + 2] = color.b;
+  }
+  geometry.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
+}

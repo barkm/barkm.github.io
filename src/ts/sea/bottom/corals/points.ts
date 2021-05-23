@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 import { randomUniform } from "../../../utils";
 import { SeaParameters } from "../../sea";
-import { Time } from "../../../three/utils";
+import { setColorAttribute, Time } from "../../../three/utils";
 import { Subscribable } from "../../../subscribable";
 
 import particlesVertexShader from "../../../../shaders/coral/particles/vertex.glsl";
@@ -90,7 +90,8 @@ export function getParticlesMaterial(
 
 export function getParticlesGeometry(
   parameters: ParticlesParameters,
-  boundingBox: THREE.Box3
+  boundingBox: THREE.Box3,
+  color: THREE.Color
 ) {
   const geometry = new THREE.BufferGeometry();
   const setPositionAttribute = () => {
@@ -110,9 +111,14 @@ export function getParticlesGeometry(
       )
     );
   };
-  setPositionAttribute();
-  setSizeAttribute();
+  const setAttributes = () => {
+    setPositionAttribute();
+    setSizeAttribute();
+    setColorAttribute(geometry, color);
+  };
+  setAttributes();
   parameters.minSize.subscribeOnFinishChange(setSizeAttribute);
   parameters.maxSize.subscribeOnFinishChange(setSizeAttribute);
+  parameters.numPerCoral.subscribeOnFinishChange(setAttributes);
   return geometry;
 }
