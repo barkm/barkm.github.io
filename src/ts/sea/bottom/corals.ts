@@ -12,7 +12,12 @@ import { addSubscribable, Subscribable } from "../../subscribable";
 import { TerrainParameters, getElevation } from "./terrain";
 import { SeaParameters } from "../sea";
 import { setBarycentricCoordinateAttribute } from "../../three/barycentric";
-import { loadModel, Time } from "../../three/utils";
+import {
+  loadModel,
+  Time,
+  removeGroup,
+  getBoundingBoxFromBufferGeometry,
+} from "../../three/utils";
 
 import vertexShader from "../../../shaders/coral/vertex.glsl";
 import fragmentShader from "../../../shaders/coral/fragment.glsl";
@@ -180,19 +185,6 @@ function getCoralMaterial(
   return material;
 }
 
-function removeGroup(group: THREE.Group): void {
-  const toRemove: Array<THREE.Mesh | THREE.Points> = [];
-  group.traverse((obj) => {
-    if (obj instanceof THREE.Group && obj != group) {
-      removeGroup(obj);
-    }
-    if (obj instanceof THREE.Mesh || obj instanceof THREE.Points) {
-      toRemove.push(obj);
-    }
-  });
-  toRemove.forEach((mesh) => group.remove(mesh));
-}
-
 async function loadMeshGeometry(
   loader: GLTFLoader,
   path: string
@@ -213,13 +205,6 @@ function loadMeshGeometries() {
   const promise1 = loadMeshGeometry(loader, coralModel1);
   const promise2 = loadMeshGeometry(loader, coralModel2);
   return Promise.all([promise1, promise2]);
-}
-
-function getBoundingBoxFromBufferGeometry(geometry: THREE.BufferGeometry) {
-  const positionAttribute = geometry.getAttribute(
-    "position"
-  ) as THREE.BufferAttribute;
-  return new THREE.Box3().setFromBufferAttribute(positionAttribute);
 }
 
 async function getCoralGeometries(particleParameters: ParticlesParameters) {
@@ -308,7 +293,7 @@ export function addCorals(
   gui: dat.GUI
 ): (t: Time) => void {
   const coralParameters = {
-    numCorals: 2000,
+    numCorals: 100,
     edgeThickness: new Subscribable(1.5),
   };
   const particleParameters = {

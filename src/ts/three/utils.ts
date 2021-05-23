@@ -101,3 +101,25 @@ export function loadModel(
     loader.load(path, resolve);
   });
 }
+
+export function removeGroup(group: THREE.Group): void {
+  const toRemove: Array<THREE.Mesh | THREE.Points> = [];
+  group.traverse((obj) => {
+    if (obj instanceof THREE.Group && obj != group) {
+      removeGroup(obj);
+    }
+    if (obj instanceof THREE.Mesh || obj instanceof THREE.Points) {
+      toRemove.push(obj);
+    }
+  });
+  toRemove.forEach((mesh) => group.remove(mesh));
+}
+
+export function getBoundingBoxFromBufferGeometry(
+  geometry: THREE.BufferGeometry
+) {
+  const positionAttribute = geometry.getAttribute(
+    "position"
+  ) as THREE.BufferAttribute;
+  return new THREE.Box3().setFromBufferAttribute(positionAttribute);
+}
