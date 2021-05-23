@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import gaussian from "gaussian";
 
 import { range, randomUniformInt, randomUniform } from "../../utils";
 import { addSubscribable, Subscribable } from "../../subscribable";
@@ -218,7 +219,7 @@ function getCoral(
   const scale = 0.3 * Math.random() + 1;
   coral.scale.set(scale, scale, scale);
   coral.rotateY(2 * Math.PI * Math.random());
-  coral.position.x = seaParameters.width * (Math.random() - 0.5);
+  coral.position.x = gaussian(0, seaParameters.width).ppf(Math.random());
   coral.position.z = -seaParameters.height * Math.random();
 
   const setElevation = () => {
@@ -278,7 +279,7 @@ export function addCorals(
   gui: dat.GUI
 ): (t: Time) => void {
   const coralParameters = {
-    numCorals: 1500,
+    numCorals: 700,
     edgeThickness: new Subscribable(1.5),
   };
   const particleParameters = {
