@@ -41,7 +41,7 @@ export function getMeshMaterial(seaParameters: SeaParameters, gui: dat.GUI) {
   gui
     .add(material.uniforms.uLineThickness, "value")
     .min(0)
-    .max(1)
+    .max(2)
     .name("edgeThickness");
   return material;
 }

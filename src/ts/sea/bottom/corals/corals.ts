@@ -98,7 +98,8 @@ export function addCorals(
   gui: dat.GUI
 ): (t: Time) => void {
   const parameters = {
-    numCorals: 1000,
+    numCorals: 2000,
+    numColors: 5,
   };
   const particleParameters = {
     numPerCoral: new Subscribable(10),
@@ -110,7 +111,8 @@ export function addCorals(
 
   const particlesMaterial = getParticlesMaterial(seaParameters, particlesGui);
   const coralMaterial = getMeshMaterial(seaParameters, gui);
-  const hues = subsample(range(100), 10);
+  const step = Math.floor(100 / parameters.numColors);
+  const hues = subsample(range(100), step);
   const colors = hues.map((hue) => new THREE.Color(`hsl(${hue}, 100%, 85%)`));
 
   getCorals(
