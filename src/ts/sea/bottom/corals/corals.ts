@@ -7,24 +7,24 @@ import {
   randomUniform,
   cartesian,
   subsample,
-} from "../../utils";
-import { addSubscribable, Subscribable } from "../../subscribable";
-import { TerrainParameters, getElevation } from "./terrain";
-import { SeaParameters } from "../sea";
-import { setBarycentricCoordinateAttribute } from "../../three/barycentric";
+} from "../../../utils";
+import { addSubscribable, Subscribable } from "../../../subscribable";
+import { TerrainParameters, getElevation } from "../terrain";
+import { SeaParameters } from "../../sea";
+import { setBarycentricCoordinateAttribute } from "../../../three/barycentric";
 import {
   loadModel,
   Time,
   removeGroup,
   getBoundingBoxFromBufferGeometry,
-} from "../../three/utils";
+} from "../../../three/utils";
 
-import vertexShader from "../../../shaders/coral/vertex.glsl";
-import fragmentShader from "../../../shaders/coral/fragment.glsl";
-import coralModel1 from "../../../../models/corals/coral1.glb";
-import coralModel2 from "../../../../models/corals/coral2.glb";
-import particlesVertexShader from "../../../shaders/coral/particles/vertex.glsl";
-import particlesFragmentShader from "../../../shaders/coral/particles/fragment.glsl";
+import vertexShader from "../../../../shaders/coral/vertex.glsl";
+import fragmentShader from "../../../../shaders/coral/fragment.glsl";
+import coralModel1 from "../../../../../models/corals/coral1.glb";
+import coralModel2 from "../../../../../models/corals/coral2.glb";
+import particlesVertexShader from "../../../../shaders/coral/particles/vertex.glsl";
+import particlesFragmentShader from "../../../../shaders/coral/particles/fragment.glsl";
 
 interface ParticlesParameters {
   numPerCoral: Subscribable<number>;

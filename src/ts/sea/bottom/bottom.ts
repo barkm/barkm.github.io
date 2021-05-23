@@ -5,7 +5,7 @@ import { SeaParameters } from "../sea";
 
 import { getNoiseMaterial } from "./caustic/noise";
 import { getTerrain } from "./terrain";
-import { addCorals } from "./corals";
+import { addCorals } from "./corals/corals";
 import { addBubbles } from "./bubbles";
 
 export function addBottom(
