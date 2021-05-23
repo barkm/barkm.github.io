@@ -21,9 +21,9 @@ void main() {
 
     modelPosition.y += uHeightOffset;
 
-    modelPosition.x += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * position.xyz, uSpeed * uTime));
-    modelPosition.y += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * position.zxy, uSpeed * uTime));
-    modelPosition.z += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * position.yxz, uSpeed * uTime));
+    modelPosition.x += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * modelPosition.xyz, uSpeed * uTime));
+    modelPosition.y += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * modelPosition.zxy, uSpeed * uTime));
+    modelPosition.z += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * modelPosition.yxz, uSpeed * uTime));
 
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * viewPosition;
