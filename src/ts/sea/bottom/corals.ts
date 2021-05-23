@@ -23,7 +23,6 @@ import particlesFragmentShader from "../../../shaders/coral/particles/fragment.g
 
 interface ParticlesParameters {
   numPerCoral: Subscribable<number>;
-  heightOffset: Subscribable<number>;
   minSize: Subscribable<number>;
   maxSize: Subscribable<number>;
 }
@@ -68,6 +67,7 @@ function getParticlesMaterial(seaParameters: SeaParameters, gui: dat.GUI) {
       uNoiseAmplitude: { value: 0.5 },
       uNoiseFrequency: { value: 1.0 },
       uSpeed: { value: 0.05 },
+      uHeightOffset: { value: 0 },
       uTime: { value: 0 },
     },
     transparent: true,
@@ -97,6 +97,7 @@ function getParticlesMaterial(seaParameters: SeaParameters, gui: dat.GUI) {
     .max(2)
     .name("noiseFrequency");
   gui.add(material.uniforms.uSpeed, "value").min(0).max(0.1).name("speed");
+  gui.add(material.uniforms.uHeightOffset, "value", 0, 1).name("heightOffset");
 
   return { material, update };
 }
@@ -312,7 +313,6 @@ export function addCorals(
   };
   const particleParameters = {
     numPerCoral: new Subscribable(10),
-    heightOffset: new Subscribable(0.2),
     minSize: new Subscribable(3),
     maxSize: new Subscribable(10),
   };
@@ -360,13 +360,6 @@ export function addCorals(
     "numPerCoral",
     0,
     50,
-    1
-  );
-  addSubscribable(
-    particlesGui,
-    particleParameters.heightOffset,
-    "heightOffset",
-    0,
     1
   );
   addSubscribable(particlesGui, particleParameters.minSize, "minSize", 0, 10);

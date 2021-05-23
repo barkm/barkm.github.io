@@ -5,6 +5,7 @@ uniform float uSpeed;
 uniform float uNoiseAmplitude;
 uniform float uNoiseFrequency;
 uniform float uScale;
+uniform float uHeightOffset;
 
 attribute float aSize;
 attribute vec3 aColor;
@@ -17,6 +18,8 @@ varying vec3 vColor;
 
 void main() {
 	vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+    modelPosition.y += uHeightOffset;
 
     modelPosition.x += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * position.xyz, uSpeed * uTime));
     modelPosition.y += uNoiseAmplitude * snoise4(vec4(uNoiseFrequency * position.zxy, uSpeed * uTime));
