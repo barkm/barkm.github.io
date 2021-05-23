@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import gaussian from "gaussian";
 
 import {
   range,
@@ -71,10 +72,7 @@ function placeCoral(
   const scale = 0.3 * Math.random() + 1;
   coral.scale.set(scale, scale, scale);
   coral.rotateY(2 * Math.PI * Math.random());
-  coral.position.x = randomUniform(
-    -seaParameters.width / 2,
-    seaParameters.width / 2
-  );
+  coral.position.x = gaussian(0, seaParameters.width).ppf(Math.random());
   coral.position.z = randomUniform(-seaParameters.height, 0);
   const setElevation = () => {
     coral.position.y = getElevation(
@@ -98,7 +96,7 @@ export function addCorals(
   gui: dat.GUI
 ): (t: Time) => void {
   const parameters = {
-    numCorals: 2000,
+    numCorals: 1000,
     numColors: 5,
   };
   const particleParameters = {
