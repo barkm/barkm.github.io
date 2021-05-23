@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
-import { addSubscribable, Subscribable } from "../../../subscribable";
 import { SeaParameters } from "../../sea";
 import { setBarycentricCoordinateAttribute } from "../../../three/barycentric";
 import { loadModel } from "../../../three/utils";

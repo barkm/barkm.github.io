@@ -22,7 +22,7 @@ import {
   ParticlesParameters,
   getParticlesMaterial,
   getParticlesGeometry,
-} from "./points";
+} from "./particles";
 
 async function getColoredCoralGeometries(
   particleParameters: ParticlesParameters,
@@ -55,11 +55,11 @@ async function getCorals(
   );
   return geometries.map((geometry) => {
     const mesh = new THREE.Mesh(geometry.meshGeometry, modelMaterial);
-    const points = new THREE.Points(
+    const particles = new THREE.Points(
       geometry.particlesGeometry,
       particlesMaterial
     );
-    return new THREE.Group().add(mesh, points);
+    return new THREE.Group().add(mesh, particles);
   });
 }
 
