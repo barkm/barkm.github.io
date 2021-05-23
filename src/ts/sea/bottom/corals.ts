@@ -192,7 +192,7 @@ function removeGroup(group: THREE.Group): void {
   toRemove.forEach((mesh) => group.remove(mesh));
 }
 
-async function loadCoralGeometry(
+async function loadMeshGeometry(
   loader: GLTFLoader,
   path: string
 ): Promise<THREE.BufferGeometry> {
@@ -207,10 +207,10 @@ async function loadCoralGeometry(
   return geometry!;
 }
 
-function loadCoralGeometries() {
+function loadMeshGeometries() {
   const loader = new GLTFLoader();
-  const promise1 = loadCoralGeometry(loader, coralModel1);
-  const promise2 = loadCoralGeometry(loader, coralModel2);
+  const promise1 = loadMeshGeometry(loader, coralModel1);
+  const promise2 = loadMeshGeometry(loader, coralModel2);
   return Promise.all([promise1, promise2]);
 }
 
@@ -221,10 +221,8 @@ function getBoundingBoxFromBufferGeometry(geometry: THREE.BufferGeometry) {
   return new THREE.Box3().setFromBufferAttribute(positionAttribute);
 }
 
-async function loadCoralGeometryTemplates(
-  particleParameters: ParticlesParameters
-) {
-  const modelGeometries = await loadCoralGeometries();
+async function getCoralGeometries(particleParameters: ParticlesParameters) {
+  const modelGeometries = await loadMeshGeometries();
   return modelGeometries.map((modelGeometry) => {
     const boundingBox = getBoundingBoxFromBufferGeometry(modelGeometry);
     const particlesGeometry = getParticlesGeometry(
@@ -238,13 +236,11 @@ async function loadCoralGeometryTemplates(
   });
 }
 
-async function loadColoredCoralGeometryTemplates(
+async function getColoredCoralGeometries(
   particleParameters: ParticlesParameters,
   colors: Array<THREE.Color>
 ) {
-  const geometryTemplates = await loadCoralGeometryTemplates(
-    particleParameters
-  );
+  const geometryTemplates = await getCoralGeometries(particleParameters);
   return cartesian(geometryTemplates, colors).map((product) => {
     const geometryTemplate = product[0];
     const color = product[1];
@@ -262,7 +258,7 @@ async function getCorals(
   modelMaterial: THREE.ShaderMaterial,
   particlesMaterial: THREE.ShaderMaterial
 ) {
-  const geometries = await loadColoredCoralGeometryTemplates(
+  const geometries = await getColoredCoralGeometries(
     particleParameters,
     colors
   );
