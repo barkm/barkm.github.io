@@ -2,16 +2,6 @@ export function modulo(a: number, b: number): number {
   return ((a % b) + b) % b;
 }
 
-export function randomUniform(min: number, max: number): number {
-  return (max - min) * Math.random() + min;
-}
-
-export function randomUniformInt(min: number, max: number) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min) + min);
-}
-
 export interface WindowSize {
   width: number;
   height: number;

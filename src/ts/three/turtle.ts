@@ -48,8 +48,8 @@ export class Turtle {
         this.position.y,
         this.position.z
       );
-      this.model.rotation.y = UTILS.randomUniform(0, 2 * Math.PI);
-      this.model.rotateX(UTILS.randomUniform(-Math.PI / 4, Math.PI / 4));
+      this.model.rotation.y = THREE.MathUtils.randFloat(0, 2 * Math.PI);
+      this.model.rotateX(THREE.MathUtils.randFloatSpread(Math.PI / 2));
       this.setupSwimming();
     });
   }

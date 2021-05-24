@@ -99,7 +99,7 @@ function perturbeRotationTarget(
     let rotation = target.rotation;
     if (!lastUpdateTime || time.elapsed - lastUpdateTime > interval) {
       lastUpdateTime = time.elapsed;
-      rotation += UTILS.randomUniform(-maxPerturbation, maxPerturbation);
+      rotation += THREE.MathUtils.randFloat(-maxPerturbation, maxPerturbation);
     }
     return {
       rotation: rotation,

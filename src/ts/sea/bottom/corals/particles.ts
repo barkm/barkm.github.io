@@ -1,6 +1,5 @@
 import * as THREE from "three";
 
-import { randomUniform } from "../../../utils";
 import { SeaParameters } from "../../sea";
 import { setColorAttribute, Time } from "../../../three/utils";
 import { Subscribable } from "../../../subscribable";
@@ -19,9 +18,18 @@ function getParticlePositionAttribute(count: number, boundingBox: THREE.Box3) {
   const boundingBoxSize = new THREE.Vector3();
   boundingBox.getSize(boundingBoxSize);
   for (let i = 0; i < positions.length; i += 3) {
-    positions[i] = randomUniform(boundingBox.min.x, boundingBox.max.x);
-    positions[i + 1] = randomUniform(boundingBox.min.y, boundingBox.max.y);
-    positions[i + 2] = randomUniform(boundingBox.min.z, boundingBox.max.z);
+    positions[i] = THREE.MathUtils.randFloat(
+      boundingBox.min.x,
+      boundingBox.max.x
+    );
+    positions[i + 1] = THREE.MathUtils.randFloat(
+      boundingBox.min.y,
+      boundingBox.max.y
+    );
+    positions[i + 2] = THREE.MathUtils.randFloat(
+      boundingBox.min.z,
+      boundingBox.max.z
+    );
   }
   return new THREE.BufferAttribute(positions, 3);
 }
@@ -33,7 +41,7 @@ function getParticleSizeAttribute(
 ) {
   const sizes = new Float32Array(count);
   for (let i = 0; i < sizes.length; i++) {
-    sizes[i] = randomUniform(minSize, maxSize);
+    sizes[i] = THREE.MathUtils.randFloat(minSize, maxSize);
   }
   return new THREE.BufferAttribute(sizes, 1);
 }

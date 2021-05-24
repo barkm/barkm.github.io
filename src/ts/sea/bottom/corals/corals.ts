@@ -1,13 +1,7 @@
 import * as THREE from "three";
 import gaussian from "gaussian";
 
-import {
-  range,
-  randomUniformInt,
-  randomUniform,
-  cartesian,
-  subsample,
-} from "../../../utils";
+import { range, cartesian, subsample } from "../../../utils";
 import { addSubscribable, Subscribable } from "../../../subscribable";
 import { TerrainParameters, getElevation } from "../terrain";
 import { SeaParameters } from "../../sea";
@@ -73,7 +67,7 @@ function placeCoral(
   coral.scale.set(scale, scale, scale);
   coral.rotateY(2 * Math.PI * Math.random());
   coral.position.x = gaussian(0, seaParameters.width).ppf(Math.random());
-  coral.position.z = randomUniform(-seaParameters.height, 0);
+  coral.position.z = THREE.MathUtils.randFloat(-seaParameters.height, 0);
   const setElevation = () => {
     coral.position.y = getElevation(
       coral.position.x,
@@ -123,7 +117,9 @@ export function addCorals(
     const removeAndAddCorals = () => {
       removeGroup(group);
       range(parameters.numCorals).map(() => {
-        const coral = corals[randomUniformInt(0, corals.length)].clone();
+        const coral = corals[
+          THREE.MathUtils.randInt(0, corals.length - 1)
+        ].clone();
         placeCoral(seaParameters, terrainParameters, coral);
         group.add(coral);
       });
