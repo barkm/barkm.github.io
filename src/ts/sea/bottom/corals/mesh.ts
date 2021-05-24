@@ -46,7 +46,7 @@ export function getMeshMaterial(seaParameters: SeaParameters, gui: dat.GUI) {
   return material;
 }
 
-async function loadMeshGeometry(
+export async function loadMeshGeometry(
   loader: GLTFLoader,
   path: string
 ): Promise<THREE.BufferGeometry> {
@@ -61,9 +61,4 @@ async function loadMeshGeometry(
   return geometry!;
 }
 
-export function loadMeshGeometries() {
-  const loader = new GLTFLoader();
-  const promise1 = loadMeshGeometry(loader, coralModel1);
-  const promise2 = loadMeshGeometry(loader, coralModel2);
-  return Promise.all([promise1, promise2]);
-}
+export const MESH_PATHS = [coralModel1, coralModel2];

@@ -30,7 +30,3 @@ export function range(n: number): Array<number> {
 export function sum(array: Array<number>): number {
   return array.reduce((a, b) => a + b);
 }
-
-export function cartesian(...a: Array<Array<any>>) {
-  return a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
-}
