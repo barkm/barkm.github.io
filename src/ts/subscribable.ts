@@ -31,8 +31,12 @@ function setupSubscribableController<Type>(
 ) {
   return controller
     .name(name)
-    .onChange(subscribable.callOnChangeSubscribers)
-    .onFinishChange(subscribable.callOnFinishChangeSubscribers);
+    .onChange(() => {
+      subscribable.callOnChangeSubscribers();
+    })
+    .onFinishChange(() => {
+      subscribable.callOnFinishChangeSubscribers();
+    });
 }
 
 export function addSubscribableColor<Type>(
