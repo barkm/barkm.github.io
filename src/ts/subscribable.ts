@@ -12,6 +12,16 @@ export class Subscribable<Type> {
   subscribeOnFinishChange(subscriber: (v: Type) => void) {
     this.onFinishChangeSubscribers.push(subscriber);
   }
+  callOnChangeSubscribers() {
+    this.onChangeSubscribers.forEach((f) => f(this.value));
+  }
+  callOnFinishChangeSubscribers() {
+    this.onFinishChangeSubscribers.forEach((f) => f(this.value));
+  }
+  callSubscribers() {
+    this.callOnChangeSubscribers();
+    this.callOnFinishChangeSubscribers();
+  }
 }
 
 function setupSubscribableController<Type>(
@@ -21,12 +31,8 @@ function setupSubscribableController<Type>(
 ) {
   return controller
     .name(name)
-    .onChange((v) => {
-      subscribable.onChangeSubscribers.forEach((f) => f(v));
-    })
-    .onFinishChange((v) => {
-      subscribable.onFinishChangeSubscribers.forEach((f) => f(v));
-    });
+    .onChange(subscribable.callOnChangeSubscribers)
+    .onFinishChange(subscribable.callOnFinishChangeSubscribers);
 }
 
 export function addSubscribableColor<Type>(

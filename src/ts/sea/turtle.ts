@@ -8,12 +8,14 @@ import { SeaParameters } from "./sea";
 
 import vertexShader from "../../shaders/turtle/vertex.glsl";
 import fragmentShader from "../../shaders/turtle/fragment.glsl";
+import { Subscribable } from "../subscribable";
 
 export function addTurtle(
   seaParameters: SeaParameters,
   scene: THREE.Scene,
-  gui: dat.GUI
-): (time: THREE_UTILS.Time) => void {
+  gui: dat.GUI,
+  time: Subscribable<THREE_UTILS.Time>
+) {
   const box = new THREE.BoxGeometry(6, 2, 20);
   const mesh = new THREE.Mesh(
     box,
@@ -71,7 +73,6 @@ export function addTurtle(
   });
 
   const turtle = new Turtle(scene, mesh.position, turtleMaterial, motion);
-  return (time) => {
-    turtle.update(time);
-  };
+
+  time.subscribeOnChange((t) => turtle.update(t));
 }

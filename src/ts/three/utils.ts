@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as dat from "dat.gui";
 
 import * as UTILS from "../utils";
+import { Subscribable } from "../subscribable";
 
 export function getPerspectiveCamera(
   fov: number,
@@ -74,19 +75,23 @@ export interface Time {
   delta: number;
 }
 
-export function getUpdate(updateFunctions: Array<(time: Time) => any>) {
+export function getAnimationLoop(): {
+  time: Subscribable<Time>;
+  loop: () => void;
+} {
+  let time = new Subscribable({ elapsed: 0, delta: 0 });
   const clock = new THREE.Clock();
   const update = () => {
     const delta = clock.getDelta();
     const elapsed = clock.getElapsedTime();
-    if (updateFunctions) {
-      updateFunctions.map((f) => {
-        f({ elapsed, delta });
-      });
-    }
+    time.value = { elapsed, delta };
+    time.callSubscribers();
     window.requestAnimationFrame(update);
   };
-  return update;
+  return {
+    time,
+    loop: update,
+  };
 }
 
 export interface GltfModel {

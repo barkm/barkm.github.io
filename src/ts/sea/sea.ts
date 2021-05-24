@@ -25,8 +25,9 @@ export interface SeaParameters {
 export function addSea(
   renderer: THREE.WebGLRenderer,
   scene: THREE.Scene,
-  gui: dat.GUI
-): (time: Time) => void {
+  gui: dat.GUI,
+  time: Subscribable<Time>
+) {
   const parameters: SeaParameters = {
     color: new Subscribable("#7696ff"),
     visibility: { min: new Subscribable(5.0), max: new Subscribable(25.0) },
@@ -46,12 +47,7 @@ export function addSea(
   addSubscribable(visibilityGui, parameters.visibility.min, "min", 0, 10);
   addSubscribable(visibilityGui, parameters.visibility.max, "max", 10, 50);
 
-  const updateBottom = addBottom(parameters, scene, gui.addFolder("bottom"));
-  const updateSurface = addSurface(parameters, scene, gui.addFolder("surface"));
-  const updateTurtle = addTurtle(parameters, scene, gui.addFolder("turtle"));
-  return (time: Time): void => {
-    updateBottom(time);
-    updateSurface(time);
-    updateTurtle(time);
-  };
+  addBottom(parameters, scene, gui.addFolder("bottom"), time);
+  addSurface(parameters, scene, gui.addFolder("surface"), time);
+  addTurtle(parameters, scene, gui.addFolder("turtle"), time);
 }

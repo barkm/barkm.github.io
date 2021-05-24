@@ -48,7 +48,8 @@ function getParticleSizeAttribute(
 
 export function getParticlesMaterial(
   seaParameters: SeaParameters,
-  gui: dat.GUI
+  gui: dat.GUI,
+  time: Subscribable<Time>
 ) {
   const material = new THREE.ShaderMaterial({
     vertexShader: particlesVertexShader,
@@ -76,9 +77,6 @@ export function getParticlesMaterial(
   seaParameters.color.subscribeOnChange((v) => {
     material.uniforms.uSeaColor.value = new THREE.Color(v);
   });
-  const update = (time: Time) => {
-    material.uniforms.uTime.value = time.elapsed;
-  };
 
   gui.add(material.uniforms.uScale, "value").min(0).max(20).name("scale");
   gui
@@ -94,7 +92,11 @@ export function getParticlesMaterial(
   gui.add(material.uniforms.uSpeed, "value").min(0).max(0.1).name("speed");
   gui.add(material.uniforms.uHeightOffset, "value", 0, 1).name("heightOffset");
 
-  return { material, update };
+  time.subscribeOnChange((t) => {
+    material.uniforms.uTime.value = t.elapsed;
+  });
+
+  return material;
 }
 
 export function getParticlesGeometry(

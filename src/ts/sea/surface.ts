@@ -7,6 +7,7 @@ import vertexShader from "../../shaders/surface/vertex.glsl";
 import fragmentShader from "../../shaders/surface/fragment.glsl";
 
 import { SeaParameters } from "./sea";
+import { Subscribable } from "../subscribable";
 
 function getMaterial(
   seaParameters: SeaParameters,
@@ -62,8 +63,9 @@ function getMaterial(
 export function addSurface(
   seaParameters: SeaParameters,
   scene: THREE.Scene,
-  gui: dat.GUI
-): (t: THREE_UTILS.Time) => void {
+  gui: dat.GUI,
+  time: Subscribable<THREE_UTILS.Time>
+) {
   const material = getMaterial(seaParameters, gui);
 
   const geometry = new THREE.PlaneGeometry(
@@ -79,7 +81,7 @@ export function addSurface(
   surface.rotation.x = Math.PI / 2;
   scene.add(surface);
 
-  return (time) => {
-    material.uniforms.uTime.value = time.elapsed;
-  };
+  time.subscribeOnChange((t) => {
+    material.uniforms.uTime.value = t.elapsed;
+  });
 }

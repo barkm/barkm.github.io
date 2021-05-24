@@ -87,8 +87,9 @@ export function addCorals(
   parent: THREE.Scene | THREE.Group,
   seaParameters: SeaParameters,
   terrainParameters: TerrainParameters,
-  gui: dat.GUI
-): (t: Time) => void {
+  gui: dat.GUI,
+  time: Subscribable<Time>
+) {
   const parameters = {
     numCorals: 1000,
     numColors: 5,
@@ -101,43 +102,44 @@ export function addCorals(
 
   const particlesGui = gui.addFolder("particles");
 
-  const particlesMaterial = getParticlesMaterial(seaParameters, particlesGui);
+  const particlesMaterial = getParticlesMaterial(
+    seaParameters,
+    particlesGui,
+    time
+  );
   const coralMaterial = getMeshMaterial(seaParameters, gui);
   const step = Math.floor(100 / parameters.numColors);
   const hues = subsample(range(100), step);
   const colors = hues.map((hue) => new THREE.Color(`hsl(${hue}, 100%, 85%)`));
 
-  getCorals(
-    particleParameters,
-    colors,
-    coralMaterial,
-    particlesMaterial.material
-  ).then((corals) => {
-    const group = new THREE.Group();
-    const removeAndAddCorals = () => {
-      removeGroup(group);
-      range(parameters.numCorals).map(() => {
-        const coral = corals[
-          THREE.MathUtils.randInt(0, corals.length - 1)
-        ].clone();
-        placeCoral(seaParameters, terrainParameters, coral);
-        group.add(coral);
+  getCorals(particleParameters, colors, coralMaterial, particlesMaterial).then(
+    (corals) => {
+      const group = new THREE.Group();
+      const removeAndAddCorals = () => {
+        removeGroup(group);
+        range(parameters.numCorals).map(() => {
+          const coral = corals[
+            THREE.MathUtils.randInt(0, corals.length - 1)
+          ].clone();
+          placeCoral(seaParameters, terrainParameters, coral);
+          group.add(coral);
+        });
+      };
+      group.position.y = -seaParameters.depth.value;
+      seaParameters.depth.subscribeOnChange((depth) => {
+        group.position.y = -depth;
       });
-    };
-    group.position.y = -seaParameters.depth.value;
-    seaParameters.depth.subscribeOnChange((depth) => {
-      group.position.y = -depth;
-    });
 
-    gui
-      .add(parameters, "numCorals")
-      .min(0)
-      .max(4000)
-      .step(100)
-      .onFinishChange(removeAndAddCorals);
-    removeAndAddCorals();
-    parent.add(group);
-  });
+      gui
+        .add(parameters, "numCorals")
+        .min(0)
+        .max(4000)
+        .step(100)
+        .onFinishChange(removeAndAddCorals);
+      removeAndAddCorals();
+      parent.add(group);
+    }
+  );
 
   addSubscribable(
     particlesGui,
@@ -149,6 +151,4 @@ export function addCorals(
   );
   addSubscribable(particlesGui, particleParameters.minSize, "minSize", 0, 10);
   addSubscribable(particlesGui, particleParameters.maxSize, "maxSize", 0, 10);
-
-  return particlesMaterial.update;
 }

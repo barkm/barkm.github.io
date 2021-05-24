@@ -38,13 +38,10 @@ controls.update();
 const axesHelper = new THREE.AxesHelper();
 THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axesHelper");
 
-const updateSea = addSea(renderer, scene, gui.addFolder("sea"));
+const animationLoop = THREE_UTILS.getAnimationLoop();
 
-const update = THREE_UTILS.getUpdate([
-  () => {
-    renderer.render(scene, camera);
-  },
-  updateSea,
-]);
+addSea(renderer, scene, gui.addFolder("sea"), animationLoop.time);
 
-update();
+animationLoop.time.subscribeOnChange(() => renderer.render(scene, camera));
+
+animationLoop.loop();

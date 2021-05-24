@@ -7,12 +7,14 @@ import { getNoiseMaterial } from "./caustic/noise";
 import { getTerrain } from "./terrain";
 import { addCorals } from "./corals/corals";
 import { addBubbles } from "./bubbles";
+import { Subscribable } from "../../subscribable";
 
 export function addBottom(
   seaParameters: SeaParameters,
   scene: THREE.Scene,
-  gui: dat.GUI
-): (t: THREE_UTILS.Time) => void {
+  gui: dat.GUI,
+  time: Subscribable<THREE_UTILS.Time>
+) {
   const parameters = {
     bottomColor: seaParameters.color.value,
     causticColor: "#ffffff",
@@ -73,21 +75,16 @@ export function addBottom(
 
   scene.add(bottom);
 
-  const updateCorals = addCorals(
+  addCorals(
     scene,
     seaParameters,
     terrain.parameters,
-    gui.addFolder("corals")
+    gui.addFolder("corals"),
+    time
   );
-  const updateBubbles = addBubbles(
-    scene,
-    seaParameters,
-    gui.addFolder("bubbles")
-  );
+  addBubbles(scene, seaParameters, gui.addFolder("bubbles"), time);
 
-  return (time) => {
-    material.uniforms.uTime.value = time.elapsed;
-    updateBubbles(time);
-    updateCorals(time);
-  };
+  time.subscribeOnChange((t) => {
+    material.uniforms.uTime.value = t.elapsed;
+  });
 }

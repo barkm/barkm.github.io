@@ -47,8 +47,9 @@ function getPositions(
 export function addBubbles(
   parent: THREE.Scene | THREE.Group,
   seaParameters: SeaParameters,
-  gui: dat.GUI
-): (t: Time) => void {
+  gui: dat.GUI,
+  time: Subscribable<Time>
+) {
   const parameters: BubbleParameters = {
     numBubbles: 5,
     numPillars: 100,
@@ -144,7 +145,7 @@ export function addBubbles(
     .max(1)
     .name("thickness");
 
-  return (time: Time) => {
-    material.uniforms.uTime.value = time.elapsed;
-  };
+  time.subscribeOnChange((t) => {
+    material.uniforms.uTime.value = t.elapsed;
+  });
 }
