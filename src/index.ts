@@ -6,7 +6,7 @@ import * as dat from "dat.gui";
 
 import * as UTILS from "./ts/utils";
 import * as THREE_UTILS from "./ts/three/utils";
-import { addSea } from "./ts/sea/sea";
+import { getSea } from "./ts/sea/sea";
 
 const gui = new dat.GUI();
 gui.hide();
@@ -40,7 +40,8 @@ THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axesHelper");
 
 const animationLoop = THREE_UTILS.getAnimationLoop();
 
-addSea(renderer, scene, gui.addFolder("sea"), animationLoop.time);
+const sea = getSea(renderer, gui.addFolder("sea"), animationLoop.time);
+scene.add(sea);
 
 animationLoop.time.subscribeOnChange(() => renderer.render(scene, camera));
 

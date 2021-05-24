@@ -38,7 +38,7 @@ async function getColoredCoralGeometries(
   });
 }
 
-async function getCorals(
+async function getColoredCorals(
   particleParameters: ParticlesParameters,
   colors: Array<THREE.Color>,
   modelMaterial: THREE.ShaderMaterial,
@@ -83,8 +83,7 @@ function placeCoral(
   terrainParameters.octaves.subscribeOnFinishChange(setElevation);
 }
 
-export function addCorals(
-  parent: THREE.Scene | THREE.Group,
+export function getCorals(
   seaParameters: SeaParameters,
   terrainParameters: TerrainParameters,
   gui: dat.GUI,
@@ -112,34 +111,37 @@ export function addCorals(
   const hues = subsample(range(100), step);
   const colors = hues.map((hue) => new THREE.Color(`hsl(${hue}, 100%, 85%)`));
 
-  getCorals(particleParameters, colors, coralMaterial, particlesMaterial).then(
-    (corals) => {
-      const group = new THREE.Group();
-      const removeAndAddCorals = () => {
-        removeGroup(group);
-        range(parameters.numCorals).map(() => {
-          const coral = corals[
-            THREE.MathUtils.randInt(0, corals.length - 1)
-          ].clone();
-          placeCoral(seaParameters, terrainParameters, coral);
-          group.add(coral);
-        });
-      };
-      group.position.y = -seaParameters.depth.value;
-      seaParameters.depth.subscribeOnChange((depth) => {
-        group.position.y = -depth;
-      });
+  const group = new THREE.Group();
 
-      gui
-        .add(parameters, "numCorals")
-        .min(0)
-        .max(4000)
-        .step(100)
-        .onFinishChange(removeAndAddCorals);
-      removeAndAddCorals();
-      parent.add(group);
-    }
-  );
+  getColoredCorals(
+    particleParameters,
+    colors,
+    coralMaterial,
+    particlesMaterial
+  ).then((corals) => {
+    const removeAndAddCorals = () => {
+      removeGroup(group);
+      range(parameters.numCorals).map(() => {
+        const coral = corals[
+          THREE.MathUtils.randInt(0, corals.length - 1)
+        ].clone();
+        placeCoral(seaParameters, terrainParameters, coral);
+        group.add(coral);
+      });
+    };
+    group.position.y = -seaParameters.depth.value;
+    seaParameters.depth.subscribeOnChange((depth) => {
+      group.position.y = -depth;
+    });
+
+    gui
+      .add(parameters, "numCorals")
+      .min(0)
+      .max(4000)
+      .step(100)
+      .onFinishChange(removeAndAddCorals);
+    removeAndAddCorals();
+  });
 
   addSubscribable(
     particlesGui,
@@ -151,4 +153,6 @@ export function addCorals(
   );
   addSubscribable(particlesGui, particleParameters.minSize, "minSize", 0, 10);
   addSubscribable(particlesGui, particleParameters.maxSize, "maxSize", 0, 10);
+
+  return group;
 }

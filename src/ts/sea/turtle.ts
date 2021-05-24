@@ -10,12 +10,13 @@ import vertexShader from "../../shaders/turtle/vertex.glsl";
 import fragmentShader from "../../shaders/turtle/fragment.glsl";
 import { Subscribable } from "../subscribable";
 
-export function addTurtle(
+export function getTurtle(
   seaParameters: SeaParameters,
-  scene: THREE.Scene,
   gui: dat.GUI,
   time: Subscribable<THREE_UTILS.Time>
 ) {
+  const group = new THREE.Group();
+
   const box = new THREE.BoxGeometry(6, 2, 20);
   const mesh = new THREE.Mesh(
     box,
@@ -23,7 +24,7 @@ export function addTurtle(
   );
   mesh.position.z = -box.parameters.depth / 2;
   mesh.position.y -= 2 + box.parameters.height / 2;
-  THREE_UTILS.addVisibilityToggle(gui, mesh, scene, "boundary");
+  THREE_UTILS.addVisibilityToggle(gui, mesh, group, "boundary");
   const boxMotion = MOTION.getStayWithinBoxMotion(
     mesh.position,
     box.parameters
@@ -72,7 +73,9 @@ export function addTurtle(
     turtleMaterial.uniforms.uMaxVisibility.value = v;
   });
 
-  const turtle = new Turtle(scene, mesh.position, turtleMaterial, motion);
+  const turtle = new Turtle(group, mesh.position, turtleMaterial, motion);
 
   time.subscribeOnChange((t) => turtle.update(t));
+
+  return group;
 }

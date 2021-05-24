@@ -60,9 +60,8 @@ function getMaterial(
   return material;
 }
 
-export function addSurface(
+export function getSurface(
   seaParameters: SeaParameters,
-  scene: THREE.Scene,
   gui: dat.GUI,
   time: Subscribable<THREE_UTILS.Time>
 ) {
@@ -79,9 +78,10 @@ export function addSurface(
   const surface = new THREE.Mesh(geometry, material);
   surface.position.z = -seaParameters.height / 2;
   surface.rotation.x = Math.PI / 2;
-  scene.add(surface);
 
   time.subscribeOnChange((t) => {
     material.uniforms.uTime.value = t.elapsed;
   });
+
+  return surface;
 }

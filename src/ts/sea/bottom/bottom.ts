@@ -5,13 +5,12 @@ import { SeaParameters } from "../sea";
 
 import { getNoiseMaterial } from "./caustic/noise";
 import { getTerrain } from "./terrain";
-import { addCorals } from "./corals/corals";
-import { addBubbles } from "./bubbles";
+import { getCorals } from "./corals/corals";
+import { getBubbles } from "./bubbles";
 import { Subscribable } from "../../subscribable";
 
-export function addBottom(
+export function getBottom(
   seaParameters: SeaParameters,
-  scene: THREE.Scene,
   gui: dat.GUI,
   time: Subscribable<THREE_UTILS.Time>
 ) {
@@ -73,18 +72,17 @@ export function addBottom(
   bottom.position.y = -seaParameters.depth.value;
   seaParameters.depth.subscribeOnChange((d) => (bottom.position.y = -d));
 
-  scene.add(bottom);
-
-  addCorals(
-    scene,
+  const corals = getCorals(
     seaParameters,
     terrain.parameters,
     gui.addFolder("corals"),
     time
   );
-  addBubbles(scene, seaParameters, gui.addFolder("bubbles"), time);
+  const bubbles = getBubbles(seaParameters, gui.addFolder("bubbles"), time);
 
   time.subscribeOnChange((t) => {
     material.uniforms.uTime.value = t.elapsed;
   });
+
+  return new THREE.Group().add(bottom, corals, bubbles);
 }

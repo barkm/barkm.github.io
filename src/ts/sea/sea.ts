@@ -7,9 +7,9 @@ import {
 } from "../subscribable";
 import { Time } from "../three/utils";
 
-import { addBottom } from "./bottom/bottom";
-import { addSurface } from "./surface";
-import { addTurtle } from "./turtle";
+import { getBottom } from "./bottom/bottom";
+import { getSurface } from "./surface";
+import { getTurtle } from "./turtle";
 
 export interface SeaParameters {
   color: Subscribable<string>;
@@ -22,9 +22,8 @@ export interface SeaParameters {
   height: number;
 }
 
-export function addSea(
+export function getSea(
   renderer: THREE.WebGLRenderer,
-  scene: THREE.Scene,
   gui: dat.GUI,
   time: Subscribable<Time>
 ) {
@@ -47,7 +46,9 @@ export function addSea(
   addSubscribable(visibilityGui, parameters.visibility.min, "min", 0, 10);
   addSubscribable(visibilityGui, parameters.visibility.max, "max", 10, 50);
 
-  addBottom(parameters, scene, gui.addFolder("bottom"), time);
-  addSurface(parameters, scene, gui.addFolder("surface"), time);
-  addTurtle(parameters, scene, gui.addFolder("turtle"), time);
+  const bottom = getBottom(parameters, gui.addFolder("bottom"), time);
+  const surface = getSurface(parameters, gui.addFolder("surface"), time);
+  const turtle = getTurtle(parameters, gui.addFolder("turtle"), time);
+
+  return new THREE.Group().add(bottom, surface, turtle);
 }

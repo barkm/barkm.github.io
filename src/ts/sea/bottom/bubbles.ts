@@ -44,8 +44,7 @@ function getPositions(
   return new THREE.BufferAttribute(positions, 3);
 }
 
-export function addBubbles(
-  parent: THREE.Scene | THREE.Group,
+export function getBubbles(
   seaParameters: SeaParameters,
   gui: dat.GUI,
   time: Subscribable<Time>
@@ -83,9 +82,6 @@ export function addBubbles(
     transparent: true,
     precision: "highp",
   });
-
-  const points = new THREE.Points(geometry, material);
-  parent.add(points);
 
   seaParameters.depth.subscribeOnFinishChange(setPositionAttribute);
   seaParameters.depth.subscribeOnFinishChange((v) => {
@@ -148,4 +144,6 @@ export function addBubbles(
   time.subscribeOnChange((t) => {
     material.uniforms.uTime.value = t.elapsed;
   });
+
+  return new THREE.Points(geometry, material);
 }
