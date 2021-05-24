@@ -23,6 +23,7 @@ export interface SeaParameters {
 }
 
 export function getSea(
+  far: number,
   renderer: THREE.WebGLRenderer,
   gui: dat.GUI,
   time: Subscribable<Time>
@@ -31,8 +32,8 @@ export function getSea(
     color: new Subscribable("#7696ff"),
     visibility: { min: new Subscribable(5.0), max: new Subscribable(25.0) },
     depth: new Subscribable(8),
-    width: 40,
-    height: 30,
+    width: 30,
+    height: far,
   };
 
   renderer.setClearColor(parameters.color.value);

@@ -15,7 +15,7 @@ const scene = new THREE.Scene();
 
 const windowSize = UTILS.getWindowSize();
 
-const camera = THREE_UTILS.getPerspectiveCamera(60, 1, 50, windowSize);
+const camera = THREE_UTILS.getPerspectiveCamera(50, 1, 25, windowSize);
 camera.position.set(0, -3, 0);
 
 const cameraHelper = THREE_UTILS.getFixedCameraHelper(camera);
@@ -40,7 +40,12 @@ THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axesHelper");
 
 const animationLoop = THREE_UTILS.getAnimationLoop();
 
-const sea = getSea(renderer, gui.addFolder("sea"), animationLoop.time);
+const sea = getSea(
+  camera.far,
+  renderer,
+  gui.addFolder("sea"),
+  animationLoop.time
+);
 scene.add(sea);
 
 animationLoop.time.subscribeOnChange(() => renderer.render(scene, camera));

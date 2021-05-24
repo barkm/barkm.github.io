@@ -10,7 +10,7 @@ export function getPerspectiveCamera(
   near: number,
   far: number,
   windowSize: UTILS.WindowSize
-): THREE.Camera {
+): THREE.PerspectiveCamera {
   const camera = new THREE.PerspectiveCamera(
     fov,
     windowSize.width / windowSize.height,
