@@ -34,8 +34,7 @@ function getPositions(
     ) {
       const offset = 3 * (bubbleIndex + parameters.numBubbles * pillarIndex);
       const height =
-        parameters.maxHeight.value * (bubbleIndex / parameters.numBubbles) -
-        seaParameters.depth.value;
+        parameters.maxHeight.value * (bubbleIndex / parameters.numBubbles);
       positions[offset] = pillarX;
       positions[offset + 1] = height + Math.random();
       positions[offset + 2] = pillarZ;
@@ -67,7 +66,6 @@ export function getBubbles(
       uMinVisibility: { value: seaParameters.visibility.min.value },
       uMaxVisibility: { value: seaParameters.visibility.max.value },
       uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
-      uDepth: { value: seaParameters.depth.value },
       uMaxHeight: { value: parameters.maxHeight.value },
       uDecayPower: { value: 5 },
       uTime: { value: 0 },
@@ -83,9 +81,11 @@ export function getBubbles(
     precision: "highp",
   });
 
-  seaParameters.depth.subscribeOnFinishChange(setPositionAttribute);
-  seaParameters.depth.subscribeOnFinishChange((v) => {
-    material.uniforms.uDepth.value = v;
+  const points = new THREE.Points(geometry, material);
+
+  points.position.y -= seaParameters.depth.value;
+  seaParameters.depth.subscribeOnChange((depth) => {
+    points.position.y = -depth;
   });
   seaParameters.color.subscribeOnChange((v) => {
     material.uniforms.uSeaColor.value = new THREE.Color(v);
@@ -145,5 +145,5 @@ export function getBubbles(
     material.uniforms.uTime.value = t.elapsed;
   });
 
-  return new THREE.Points(geometry, material);
+  return points;
 }
