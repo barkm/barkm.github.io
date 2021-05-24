@@ -15,6 +15,7 @@ function getMaterial(
   const parameters = {
     skyColor: "#ffffff",
     edgeColor: "#0000ff",
+    useRefraction: false,
   };
 
   const material = new THREE.ShaderMaterial({
@@ -29,9 +30,13 @@ function getMaterial(
       uMinVisibility: { value: seaParameters.visibility.min.value },
       uMaxVisibility: { value: seaParameters.visibility.max.value },
     },
+    defines: {
+      REFRACTION: parameters.useRefraction ? "1" : "0",
+    },
     extensions: {
       derivatives: true,
     },
+    precision: parameters.useRefraction ? "highp" : "mediump",
   });
 
   seaParameters.color.subscribeOnChange((v) => {

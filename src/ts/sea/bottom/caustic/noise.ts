@@ -15,6 +15,7 @@ export function getNoiseMaterial(gui: dat.GUI): THREE.ShaderMaterial {
       uCausticScale: { value: 20.0 },
       uCausticIterations: { value: 3 },
     },
+    precision: "highp",
   });
 
   gui

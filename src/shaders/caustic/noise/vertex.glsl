@@ -1,5 +1,3 @@
-#include "../../precision.glsl";
-
 #pragma glslify: fogLinear = require(glsl-fog/linear)
 
 uniform float uTime;

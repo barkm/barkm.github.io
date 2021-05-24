@@ -1,5 +1,3 @@
-#include "../precision.glsl";
-
 #pragma glslify: fogLinear = require(glsl-fog/linear)
 
 attribute vec3 aBarycentricCoordinate;
@@ -9,7 +7,9 @@ uniform float uMinVisibility;
 uniform float uMaxVisibility;
 
 varying float vVisibility;
-varying vec3 vModelPosition;
+#if (REFRACTION == 1)
+    varying vec3 vModelPosition;
+#endif
 varying vec3 vBarycentricCoordinate;
 
 #include "../surface.glsl";
@@ -25,6 +25,8 @@ void main() {
 
     gl_Position = projectedPosition;
     vVisibility = getVisibility(viewPosition.xyz, uMinVisibility, uMaxVisibility);
-    vModelPosition = modelPosition.xyz;
+    #if (REFRACTION == 1)
+        vModelPosition = modelPosition.xyz;
+    #endif
     vBarycentricCoordinate = aBarycentricCoordinate;
 }

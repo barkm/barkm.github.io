@@ -80,6 +80,7 @@ export function addBubbles(
       uThickness: { value: 0.4 },
     },
     transparent: true,
+    precision: "highp",
   });
 
   const points = new THREE.Points(geometry, material);

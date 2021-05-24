@@ -1,5 +1,3 @@
-#include "../../precision.glsl";
-
 #pragma glslify: simplexNoise = require(glsl-noise/simplex/3d) 
 
 uniform vec3 uBottomColor;

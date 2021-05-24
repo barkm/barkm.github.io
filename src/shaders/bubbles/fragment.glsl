@@ -1,5 +1,3 @@
-#include "../precision.glsl";
-
 uniform vec3 uSeaColor;
 uniform float uThickness;
 uniform float uRadius;

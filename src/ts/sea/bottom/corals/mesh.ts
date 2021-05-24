@@ -26,6 +26,7 @@ export function getMeshMaterial(seaParameters: SeaParameters, gui: dat.GUI) {
     extensions: {
       derivatives: true,
     },
+    precision: "mediump",
   });
 
   seaParameters.color.subscribeOnChange((c) => {

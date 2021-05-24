@@ -57,6 +57,7 @@ export function getParticlesMaterial(
       uTime: { value: 0 },
     },
     transparent: true,
+    precision: "highp",
   });
   seaParameters.visibility.min.subscribeOnChange((v) => {
     material.uniforms.uMinVisibility.value = v;

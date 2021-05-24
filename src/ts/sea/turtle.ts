@@ -48,6 +48,7 @@ export function addTurtle(
     extensions: {
       derivatives: true,
     },
+    precision: "mediump",
   });
   gui.addColor(parameters, "color").onChange(() => {
     turtleMaterial.uniforms.uColor.value.set(parameters.color);

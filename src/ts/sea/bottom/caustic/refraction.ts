@@ -14,6 +14,7 @@ export function getRefractionMaterial(gui: dat.GUI): THREE.ShaderMaterial {
     extensions: {
       derivatives: true,
     },
+    precision: "mediump",
   });
 
   gui

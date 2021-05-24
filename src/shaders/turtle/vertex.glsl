@@ -1,5 +1,3 @@
-#include "../precision.glsl";
-
 attribute vec3 aBarycentricCoordinate;
 
 uniform float uMinVisibility;
