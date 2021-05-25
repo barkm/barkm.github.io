@@ -40,13 +40,10 @@ THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axesHelper");
 
 const animationLoop = THREE_UTILS.getAnimationLoop();
 
-const sea = getSea(
-  camera.far,
-  renderer,
-  gui.addFolder("sea"),
-  animationLoop.time
-);
+const seaGui = gui.addFolder("sea");
+const sea = getSea(camera.far, renderer, seaGui, animationLoop.time);
 scene.add(sea);
+THREE_UTILS.addVisibilityToggle(seaGui, sea, scene, "visible");
 
 animationLoop.time.subscribeOnChange(() => renderer.render(scene, camera));
 

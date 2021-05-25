@@ -66,23 +66,30 @@ export function getBottom(
         ))
     );
 
-  const terrain = getTerrain(seaParameters, gui.addFolder("terrain"));
+  const group = new THREE.Group();
+
+  const terrainGui = gui.addFolder("terrain");
+  const terrain = getTerrain(seaParameters, terrainGui);
 
   const bottom = new THREE.Mesh(terrain.geometry, material);
   bottom.position.y = -seaParameters.depth.value;
   seaParameters.depth.subscribeOnChange((d) => (bottom.position.y = -d));
+  group.add(bottom);
+  THREE_UTILS.addVisibilityToggle(terrainGui, bottom, group, "visible");
 
-  const corals = getCorals(
-    seaParameters,
-    terrain.parameters,
-    gui.addFolder("corals"),
-    time
-  );
-  const bubbles = getBubbles(seaParameters, gui.addFolder("bubbles"), time);
+  const coralGui = gui.addFolder("corals");
+  const corals = getCorals(seaParameters, terrain.parameters, coralGui, time);
+  group.add(corals);
+  THREE_UTILS.addVisibilityToggle(coralGui, corals, group, "visible");
+
+  const bubblesGui = gui.addFolder("bubbles");
+  const bubbles = getBubbles(seaParameters, bubblesGui, time);
+  group.add(bubbles);
+  THREE_UTILS.addVisibilityToggle(bubblesGui, bubbles, group, "visible");
 
   time.subscribeOnChange((t) => {
     material.uniforms.uTime.value = t.elapsed;
   });
 
-  return new THREE.Group().add(bottom, corals, bubbles);
+  return group;
 }

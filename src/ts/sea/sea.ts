@@ -5,7 +5,7 @@ import {
   addSubscribable,
   addSubscribableColor,
 } from "../subscribable";
-import { Time } from "../three/utils";
+import { addVisibilityToggle, Time } from "../three/utils";
 
 import { getBottom } from "./bottom/bottom";
 import { getSurface } from "./surface";
@@ -47,9 +47,22 @@ export function getSea(
   addSubscribable(visibilityGui, parameters.visibility.min, "min", 0, 10);
   addSubscribable(visibilityGui, parameters.visibility.max, "max", 10, 50);
 
-  const bottom = getBottom(parameters, gui.addFolder("bottom"), time);
-  const surface = getSurface(parameters, gui.addFolder("surface"), time);
-  const turtle = getTurtle(parameters, gui.addFolder("turtle"), time);
+  const sea = new THREE.Group();
 
-  return new THREE.Group().add(bottom, surface, turtle);
+  const bottomGui = gui.addFolder("bottom");
+  const bottom = getBottom(parameters, bottomGui, time);
+  sea.add(bottom);
+  addVisibilityToggle(bottomGui, bottom, sea, "visible");
+
+  const surfaceGui = gui.addFolder("surface");
+  const surface = getSurface(parameters, surfaceGui, time);
+  sea.add(surface);
+  addVisibilityToggle(surfaceGui, surface, sea, "visible");
+
+  const turtleGui = gui.addFolder("turtle");
+  const turtle = getTurtle(parameters, turtleGui, time);
+  sea.add(turtle);
+  addVisibilityToggle(turtleGui, turtle, sea, "visible");
+
+  return sea;
 }
