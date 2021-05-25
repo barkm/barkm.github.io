@@ -47,12 +47,19 @@ async function getColoredCorals(
 function placeCoral(
   seaParameters: SeaParameters,
   terrainParameters: TerrainParameters,
+  separation: number,
+  spread: number,
   coral: THREE.Group
 ) {
   const scale = 0.3 * Math.random() + 1;
   coral.scale.set(scale, scale, scale);
   coral.rotateY(2 * Math.PI * Math.random());
-  coral.position.x = gaussian(0, seaParameters.width).ppf(Math.random());
+
+  const mu = Math.random() < 0.5 ? -separation / 2 : separation / 2;
+
+  coral.position.x = gaussian(mu, spread * seaParameters.width).ppf(
+    Math.random()
+  );
   coral.position.z = THREE.MathUtils.randFloat(-seaParameters.height, 0);
   const setElevation = () => {
     coral.position.y = getElevation(
@@ -78,6 +85,8 @@ export function getCorals(
   const parameters = {
     numCorals: 1000,
     numColors: 5,
+    separation: 8,
+    spread: 1,
   };
   const particleParameters = {
     numPerCoral: new Subscribable(10),
@@ -131,7 +140,13 @@ export function getCorals(
           const coral = corals[
             THREE.MathUtils.randInt(0, corals.length - 1)
           ].clone();
-          placeCoral(seaParameters, terrainParameters, coral);
+          placeCoral(
+            seaParameters,
+            terrainParameters,
+            parameters.separation,
+            parameters.spread,
+            coral
+          );
           group.add(coral);
         });
       };
@@ -145,6 +160,16 @@ export function getCorals(
         .min(0)
         .max(4000)
         .step(100)
+        .onFinishChange(removeAndAddCorals);
+      gui
+        .add(parameters, "separation")
+        .min(0)
+        .max(20)
+        .onFinishChange(removeAndAddCorals);
+      gui
+        .add(parameters, "spread")
+        .min(0)
+        .max(2)
         .onFinishChange(removeAndAddCorals);
       removeAndAddCorals();
     });

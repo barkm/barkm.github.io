@@ -43,7 +43,7 @@ export function getNoiseMaterial(gui: dat.GUI): THREE.ShaderMaterial {
   gui
     .add(material.uniforms.uCausticIterations, "value")
     .min(0)
-    .max(10)
+    .max(3)
     .step(1)
     .name("iterations");
   gui
