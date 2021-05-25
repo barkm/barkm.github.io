@@ -3,7 +3,7 @@ import * as THREE from "three";
 import * as THREE_UTILS from "../../three/utils";
 import { SeaParameters } from "../sea";
 
-import { getNoiseMaterial } from "./caustic/noise";
+import { getNoiseMaterial } from "./caustic";
 import { getTerrain } from "./terrain";
 import { getCorals } from "./corals/corals";
 import { getBubbles } from "./bubbles";
