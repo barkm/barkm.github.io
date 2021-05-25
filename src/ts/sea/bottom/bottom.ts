@@ -13,7 +13,8 @@ import bottomFragmentShader from "../../../shaders/bottom/fragment.glsl";
 
 function getMaterial(
   seaParameters: SeaParameters,
-  gui: dat.GUI
+  gui: dat.GUI,
+  day: boolean
 ): THREE.ShaderMaterial {
   const parameters = {
     bottomColor: seaParameters.color.value,
@@ -45,6 +46,9 @@ function getMaterial(
         value: new THREE.Color(parameters.causticColor),
       },
       uTime: { value: 0 },
+    },
+    defines: {
+      CAUSTIC: day ? "1" : "0",
     },
     precision: "highp",
   });
@@ -117,9 +121,10 @@ function getMaterial(
 export function getBottom(
   seaParameters: SeaParameters,
   gui: dat.GUI,
-  time: Subscribable<THREE_UTILS.Time>
+  time: Subscribable<THREE_UTILS.Time>,
+  day: boolean
 ) {
-  const material = getMaterial(seaParameters, gui.addFolder("material"));
+  const material = getMaterial(seaParameters, gui.addFolder("material"), day);
 
   const group = new THREE.Group();
 
@@ -137,10 +142,12 @@ export function getBottom(
   group.add(corals);
   THREE_UTILS.addVisibilityToggle(coralGui, corals, group, "visible");
 
-  const bubblesGui = gui.addFolder("bubbles");
-  const bubbles = getBubbles(seaParameters, bubblesGui, time);
-  group.add(bubbles);
-  THREE_UTILS.addVisibilityToggle(bubblesGui, bubbles, group, "visible");
+  if (day) {
+    const bubblesGui = gui.addFolder("bubbles");
+    const bubbles = getBubbles(seaParameters, bubblesGui, time);
+    group.add(bubbles);
+    THREE_UTILS.addVisibilityToggle(bubblesGui, bubbles, group, "visible");
+  }
 
   time.subscribeOnChange((t) => {
     material.uniforms.uTime.value = t.elapsed;

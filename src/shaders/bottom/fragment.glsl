@@ -11,11 +11,11 @@ uniform int uCausticIterations;
 uniform vec3 uSeaColor;
 uniform float uTime;
 
-varying vec2 vUv;
 varying float vVisibility;
 
+#if CAUSTIC == 1
+varying vec2 vUv;
 const int maxCausticIterations = 5;
-
 float getCaustic(vec2 coord, float time, int iterations) {
     float totalCaustic = 1.0;
     for (int i = 0; i < maxCausticIterations; i++) {
@@ -30,13 +30,17 @@ float getCaustic(vec2 coord, float time, int iterations) {
     }
     return totalCaustic;
 }
+#endif
 
 void main() {
 
-    float caustic = uCausticStrength * getCaustic(uCausticScale * (vUv - 0.5), uCausticSpeed * uTime, uCausticIterations);
+    vec3 color = uBottomColor;
 
-    vec3 color = mix(uBottomColor, uCausticColor, caustic);
+    #if CAUSTIC == 1
+        float caustic = uCausticStrength * getCaustic(uCausticScale * (vUv - 0.5), uCausticSpeed * uTime, uCausticIterations);
+        color = mix(color, uCausticColor, caustic);
+    #endif
+
     color = mix(uSeaColor, color, vVisibility);
-
     gl_FragColor = vec4(color, 1.0);
 }

@@ -26,10 +26,11 @@ export function getSea(
   far: number,
   renderer: THREE.WebGLRenderer,
   gui: dat.GUI,
-  time: Subscribable<Time>
+  time: Subscribable<Time>,
+  day: boolean
 ) {
   const parameters: SeaParameters = {
-    color: new Subscribable("#7696ff"),
+    color: new Subscribable(day ? "#7696ff" : "#000000"),
     visibility: { min: new Subscribable(5.0), max: new Subscribable(25.0) },
     depth: new Subscribable(8),
     width: 30,
@@ -50,12 +51,12 @@ export function getSea(
   const sea = new THREE.Group();
 
   const bottomGui = gui.addFolder("bottom");
-  const bottom = getBottom(parameters, bottomGui, time);
+  const bottom = getBottom(parameters, bottomGui, time, day);
   sea.add(bottom);
   addVisibilityToggle(bottomGui, bottom, sea, "visible");
 
   const surfaceGui = gui.addFolder("surface");
-  const surface = getSurface(parameters, surfaceGui, time);
+  const surface = getSurface(parameters, surfaceGui, time, day);
   sea.add(surface);
   addVisibilityToggle(surfaceGui, surface, sea, "visible");
 

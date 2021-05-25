@@ -4,10 +4,13 @@ uniform float uTime;
 uniform float uMinVisibility;
 uniform float uMaxVisibility;
 
-varying vec2 vUv;
 varying float vVisibility;
 
 #include "../visibility.glsl";
+
+#if CAUSTIC == 1
+    varying vec2 vUv;
+#endif
 
 void main() {
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
@@ -16,5 +19,8 @@ void main() {
     gl_Position = projectedPosition;
 
     vVisibility = getVisibility(viewPosition.xyz, uMinVisibility, uMaxVisibility);
-    vUv = uv;
+
+    #if CAUSTIC == 1
+        vUv = uv;
+    #endif
 }
