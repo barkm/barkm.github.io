@@ -2,8 +2,16 @@ import * as THREE from "three";
 
 import vertexShader from "../../../shaders/caustic/vertex.glsl";
 import bottomFragmentShader from "../../../shaders/caustic/fragment.glsl";
+import { SeaParameters } from "../sea";
 
-export function getNoiseMaterial(gui: dat.GUI): THREE.ShaderMaterial {
+export function getCausticMaterial(
+  seaParameters: SeaParameters,
+  gui: dat.GUI
+): THREE.ShaderMaterial {
+  const parameters = {
+    bottomColor: seaParameters.color.value,
+    causticColor: "#ffffff",
+  };
   const material = new THREE.ShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: bottomFragmentShader,
@@ -14,6 +22,22 @@ export function getNoiseMaterial(gui: dat.GUI): THREE.ShaderMaterial {
       uCausticPersistance: { value: 0.75 },
       uCausticScale: { value: 20.0 },
       uCausticIterations: { value: 3 },
+      uMinVisibility: {
+        value: seaParameters.visibility.min.value,
+      },
+      uMaxVisibility: {
+        value: seaParameters.visibility.max.value,
+      },
+      uSeaColor: {
+        value: new THREE.Color(seaParameters.color.value),
+      },
+      uBottomColor: {
+        value: new THREE.Color(parameters.bottomColor),
+      },
+      uCausticColor: {
+        value: new THREE.Color(parameters.causticColor),
+      },
+      uTime: { value: 0 },
     },
     precision: "highp",
   });
@@ -52,6 +76,33 @@ export function getNoiseMaterial(gui: dat.GUI): THREE.ShaderMaterial {
     .max(50)
     .step(0.01)
     .name("scale");
+
+  seaParameters.color.subscribeOnChange((v) => {
+    material.uniforms.uSeaColor.value = new THREE.Color(v);
+  });
+  seaParameters.visibility.min.subscribeOnChange((v) => {
+    material.uniforms.uMinVisibility.value = v;
+  });
+  seaParameters.visibility.max.subscribeOnChange((v) => {
+    material.uniforms.uMaxVisibility.value = v;
+  });
+
+  gui
+    .addColor(parameters, "bottomColor")
+    .onChange(
+      () =>
+        (material.uniforms.uBottomColor.value = new THREE.Color(
+          parameters.bottomColor
+        ))
+    );
+  gui
+    .addColor(parameters, "causticColor")
+    .onChange(
+      () =>
+        (material.uniforms.uCausticColor.value = new THREE.Color(
+          parameters.causticColor
+        ))
+    );
 
   return material;
 }
