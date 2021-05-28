@@ -20,6 +20,18 @@ import {
   getParticlesGeometry,
 } from "./particles";
 
+export interface ShimmerParameters {
+  pulse: {
+    offTime: Subscribable<number>;
+    rampTime: Subscribable<number>;
+    onTime: Subscribable<number>;
+  };
+  flicker: {
+    speed: Subscribable<number>;
+    amplitude: Subscribable<number>;
+  };
+}
+
 async function getColoredCorals(
   loader: GLTFLoader,
   path: string,
@@ -80,16 +92,50 @@ export function getCorals(
   seaParameters: SeaParameters,
   terrainParameters: TerrainParameters,
   gui: dat.GUI,
-  time: Subscribable<Time>
+  time: Subscribable<Time>,
+  day: boolean
 ) {
   const parameters = {
-    numCorals: 1000,
+    numCorals: 500,
     numColors: 5,
     separation: 8,
     spread: 1,
   };
+  const shimmerParameters = {
+    pulse: {
+      offTime: new Subscribable(10),
+      rampTime: new Subscribable(2.0),
+      onTime: new Subscribable(5.0),
+    },
+    flicker: {
+      speed: new Subscribable(5),
+      amplitude: new Subscribable(0.2),
+    },
+  };
+
+  const shimmerGui = gui.addFolder("shimmer");
+  const pulseGui = shimmerGui.addFolder("pulse");
+  addSubscribable(pulseGui, shimmerParameters.pulse.offTime, "offTime", 0, 40);
+  addSubscribable(
+    pulseGui,
+    shimmerParameters.pulse.rampTime,
+    "rampTime",
+    0,
+    10
+  );
+  addSubscribable(pulseGui, shimmerParameters.pulse.onTime, "onTime", 0, 20);
+  const flickerGui = shimmerGui.addFolder("flicker");
+  addSubscribable(
+    flickerGui,
+    shimmerParameters.flicker.amplitude,
+    "amplitude",
+    0,
+    1.0
+  );
+  addSubscribable(flickerGui, shimmerParameters.flicker.speed, "speed", 0, 10);
+
   const particleParameters = {
-    numPerCoral: new Subscribable(10),
+    numPerCoral: new Subscribable(30),
     minSize: new Subscribable(3),
     maxSize: new Subscribable(10),
   };
@@ -109,13 +155,24 @@ export function getCorals(
 
   const particlesMaterial = getParticlesMaterial(
     seaParameters,
+    shimmerParameters,
     particlesGui,
-    time
+    time,
+    day
   );
-  const coralMaterial = getMeshMaterial(seaParameters, gui);
+  const coralMaterial = getMeshMaterial(
+    seaParameters,
+    shimmerParameters,
+    gui,
+    time,
+    day
+  );
   const step = Math.floor(100 / parameters.numColors);
   const hues = subsample(range(100), step);
-  const colors = hues.map((hue) => new THREE.Color(`hsl(${hue}, 100%, 85%)`));
+  const lightness = day ? 85 : 65;
+  const colors = hues.map(
+    (hue) => new THREE.Color(`hsl(${hue}, 100%, ${lightness}%)`)
+  );
 
   const loader = new GLTFLoader();
   const _getColoredCorals = (meshPath: string) => {

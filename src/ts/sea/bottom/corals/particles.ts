@@ -7,6 +7,7 @@ import { Subscribable } from "../../../subscribable";
 import particlesVertexShader from "../../../../shaders/coral/particles/vertex.glsl";
 import particlesFragmentShader from "../../../../shaders/coral/particles/fragment.glsl";
 
+import { ShimmerParameters } from "./corals";
 export interface ParticlesParameters {
   numPerCoral: Subscribable<number>;
   minSize: Subscribable<number>;
@@ -48,8 +49,10 @@ function getParticleSizeAttribute(
 
 export function getParticlesMaterial(
   seaParameters: SeaParameters,
+  shimmerParameters: ShimmerParameters,
   gui: dat.GUI,
-  time: Subscribable<Time>
+  time: Subscribable<Time>,
+  day: Boolean
 ) {
   const material = new THREE.ShaderMaterial({
     vertexShader: particlesVertexShader,
@@ -58,12 +61,20 @@ export function getParticlesMaterial(
       uMinVisibility: { value: seaParameters.visibility.min.value },
       uMaxVisibility: { value: seaParameters.visibility.max.value },
       uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
+      uPulseOffTime: { value: shimmerParameters.pulse.offTime.value },
+      uPulseOnTime: { value: shimmerParameters.pulse.onTime.value },
+      uPulseRampTime: { value: shimmerParameters.pulse.rampTime.value },
+      uFlickerAmplitude: { value: shimmerParameters.flicker.amplitude.value },
+      uFlickerSpeed: { value: shimmerParameters.flicker.speed.value },
       uScale: { value: 10.0 },
       uNoiseAmplitude: { value: 0.5 },
       uNoiseFrequency: { value: 1.0 },
       uSpeed: { value: 0.05 },
       uHeightOffset: { value: 0 },
       uTime: { value: 0 },
+    },
+    defines: {
+      SHIMMER: day ? "0" : "1",
     },
     transparent: true,
     precision: "highp",
@@ -77,7 +88,21 @@ export function getParticlesMaterial(
   seaParameters.color.subscribeOnChange((v) => {
     material.uniforms.uSeaColor.value = new THREE.Color(v);
   });
-
+  shimmerParameters.pulse.offTime.subscribeOnChange((v) => {
+    material.uniforms.uPulseOffTime.value = v;
+  });
+  shimmerParameters.pulse.onTime.subscribeOnChange((v) => {
+    material.uniforms.uPulseOnTime.value = v;
+  });
+  shimmerParameters.pulse.rampTime.subscribeOnChange((v) => {
+    material.uniforms.uPulseRampTime.value = v;
+  });
+  shimmerParameters.flicker.amplitude.subscribeOnChange((v) => {
+    material.uniforms.uFlickerAmplitude.value = v;
+  });
+  shimmerParameters.flicker.speed.subscribeOnChange((v) => {
+    material.uniforms.uFlickerSpeed.value = v;
+  });
   gui.add(material.uniforms.uScale, "value").min(0).max(20).name("scale");
   gui
     .add(material.uniforms.uNoiseAmplitude, "value")

@@ -138,7 +138,13 @@ export function getBottom(
   THREE_UTILS.addVisibilityToggle(terrainGui, bottom, group, "visible");
 
   const coralGui = gui.addFolder("corals");
-  const corals = getCorals(seaParameters, terrain.parameters, coralGui, time);
+  const corals = getCorals(
+    seaParameters,
+    terrain.parameters,
+    coralGui,
+    time,
+    day
+  );
   group.add(corals);
   THREE_UTILS.addVisibilityToggle(coralGui, corals, group, "visible");
 

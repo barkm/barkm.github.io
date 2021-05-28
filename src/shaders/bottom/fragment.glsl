@@ -19,7 +19,7 @@ const int maxCausticIterations = 5;
 float getCaustic(vec2 coord, float time, int iterations) {
     float totalCaustic = 1.0;
     for (int i = 0; i < maxCausticIterations; i++) {
-        if (i >= uCausticIterations) {
+        if (i >= iterations) {
             break;
         }
         float frequency = pow(uCausticLacunarity, float(i));

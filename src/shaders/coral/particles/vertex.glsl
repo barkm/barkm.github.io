@@ -1,3 +1,5 @@
+#pragma glslify: random = require(glsl-random) 
+
 uniform float uMinVisibility;
 uniform float uMaxVisibility;
 uniform float uTime;
@@ -11,10 +13,14 @@ attribute float aSize;
 attribute vec3 aColor;
 
 varying float vVisibility;
-varying vec3 vColor;
+varying vec4 vColor;
 
 #pragma glslify: snoise4 = require(glsl-noise/simplex/4d) 
 #include "../../visibility.glsl";
+
+#if (SHIMMER == 1)
+    #include "../shimmer.glsl";
+#endif
 
 void main() {
 	vec4 modelPosition = modelMatrix * vec4(position, 1.0);
@@ -33,5 +39,10 @@ void main() {
     gl_PointSize *= (uScale / -viewPosition.z);
 
 	vVisibility = getVisibility(viewPosition.xyz, uMinVisibility, uMaxVisibility);
-    vColor = aColor;
+
+    vColor = vec4(aColor, 1.0);
+
+    #if (SHIMMER == 1)
+        vColor *= getShimmer();
+    #endif
 }
