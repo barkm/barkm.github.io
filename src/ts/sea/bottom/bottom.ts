@@ -28,7 +28,6 @@ function getMaterial(
       uCausticLacunarity: { value: 1.2 },
       uCausticPersistance: { value: 0.75 },
       uCausticScale: { value: 20.0 },
-      uCausticIterations: { value: 3 },
       uMinVisibility: {
         value: seaParameters.visibility.min.value,
       },
@@ -71,12 +70,6 @@ function getMaterial(
     .min(0)
     .max(1)
     .name("persistance");
-  gui
-    .add(material.uniforms.uCausticIterations, "value")
-    .min(0)
-    .max(3)
-    .step(1)
-    .name("iterations");
   gui
     .add(material.uniforms.uCausticScale, "value")
     .min(0)
