@@ -61,7 +61,7 @@ export function getSea(
   addVisibilityToggle(surfaceGui, surface, sea, "visible");
 
   const turtleGui = gui.addFolder("turtle");
-  const turtle = getTurtle(parameters, turtleGui, time);
+  const turtle = getTurtle(parameters, turtleGui, time, day);
   sea.add(turtle);
   addVisibilityToggle(turtleGui, turtle, sea, "visible");
 

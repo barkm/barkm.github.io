@@ -13,7 +13,8 @@ import { Subscribable } from "../subscribable";
 export function getTurtle(
   seaParameters: SeaParameters,
   gui: dat.GUI,
-  time: Subscribable<THREE_UTILS.Time>
+  time: Subscribable<THREE_UTILS.Time>,
+  day: Boolean
 ) {
   const group = new THREE.Group();
 
@@ -45,6 +46,12 @@ export function getTurtle(
       uSeaColor: { value: new THREE.Color(seaParameters.color.value) },
       uMinVisibility: { value: seaParameters.visibility.min.value },
       uMaxVisibility: { value: seaParameters.visibility.max.value },
+      uShimmerFrequency: { value: 20 },
+      uShimmerSpeed: { value: 2 },
+      uTime: { value: 0.0 },
+    },
+    defines: {
+      SHIMMER: day ? "0" : "1",
     },
     side: THREE.DoubleSide,
     alphaToCoverage: true,
@@ -62,6 +69,16 @@ export function getTurtle(
     .max(2)
     .step(0.01)
     .name("lineThickness");
+  gui
+    .add(turtleMaterial.uniforms.uShimmerFrequency, "value")
+    .min(0)
+    .max(50)
+    .name("shimmerFrequency");
+  gui
+    .add(turtleMaterial.uniforms.uShimmerSpeed, "value")
+    .min(0)
+    .max(5)
+    .name("shimmerSpeed");
 
   seaParameters.color.subscribeOnChange((v) => {
     turtleMaterial.uniforms.uSeaColor.value = new THREE.Color(v);
@@ -76,6 +93,9 @@ export function getTurtle(
   const turtle = new Turtle(group, mesh.position, turtleMaterial, motion);
 
   time.subscribeOnChange((t) => turtle.update(t));
+  time.subscribeOnChange(
+    (t) => (turtleMaterial.uniforms.uTime.value = t.elapsed)
+  );
 
   return group;
 }
