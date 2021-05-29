@@ -17,7 +17,6 @@ function getMaterial(
   day: boolean
 ): THREE.ShaderMaterial {
   const parameters = {
-    bottomColor: seaParameters.color.value,
     causticColor: "#ffffff",
   };
   const material = new THREE.ShaderMaterial({
@@ -38,9 +37,6 @@ function getMaterial(
       },
       uSeaColor: {
         value: new THREE.Color(seaParameters.color.value),
-      },
-      uBottomColor: {
-        value: new THREE.Color(parameters.bottomColor),
       },
       uCausticColor: {
         value: new THREE.Color(parameters.causticColor),
@@ -98,14 +94,6 @@ function getMaterial(
     material.uniforms.uMaxVisibility.value = v;
   });
 
-  gui
-    .addColor(parameters, "bottomColor")
-    .onChange(
-      () =>
-        (material.uniforms.uBottomColor.value = new THREE.Color(
-          parameters.bottomColor
-        ))
-    );
   gui
     .addColor(parameters, "causticColor")
     .onChange(

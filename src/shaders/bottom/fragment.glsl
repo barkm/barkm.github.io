@@ -1,6 +1,5 @@
 #pragma glslify: simplexNoise = require(glsl-noise/simplex/3d) 
 
-uniform vec3 uBottomColor;
 uniform vec3 uCausticColor;
 uniform float uCausticStrength;
 uniform float uCausticLacunarity;
@@ -34,7 +33,7 @@ float getCaustic(vec2 coord, float time, int iterations) {
 
 void main() {
 
-    vec3 color = uBottomColor;
+    vec3 color = uSeaColor;
 
     #if CAUSTIC == 1
         float caustic = uCausticStrength * getCaustic(uCausticScale * (vUv - 0.5), uCausticSpeed * uTime, uCausticIterations);

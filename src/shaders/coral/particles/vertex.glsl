@@ -8,6 +8,7 @@ uniform float uNoiseAmplitude;
 uniform float uNoiseFrequency;
 uniform float uScale;
 uniform float uHeightOffset;
+uniform vec3 uSeaColor;
 
 attribute float aSize;
 attribute vec3 aColor;
@@ -43,6 +44,6 @@ void main() {
     vColor = vec4(aColor, 1.0);
 
     #if (SHIMMER == 1)
-        vColor *= getShimmer();
+        vColor = mix(vec4(uSeaColor, 0.0), vColor, getShimmer());
     #endif
 }

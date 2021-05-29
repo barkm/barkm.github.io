@@ -78,7 +78,6 @@ export function getSurface(
   setBarycentricCoordinateAttribute(geometry);
 
   const surface = new THREE.Mesh(geometry, material);
-  surface.position.z = -seaParameters.height / 2;
   surface.rotation.x = Math.PI / 2;
 
   time.subscribeOnChange((t) => {

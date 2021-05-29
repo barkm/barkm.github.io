@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import gaussian from "gaussian";
 
 import { range, subsample } from "../../../utils";
 import { addSubscribable, Subscribable } from "../../../subscribable";
@@ -59,20 +58,14 @@ async function getColoredCorals(
 function placeCoral(
   seaParameters: SeaParameters,
   terrainParameters: TerrainParameters,
-  separation: number,
-  spread: number,
   coral: THREE.Group
 ) {
   const scale = 0.3 * Math.random() + 1;
   coral.scale.set(scale, scale, scale);
   coral.rotateY(2 * Math.PI * Math.random());
 
-  const mu = Math.random() < 0.5 ? -separation / 2 : separation / 2;
-
-  coral.position.x = gaussian(mu, spread * seaParameters.width).ppf(
-    Math.random()
-  );
-  coral.position.z = THREE.MathUtils.randFloat(-seaParameters.height, 0);
+  coral.position.x = THREE.MathUtils.randFloatSpread(seaParameters.width);
+  coral.position.z = THREE.MathUtils.randFloatSpread(seaParameters.height);
   const setElevation = () => {
     coral.position.y = getElevation(
       coral.position.x,
@@ -96,10 +89,8 @@ export function getCorals(
   day: boolean
 ) {
   const parameters = {
-    numCorals: 500,
+    numCorals: 750,
     numColors: 5,
-    separation: 8,
-    spread: 1,
   };
   const shimmerParameters = {
     pulse: {
@@ -197,13 +188,7 @@ export function getCorals(
           const coral = corals[
             THREE.MathUtils.randInt(0, corals.length - 1)
           ].clone();
-          placeCoral(
-            seaParameters,
-            terrainParameters,
-            parameters.separation,
-            parameters.spread,
-            coral
-          );
+          placeCoral(seaParameters, terrainParameters, coral);
           group.add(coral);
         });
       };
@@ -217,16 +202,6 @@ export function getCorals(
         .min(0)
         .max(4000)
         .step(100)
-        .onFinishChange(removeAndAddCorals);
-      gui
-        .add(parameters, "separation")
-        .min(0)
-        .max(20)
-        .onFinishChange(removeAndAddCorals);
-      gui
-        .add(parameters, "spread")
-        .min(0)
-        .max(2)
         .onFinishChange(removeAndAddCorals);
       removeAndAddCorals();
     });

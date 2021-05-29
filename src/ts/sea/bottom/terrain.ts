@@ -71,7 +71,6 @@ function getTerrainGeometry(
     (128 * seaParameters.height) / seaParameters.width
   );
   geometry.rotateX(-Math.PI / 2);
-  geometry.translate(0, 0, -seaParameters.height / 2);
   const positions = geometry.getAttribute("position").clone();
   const update = () => {
     const newPositions = getNewPositions(positions, parameters);

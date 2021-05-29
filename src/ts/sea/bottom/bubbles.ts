@@ -26,7 +26,7 @@ function getPositions(
     pillarIndex++
   ) {
     const pillarX = seaParameters.width * (Math.random() - 0.5);
-    const pillarZ = -seaParameters.height * Math.random();
+    const pillarZ = -seaParameters.height * (Math.random() - 0.5);
     for (
       let bubbleIndex = 0;
       bubbleIndex < parameters.numBubbles;

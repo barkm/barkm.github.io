@@ -30,11 +30,11 @@ export function getSea(
   day: boolean
 ) {
   const parameters: SeaParameters = {
-    color: new Subscribable(day ? "#7696ff" : "#000000"),
-    visibility: { min: new Subscribable(5.0), max: new Subscribable(25.0) },
+    color: new Subscribable(day ? "#7696ff" : "#061222"),
+    visibility: { min: new Subscribable(5.0), max: new Subscribable(20.0) },
     depth: new Subscribable(8),
-    width: 30,
-    height: far,
+    width: far + 5,
+    height: far + 5,
   };
 
   renderer.setClearColor(parameters.color.value);

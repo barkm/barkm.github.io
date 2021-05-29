@@ -5,6 +5,7 @@ attribute vec3 aBarycentricCoordinate;
 uniform float uMinVisibility;
 uniform float uMaxVisibility;
 uniform float uTime;
+uniform vec3 uSeaColor;
 
 attribute vec3 aColor;
 
@@ -32,6 +33,6 @@ void main() {
     vColor = aColor;
 
     #if (SHIMMER == 1)
-        vColor *= getShimmer();
+        vColor = mix(uSeaColor, vColor, getShimmer());
     #endif
 }
