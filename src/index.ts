@@ -69,7 +69,13 @@ const animationLoop = THREE_UTILS.getAnimationLoop();
 animationLoop.time.subscribeOnChange(rotateCamera);
 
 const seaGui = gui.addFolder("sea");
-const sea = getSea(camera.far, renderer, seaGui, animationLoop.time, false);
+const sea = getSea(
+  camera.far,
+  renderer,
+  seaGui,
+  animationLoop.time,
+  !UTILS.isDarkMode()
+);
 scene.add(sea);
 THREE_UTILS.addVisibilityToggle(seaGui, sea, scene, "visible");
 

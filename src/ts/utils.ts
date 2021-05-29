@@ -19,6 +19,13 @@ export function getWindowSize(): WindowSize {
   return windowSize;
 }
 
+export function isDarkMode(): boolean {
+  return (
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  );
+}
+
 export function subsample(array: Array<any>, step: number) {
   return array.filter((e, i) => i % step === step - 1);
 }
