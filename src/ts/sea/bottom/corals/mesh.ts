@@ -7,8 +7,7 @@ import { loadModel, Time } from "../../../three/utils";
 
 import vertexShader from "../../../../shaders/coral/vertex.glsl";
 import fragmentShader from "../../../../shaders/coral/fragment.glsl";
-import coralModel1 from "../../../../../models/corals/coral1.glb";
-import coralModel2 from "../../../../../models/corals/coral2.glb";
+import coralModel from "../../../../../models/coral.glb";
 import { Subscribable } from "../../../subscribable";
 import { ShimmerParameters } from "./corals";
 
@@ -80,11 +79,9 @@ export function getMeshMaterial(
   return material;
 }
 
-export async function loadMeshGeometry(
-  loader: GLTFLoader,
-  path: string
-): Promise<THREE.BufferGeometry> {
-  const model = await loadModel(loader, path);
+export async function loadMeshGeometry(): Promise<THREE.BufferGeometry> {
+  const loader = new GLTFLoader();
+  const model = await loadModel(loader, coralModel);
   let geometry: THREE.BufferGeometry | null = null;
   model.scene.traverse((obj: any) => {
     if (obj instanceof THREE.Mesh) {
@@ -94,5 +91,3 @@ export async function loadMeshGeometry(
   });
   return geometry!;
 }
-
-export const MESH_PATHS = [coralModel2];

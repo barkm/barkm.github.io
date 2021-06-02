@@ -12,7 +12,7 @@ import {
   setColorAttribute,
 } from "../../../three/utils";
 
-import { getMeshMaterial, loadMeshGeometry, MESH_PATHS } from "./mesh";
+import { getMeshMaterial, loadMeshGeometry } from "./mesh";
 import {
   ParticlesParameters,
   getParticlesMaterial,
@@ -32,14 +32,12 @@ export interface ShimmerParameters {
 }
 
 async function getColoredCorals(
-  loader: GLTFLoader,
-  path: string,
   particleParameters: ParticlesParameters,
   colors: Array<THREE.Color>,
   modelMaterial: THREE.ShaderMaterial,
   particlesMaterial: THREE.ShaderMaterial
 ): Promise<Array<THREE.Group>> {
-  const meshGeometry = await loadMeshGeometry(loader, path);
+  const meshGeometry = await loadMeshGeometry();
   const boundingBox = getBoundingBoxFromBufferGeometry(meshGeometry);
   return colors.map((color) => {
     const particlesGeometry = getParticlesGeometry(
@@ -165,21 +163,9 @@ export function getCorals(
     (hue) => new THREE.Color(`hsl(${hue}, 100%, ${lightness}%)`)
   );
 
-  const loader = new GLTFLoader();
-  const _getColoredCorals = (meshPath: string) => {
-    return getColoredCorals(
-      loader,
-      meshPath,
-      particleParameters,
-      colors,
-      coralMaterial,
-      particlesMaterial
-    );
-  };
-
   const group = new THREE.Group();
 
-  Promise.all(MESH_PATHS.map(_getColoredCorals))
+  getColoredCorals(particleParameters, colors, coralMaterial, particlesMaterial)
     .then((coralsPerModel) => coralsPerModel.flat())
     .then((corals) => {
       const removeAndAddCorals = () => {
