@@ -61,7 +61,10 @@ export function getRenderer(windowSize: UTILS.WindowSize): THREE.WebGLRenderer {
     canvas.className = "webgl";
     document.body.appendChild(canvas);
   }
-  const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  const renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    powerPreference: "high-performance",
+  });
   renderer.setSize(windowSize.width, windowSize.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   window.addEventListener("resize", () => {
@@ -75,18 +78,23 @@ export interface Time {
   delta: number;
 }
 
-export function getAnimationLoop(): {
+export function getAnimationLoop(
+  pre: () => void,
+  post: () => void
+): {
   time: Subscribable<Time>;
   loop: () => void;
 } {
   let time = new Subscribable({ elapsed: 0, delta: 0 });
   const clock = new THREE.Clock();
   const update = () => {
+    pre();
     const delta = clock.getDelta();
     const elapsed = clock.getElapsedTime();
     time.value = { elapsed, delta };
     time.callSubscribers();
     window.requestAnimationFrame(update);
+    post();
   };
   return {
     time,

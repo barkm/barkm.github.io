@@ -3,6 +3,7 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as dat from "dat.gui";
+import Stats from "stats.js";
 
 import * as UTILS from "./ts/utils";
 import * as THREE_UTILS from "./ts/three/utils";
@@ -10,6 +11,17 @@ import { getSea } from "./ts/sea/sea";
 
 const gui = new dat.GUI();
 gui.hide();
+
+const stats = new Stats();
+stats.showPanel(0);
+const child = document.body.appendChild(stats.dom);
+const statsDebug = {
+  toggleStats: () => {
+    child.style.display = child.style.display == "none" ? "block" : "none";
+  },
+};
+statsDebug.toggleStats();
+gui.add(statsDebug, "toggleStats");
 
 const scene = new THREE.Scene();
 
@@ -64,7 +76,10 @@ controls.update();
 const axesHelper = new THREE.AxesHelper();
 THREE_UTILS.addVisibilityToggle(gui, axesHelper, scene, "axesHelper");
 
-const animationLoop = THREE_UTILS.getAnimationLoop();
+const animationLoop = THREE_UTILS.getAnimationLoop(
+  () => stats.begin(),
+  () => stats.end()
+);
 
 animationLoop.time.subscribeOnChange(rotateCamera);
 

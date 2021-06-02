@@ -37,8 +37,8 @@ export function getMeshMaterial(
     defines: {
       SHIMMER: day ? "0" : "1",
     },
+    transparent: true,
     side: THREE.DoubleSide,
-    alphaToCoverage: true,
     extensions: {
       derivatives: true,
     },
