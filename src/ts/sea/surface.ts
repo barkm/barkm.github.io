@@ -38,7 +38,7 @@ function getMaterial(
     extensions: {
       derivatives: true,
     },
-    precision: parameters.useRefraction ? "highp" : "mediump",
+    precision: "highp",
   });
 
   seaParameters.color.subscribeOnChange((v) => {
