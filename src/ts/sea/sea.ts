@@ -23,20 +23,12 @@ export interface SeaParameters {
 }
 
 export function getSea(
-  far: number,
+  parameters: SeaParameters,
   renderer: THREE.WebGLRenderer,
   gui: dat.GUI,
   time: Subscribable<Time>,
   day: boolean
 ) {
-  const parameters: SeaParameters = {
-    color: new Subscribable(day ? "#7696ff" : "#061222"),
-    visibility: { min: new Subscribable(5.0), max: new Subscribable(20.0) },
-    depth: new Subscribable(8),
-    width: far + 5,
-    height: far + 5,
-  };
-
   renderer.setClearColor(parameters.color.value);
   parameters.color.subscribeOnChange((v) => {
     renderer.setClearColor(v);

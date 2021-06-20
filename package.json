@@ -12,6 +12,7 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.3",
     "animejs": "^3.2.1",
     "dat.gui": "^0.7.7",
     "gaussian": "^1.2.0",

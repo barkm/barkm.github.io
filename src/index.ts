@@ -1,4 +1,6 @@
 import "./style.css";
+import "@fortawesome/fontawesome-free/js/fontawesome";
+import "@fortawesome/fontawesome-free/js/solid";
 
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -8,6 +10,12 @@ import Stats from "stats.js";
 import * as UTILS from "./ts/utils";
 import * as THREE_UTILS from "./ts/three/utils";
 import { getSea } from "./ts/sea/sea";
+import {
+  addDayNightToggle,
+  ColorParameters,
+  DayNightParameters,
+} from "./ts/day_night";
+import { Subscribable } from "./ts/subscribable";
 
 const gui = new dat.GUI();
 gui.hide();
@@ -83,17 +91,34 @@ const animationLoop = THREE_UTILS.getAnimationLoop(
 
 animationLoop.time.subscribeOnChange(rotateCamera);
 
+const isDay = !UTILS.isDarkMode();
+const parameters = {
+  color: new Subscribable(isDay ? "#7696ff" : "#061222"),
+  visibility: { min: new Subscribable(5.0), max: new Subscribable(20.0) },
+  depth: new Subscribable(8),
+  width: camera.far + 5,
+  height: camera.far + 5,
+};
+
 const seaGui = gui.addFolder("sea");
-const sea = getSea(
-  camera.far,
-  renderer,
-  seaGui,
-  animationLoop.time,
-  !UTILS.isDarkMode()
-);
+const sea = getSea(parameters, renderer, seaGui, animationLoop.time, isDay);
 scene.add(sea);
 THREE_UTILS.addVisibilityToggle(seaGui, sea, scene, "visible");
 
 animationLoop.time.subscribeOnChange(() => renderer.render(scene, camera));
 
 animationLoop.loop();
+
+const dayParameters: ColorParameters = {
+  background: "#ffffff",
+  icon: "#061222",
+};
+const nightParameters: ColorParameters = {
+  background: "#061222",
+  icon: "#ffffff",
+};
+const dayNightParameters: DayNightParameters = {
+  day: dayParameters,
+  night: nightParameters,
+};
+addDayNightToggle(isDay, dayNightParameters);
