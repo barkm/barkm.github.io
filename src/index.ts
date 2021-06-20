@@ -91,9 +91,10 @@ const animationLoop = THREE_UTILS.getAnimationLoop(
 
 animationLoop.time.subscribeOnChange(rotateCamera);
 
-const isDay = !UTILS.isDarkMode();
+const isDay = new Subscribable(!UTILS.isDarkMode());
+
 const parameters = {
-  color: new Subscribable(isDay ? "#7696ff" : "#061222"),
+  color: new Subscribable(isDay.value ? "#7696ff" : "#061222"),
   visibility: { min: new Subscribable(5.0), max: new Subscribable(20.0) },
   depth: new Subscribable(8),
   width: camera.far + 5,

@@ -14,7 +14,7 @@ export function getTurtle(
   seaParameters: SeaParameters,
   gui: dat.GUI,
   time: Subscribable<THREE_UTILS.Time>,
-  day: Boolean
+  isDay: Subscribable<boolean>
 ) {
   const group = new THREE.Group();
 
@@ -50,7 +50,7 @@ export function getTurtle(
       uTime: { value: 0.0 },
     },
     defines: {
-      SHIMMER: day ? "0" : "1",
+      SHIMMER: isDay.value ? "0" : "1",
     },
     transparent: true,
     side: THREE.DoubleSide,

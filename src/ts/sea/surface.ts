@@ -11,11 +11,11 @@ import { Subscribable } from "../subscribable";
 function getMaterial(
   seaParameters: SeaParameters,
   gui: dat.GUI,
-  day: boolean
+  isDay: Subscribable<boolean>
 ): THREE.ShaderMaterial {
   const parameters = {
     skyColor: "#ffffff",
-    edgeColor: day ? "#0000ff" : "#7a7a7a",
+    edgeColor: isDay.value ? "#0000ff" : "#7a7a7a",
     useRefraction: false,
   };
 
@@ -58,9 +58,9 @@ export function getSurface(
   seaParameters: SeaParameters,
   gui: dat.GUI,
   time: Subscribable<THREE_UTILS.Time>,
-  day: boolean
+  isDay: Subscribable<boolean>
 ) {
-  const material = getMaterial(seaParameters, gui, day);
+  const material = getMaterial(seaParameters, gui, isDay);
 
   const geometry = new THREE.PlaneGeometry(
     seaParameters.width,

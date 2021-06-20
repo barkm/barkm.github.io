@@ -52,7 +52,7 @@ export function getParticlesMaterial(
   shimmerParameters: ShimmerParameters,
   gui: dat.GUI,
   time: Subscribable<Time>,
-  day: Boolean
+  isDay: Subscribable<boolean>
 ) {
   const material = new THREE.ShaderMaterial({
     vertexShader: particlesVertexShader,
@@ -74,7 +74,7 @@ export function getParticlesMaterial(
       uTime: { value: 0 },
     },
     defines: {
-      SHIMMER: day ? "0" : "1",
+      SHIMMER: isDay.value ? "0" : "1",
     },
     transparent: true,
     precision: "highp",

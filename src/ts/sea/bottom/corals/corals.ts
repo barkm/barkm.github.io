@@ -84,7 +84,7 @@ export function getCorals(
   terrainParameters: TerrainParameters,
   gui: dat.GUI,
   time: Subscribable<Time>,
-  day: boolean
+  isDay: Subscribable<boolean>
 ) {
   const parameters = {
     numCorals: 750,
@@ -147,18 +147,18 @@ export function getCorals(
     shimmerParameters,
     particlesGui,
     time,
-    day
+    isDay
   );
   const coralMaterial = getMeshMaterial(
     seaParameters,
     shimmerParameters,
     gui,
     time,
-    day
+    isDay
   );
   const step = Math.floor(100 / parameters.numColors);
   const hues = subsample(range(100), step);
-  const lightness = day ? 85 : 65;
+  const lightness = isDay.value ? 85 : 65;
   const colors = hues.map(
     (hue) => new THREE.Color(`hsl(${hue}, 100%, ${lightness}%)`)
   );

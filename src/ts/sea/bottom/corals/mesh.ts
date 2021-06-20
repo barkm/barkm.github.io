@@ -16,7 +16,7 @@ export function getMeshMaterial(
   shimmerParameters: ShimmerParameters,
   gui: dat.GUI,
   time: Subscribable<Time>,
-  day: boolean
+  isDay: Subscribable<boolean>
 ) {
   const material = new THREE.ShaderMaterial({
     vertexShader: vertexShader,
@@ -34,7 +34,7 @@ export function getMeshMaterial(
       uTime: { value: 0 },
     },
     defines: {
-      SHIMMER: day ? "0" : "1",
+      SHIMMER: isDay.value ? "0" : "1",
     },
     transparent: true,
     side: THREE.DoubleSide,

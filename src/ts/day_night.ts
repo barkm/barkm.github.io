@@ -1,3 +1,5 @@
+import { Subscribable } from "./subscribable";
+
 export interface ColorParameters {
   background: string;
   icon: string;
@@ -9,7 +11,7 @@ export interface DayNightParameters {
 }
 
 export function addDayNightToggle(
-  isDay: boolean,
+  isDay: Subscribable<boolean>,
   parameters: DayNightParameters
 ) {
   const colorParameters = isDay ? parameters.day : parameters.night;

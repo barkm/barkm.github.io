@@ -27,7 +27,7 @@ export function getSea(
   renderer: THREE.WebGLRenderer,
   gui: dat.GUI,
   time: Subscribable<Time>,
-  day: boolean
+  isDay: Subscribable<boolean>
 ) {
   renderer.setClearColor(parameters.color.value);
   parameters.color.subscribeOnChange((v) => {
@@ -43,17 +43,17 @@ export function getSea(
   const sea = new THREE.Group();
 
   const bottomGui = gui.addFolder("bottom");
-  const bottom = getBottom(parameters, bottomGui, time, day);
+  const bottom = getBottom(parameters, bottomGui, time, isDay);
   sea.add(bottom);
   addVisibilityToggle(bottomGui, bottom, sea, "visible");
 
   const surfaceGui = gui.addFolder("surface");
-  const surface = getSurface(parameters, surfaceGui, time, day);
+  const surface = getSurface(parameters, surfaceGui, time, isDay);
   sea.add(surface);
   addVisibilityToggle(surfaceGui, surface, sea, "visible");
 
   const turtleGui = gui.addFolder("turtle");
-  const turtle = getTurtle(parameters, turtleGui, time, day);
+  const turtle = getTurtle(parameters, turtleGui, time, isDay);
   sea.add(turtle);
   addVisibilityToggle(turtleGui, turtle, sea, "visible");
 
