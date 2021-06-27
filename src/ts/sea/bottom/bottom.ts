@@ -41,9 +41,7 @@ function getMaterial(
         value: new THREE.Color(parameters.causticColor),
       },
       uTime: { value: 0 },
-    },
-    defines: {
-      CAUSTIC: isDay.value ? "1" : "0",
+      uShowCaustic: { value: isDay.value },
     },
     precision: "highp",
   });
@@ -89,6 +87,10 @@ function getMaterial(
     material.uniforms.uMaxVisibility.value = v;
   });
 
+  isDay.subscribeOnFinishChange((d) => {
+    material.uniforms.uShowCaustic.value = d;
+  });
+
   gui
     .addColor(parameters, "causticColor")
     .onChange(
@@ -131,12 +133,15 @@ export function getBottom(
   group.add(corals);
   THREE_UTILS.addVisibilityToggle(coralGui, corals, group, "visible");
 
+  const bubblesGui = gui.addFolder("bubbles");
+  const bubbles = getBubbles(seaParameters, bubblesGui, time);
+  THREE_UTILS.addVisibilityToggle(bubblesGui, bubbles, group, "visible");
   if (isDay.value) {
-    const bubblesGui = gui.addFolder("bubbles");
-    const bubbles = getBubbles(seaParameters, bubblesGui, time);
     group.add(bubbles);
-    THREE_UTILS.addVisibilityToggle(bubblesGui, bubbles, group, "visible");
   }
+  isDay.subscribeOnFinishChange((d) =>
+    d ? group.add(bubbles) : group.remove(bubbles)
+  );
 
   time.subscribeOnChange((t) => {
     material.uniforms.uTime.value = t.elapsed;

@@ -72,9 +72,7 @@ export function getParticlesMaterial(
       uSpeed: { value: 0.05 },
       uHeightOffset: { value: 0 },
       uTime: { value: 0 },
-    },
-    defines: {
-      SHIMMER: isDay.value ? "0" : "1",
+      uShimmer: { value: !isDay.value },
     },
     transparent: true,
     precision: "highp",
@@ -103,6 +101,9 @@ export function getParticlesMaterial(
   shimmerParameters.flicker.speed.subscribeOnChange((v) => {
     material.uniforms.uFlickerSpeed.value = v;
   });
+  isDay.subscribeOnFinishChange((d) => {
+    material.uniforms.uShimmer.value = !d;
+  });
   gui.add(material.uniforms.uScale, "value").min(0).max(20).name("scale");
   gui
     .add(material.uniforms.uNoiseAmplitude, "value")
@@ -126,8 +127,7 @@ export function getParticlesMaterial(
 
 export function getParticlesGeometry(
   parameters: ParticlesParameters,
-  boundingBox: THREE.Box3,
-  color: THREE.Color
+  boundingBox: THREE.Box3
 ) {
   const geometry = new THREE.BufferGeometry();
   const setPositionAttribute = () => {
@@ -150,7 +150,6 @@ export function getParticlesGeometry(
   const setAttributes = () => {
     setPositionAttribute();
     setSizeAttribute();
-    setColorAttribute(geometry, color);
   };
   setAttributes();
   parameters.minSize.subscribeOnFinishChange(setSizeAttribute);

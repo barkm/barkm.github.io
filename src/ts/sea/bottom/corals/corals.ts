@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import { range, subsample } from "../../../utils";
 import { addSubscribable, Subscribable } from "../../../subscribable";
@@ -33,7 +32,7 @@ export interface ShimmerParameters {
 
 async function getColoredCorals(
   particleParameters: ParticlesParameters,
-  colors: Array<THREE.Color>,
+  colors: Array<Subscribable<THREE.Color>>,
   modelMaterial: THREE.ShaderMaterial,
   particlesMaterial: THREE.ShaderMaterial
 ): Promise<Array<THREE.Group>> {
@@ -42,12 +41,16 @@ async function getColoredCorals(
   return colors.map((color) => {
     const particlesGeometry = getParticlesGeometry(
       particleParameters,
-      boundingBox,
-      color
+      boundingBox
     );
     const particles = new THREE.Points(particlesGeometry, particlesMaterial);
     const coloredMeshGeometry = meshGeometry.clone();
-    setColorAttribute(coloredMeshGeometry, color);
+    const setColors = (c: THREE.Color) => {
+      setColorAttribute(particlesGeometry, c);
+      setColorAttribute(coloredMeshGeometry, c);
+    };
+    setColors(color.value);
+    color.subscribeOnFinishChange(setColors);
     const mesh = new THREE.Mesh(coloredMeshGeometry, modelMaterial);
     return new THREE.Group().add(mesh, particles);
   });
@@ -158,10 +161,18 @@ export function getCorals(
   );
   const step = Math.floor(100 / parameters.numColors);
   const hues = subsample(range(100), step);
-  const lightness = isDay.value ? 85 : 65;
-  const colors = hues.map(
-    (hue) => new THREE.Color(`hsl(${hue}, 100%, ${lightness}%)`)
-  );
+  const colors = hues.map((hue) => {
+    const getColor = (d: boolean) => {
+      const lightness = isDay.value ? 85 : 65;
+      return new THREE.Color(`hsl(${hue}, 100%, ${lightness}%)`);
+    };
+    const color = new Subscribable(getColor(isDay.value));
+    isDay.subscribeOnFinishChange((d) => {
+      color.value = getColor(d);
+      color.callSubscribers();
+    });
+    return color;
+  });
 
   const group = new THREE.Group();
 

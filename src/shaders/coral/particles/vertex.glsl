@@ -9,6 +9,7 @@ uniform float uNoiseFrequency;
 uniform float uScale;
 uniform float uHeightOffset;
 uniform vec3 uSeaColor;
+uniform bool uShimmer;
 
 attribute float aSize;
 attribute vec3 aColor;
@@ -19,9 +20,7 @@ varying vec4 vColor;
 #pragma glslify: snoise4 = require(glsl-noise/simplex/4d) 
 #include "../../visibility.glsl";
 
-#if (SHIMMER == 1)
-    #include "../shimmer.glsl";
-#endif
+#include "../shimmer.glsl";
 
 void main() {
 	vec4 modelPosition = modelMatrix * vec4(position, 1.0);
@@ -43,7 +42,7 @@ void main() {
 
     vColor = vec4(aColor, 1.0);
 
-    #if (SHIMMER == 1)
+    if (uShimmer) {
         vColor = mix(vec4(uSeaColor, 0.0), vColor, getShimmer());
-    #endif
+    }
 }

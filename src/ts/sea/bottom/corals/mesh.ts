@@ -32,9 +32,7 @@ export function getMeshMaterial(
       uFlickerSpeed: { value: shimmerParameters.flicker.speed.value },
       uLineThickness: { value: 1.0 },
       uTime: { value: 0 },
-    },
-    defines: {
-      SHIMMER: isDay.value ? "0" : "1",
+      uShimmer: { value: !isDay.value },
     },
     transparent: true,
     side: THREE.DoubleSide,
@@ -67,6 +65,9 @@ export function getMeshMaterial(
   });
   shimmerParameters.flicker.speed.subscribeOnChange((v) => {
     material.uniforms.uFlickerSpeed.value = v;
+  });
+  isDay.subscribeOnFinishChange((d) => {
+    material.uniforms.uShimmer.value = !d;
   });
   time.subscribeOnChange((t) => {
     material.uniforms.uTime.value = t.elapsed;

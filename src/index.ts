@@ -91,7 +91,7 @@ const animationLoop = THREE_UTILS.getAnimationLoop(
 
 animationLoop.time.subscribeOnChange(rotateCamera);
 
-const isDay = new Subscribable(!UTILS.isDarkMode());
+const isDay = UTILS.isLightMode();
 
 const parameters = {
   color: new Subscribable(isDay.value ? "#7696ff" : "#061222"),
@@ -100,6 +100,10 @@ const parameters = {
   width: camera.far + 5,
   height: camera.far + 5,
 };
+isDay.subscribeOnFinishChange((d: boolean) => {
+  parameters.color.value = d ? "#7696ff" : "#061222";
+  parameters.color.callSubscribers();
+});
 
 const seaGui = gui.addFolder("sea");
 const sea = getSea(parameters, renderer, seaGui, animationLoop.time, isDay);

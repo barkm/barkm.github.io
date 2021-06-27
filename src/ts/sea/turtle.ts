@@ -48,9 +48,7 @@ export function getTurtle(
       uShimmerFrequency: { value: 20 },
       uShimmerSpeed: { value: 2 },
       uTime: { value: 0.0 },
-    },
-    defines: {
-      SHIMMER: isDay.value ? "0" : "1",
+      uShimmer: { value: !isDay.value },
     },
     transparent: true,
     side: THREE.DoubleSide,
@@ -88,6 +86,9 @@ export function getTurtle(
   seaParameters.visibility.max.subscribeOnChange((v) => {
     turtleMaterial.uniforms.uMaxVisibility.value = v;
   });
+  isDay.subscribeOnFinishChange(
+    (d) => (turtleMaterial.uniforms.uShimmer.value = !d)
+  );
 
   const turtle = new Turtle(group, mesh.position, turtleMaterial, motion);
 

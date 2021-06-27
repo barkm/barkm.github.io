@@ -44,6 +44,13 @@ function getMaterial(
     material.uniforms.uMaxVisibility.value = v;
   });
 
+  isDay.subscribeOnFinishChange(
+    (d) =>
+      (material.uniforms.uEdgeColor.value = new THREE.Color(
+        d ? "#0000ff" : "#7a7a7a"
+      ))
+  );
+
   gui.addColor(parameters, "skyColor").onChange(() => {
     material.uniforms.uSkyColor.value = new THREE.Color(parameters.skyColor);
   });

@@ -25,6 +25,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 
 .day-night-button .icon {

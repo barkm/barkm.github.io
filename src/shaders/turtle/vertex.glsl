@@ -5,6 +5,7 @@ uniform float uMaxVisibility;
 uniform float uTime;
 uniform float uShimmerFrequency;
 uniform float uShimmerSpeed;
+uniform bool uShimmer;
 
 varying vec3 vBarycentricCoordinate;
 varying float vVisibility;
@@ -23,7 +24,7 @@ void main() {
 
  	vShimmer = 1.0;
 	 
-	#if (SHIMMER == 1)
+	if (uShimmer) {
 		vShimmer+= (sin(uShimmerFrequency * position.z + uShimmerSpeed * uTime) + 1.0) / 2.0;
-	#endif
+	}
 }

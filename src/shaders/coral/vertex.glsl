@@ -6,6 +6,7 @@ uniform float uMinVisibility;
 uniform float uMaxVisibility;
 uniform float uTime;
 uniform vec3 uSeaColor;
+uniform bool uShimmer;
 
 attribute vec3 aColor;
 
@@ -14,10 +15,7 @@ varying float vVisibility;
 varying vec3 vColor;
 
 #include "../visibility.glsl";
-
-#if (SHIMMER == 1)
-    #include "./shimmer.glsl";
-#endif
+#include "./shimmer.glsl";
 
 void main() {
 	vec4 modelPosition = modelMatrix * vec4(position, 1.0);
@@ -32,7 +30,7 @@ void main() {
 
     vColor = aColor;
 
-    #if (SHIMMER == 1)
+    if (uShimmer) {
         vColor = mix(uSeaColor, vColor, getShimmer());
-    #endif
+    }
 }

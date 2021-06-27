@@ -35,23 +35,27 @@ export function getFixedCameraHelper(camera: THREE.Camera): THREE.CameraHelper {
   return cameraHelper;
 }
 
+export function toggleVisibility(
+  object3d: THREE.Object3D,
+  parent: THREE.Group | THREE.Scene
+) {
+  if (object3d.parent == parent) {
+    parent.remove(object3d);
+  } else {
+    parent.add(object3d);
+  }
+}
+
 export function addVisibilityToggle(
   gui: dat.GUI,
   object3d: THREE.Object3D,
   parent: THREE.Group | THREE.Scene,
   name: string
 ): void {
-  const toggle = () => {
-    if (object3d.parent == parent) {
-      parent.remove(object3d);
-    } else {
-      parent.add(object3d);
-    }
-  };
   gui
     .add({ show: object3d.parent == parent }, "show")
     .name(name)
-    .onChange(toggle);
+    .onChange(() => toggleVisibility(object3d, parent));
 }
 
 export function getRenderer(windowSize: UTILS.WindowSize): THREE.WebGLRenderer {

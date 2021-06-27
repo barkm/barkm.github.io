@@ -1,3 +1,5 @@
+import { Subscribable } from "./subscribable";
+
 export function modulo(a: number, b: number): number {
   return ((a % b) + b) % b;
 }
@@ -19,11 +21,18 @@ export function getWindowSize(): WindowSize {
   return windowSize;
 }
 
-export function isDarkMode(): boolean {
-  return (
+export function isLightMode(): Subscribable<boolean> {
+  const light = new Subscribable(
     window.matchMedia &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
+      window.matchMedia("(prefers-color-scheme: light)").matches
   );
+  window
+    .matchMedia("(prefers-color-scheme: light)")
+    .addEventListener("change", (e) => {
+      light.value = e.matches;
+      light.callSubscribers();
+    });
+  return light;
 }
 
 export function subsample(array: Array<any>, step: number) {
