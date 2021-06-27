@@ -15,5 +15,23 @@ body {
   outline: none;
 }
 
+.day-night-button {
+  position: absolute;
+  top: 2%;
+  right: 2%;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.day-night-button .icon {
+  width: 20px;
+  height: 20px;
+}
+
 
 /*# sourceMappingURL=main.css.map*/
