@@ -81,6 +81,7 @@ export function getBubbles(
     },
     transparent: true,
     precision: "highp",
+    depthWrite: false,
   });
 
   const points = new THREE.Points(geometry, material);
