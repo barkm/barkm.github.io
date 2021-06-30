@@ -14,7 +14,7 @@ export function getTurtle(
   seaParameters: SeaParameters,
   gui: dat.GUI,
   time: Subscribable<THREE_UTILS.Time>,
-  isDay: Subscribable<boolean>
+  isDay: Subscribable<number>
 ) {
   const group = new THREE.Group();
 
@@ -48,7 +48,7 @@ export function getTurtle(
       uShimmerFrequency: { value: 20 },
       uShimmerSpeed: { value: 2 },
       uTime: { value: 0.0 },
-      uShimmer: { value: !isDay.value },
+      uIsDay: { value: isDay.value },
     },
     transparent: true,
     side: THREE.DoubleSide,
@@ -87,7 +87,7 @@ export function getTurtle(
     turtleMaterial.uniforms.uMaxVisibility.value = v;
   });
   isDay.subscribeOnFinishChange(
-    (d) => (turtleMaterial.uniforms.uShimmer.value = !d)
+    (d) => (turtleMaterial.uniforms.uIsDay.value = d)
   );
 
   const turtle = new Turtle(group, mesh.position, turtleMaterial, motion);

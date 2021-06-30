@@ -8,7 +8,7 @@ uniform float uCausticScale;
 uniform float uCausticSpeed;
 uniform vec3 uSeaColor;
 uniform float uTime;
-uniform bool uShowCaustic;
+uniform float uShowCaustic;
 
 varying float vVisibility;
 
@@ -36,9 +36,9 @@ void main() {
 
     vec3 color = uSeaColor;
 
-    if (uShowCaustic) {
+    if (uShowCaustic > 0.01) {
         float caustic = uCausticStrength * getCaustic(uCausticScale * (vUv - 0.5), uCausticSpeed * uTime);
-        color = mix(color, uCausticColor, caustic);
+        color = mix(color, uCausticColor, caustic * uShowCaustic);
     }
 
     color = mix(uSeaColor, color, vVisibility);

@@ -16,7 +16,7 @@ export function getMeshMaterial(
   shimmerParameters: ShimmerParameters,
   gui: dat.GUI,
   time: Subscribable<Time>,
-  isDay: Subscribable<boolean>
+  isDay: Subscribable<number>
 ) {
   const material = new THREE.ShaderMaterial({
     vertexShader: vertexShader,
@@ -32,7 +32,7 @@ export function getMeshMaterial(
       uFlickerSpeed: { value: shimmerParameters.flicker.speed.value },
       uLineThickness: { value: 1.0 },
       uTime: { value: 0 },
-      uShimmer: { value: !isDay.value },
+      uIsDay: { value: isDay.value },
     },
     transparent: true,
     side: THREE.DoubleSide,
@@ -66,8 +66,8 @@ export function getMeshMaterial(
   shimmerParameters.flicker.speed.subscribeOnChange((v) => {
     material.uniforms.uFlickerSpeed.value = v;
   });
-  isDay.subscribeOnFinishChange((d) => {
-    material.uniforms.uShimmer.value = !d;
+  isDay.subscribeOnChange((d) => {
+    material.uniforms.uIsDay.value = d;
   });
   time.subscribeOnChange((t) => {
     material.uniforms.uTime.value = t.elapsed;

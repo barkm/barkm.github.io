@@ -16,6 +16,7 @@ import {
   DayNightParameters,
 } from "./ts/day_night";
 import { Subscribable } from "./ts/subscribable";
+import anime from "animejs";
 
 const gui = new dat.GUI();
 gui.hide();
@@ -91,17 +92,33 @@ const animationLoop = THREE_UTILS.getAnimationLoop(
 
 animationLoop.time.subscribeOnChange(rotateCamera);
 
-const isDay = UTILS.isLightMode();
+const isLightMode = UTILS.isLightMode();
+const isDay = new Subscribable<number>(isLightMode.value ? 1 : 0);
+isLightMode.subscribeOnFinishChange((d) => {
+  anime({
+    targets: isDay,
+    value: d ? 1 : 0,
+    duration: 2e3,
+    easing: "linear",
+    update: () => isDay.callSubscribers(),
+  });
+});
+
+let dayColor = new THREE.Color("#7696ff");
+let nightColor = new THREE.Color("#061222");
+
+let getColor = (d: number) =>
+  new THREE.Color().lerpColors(nightColor, dayColor, d);
 
 const parameters = {
-  color: new Subscribable(isDay.value ? "#7696ff" : "#061222"),
+  color: new Subscribable(getColor(isDay.value)),
   visibility: { min: new Subscribable(5.0), max: new Subscribable(20.0) },
   depth: new Subscribable(8),
   width: camera.far + 5,
   height: camera.far + 5,
 };
-isDay.subscribeOnFinishChange((d: boolean) => {
-  parameters.color.value = d ? "#7696ff" : "#061222";
+isDay.subscribeOnChange((d) => {
+  parameters.color.value = getColor(d);
   parameters.color.callSubscribers();
 });
 
@@ -126,4 +143,4 @@ const dayNightParameters: DayNightParameters = {
   day: dayParameters,
   night: nightParameters,
 };
-addDayNightToggle(isDay, dayNightParameters);
+addDayNightToggle(isLightMode, dayNightParameters);

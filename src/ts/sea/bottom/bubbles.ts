@@ -46,7 +46,8 @@ function getPositions(
 export function getBubbles(
   seaParameters: SeaParameters,
   gui: dat.GUI,
-  time: Subscribable<Time>
+  time: Subscribable<Time>,
+  isDay: Subscribable<number>
 ) {
   const parameters: BubbleParameters = {
     numBubbles: 5,
@@ -76,6 +77,7 @@ export function getBubbles(
       uScale: { value: 10.0 },
       uRadius: { value: 0 },
       uThickness: { value: 0.4 },
+      uIsDay: { value: isDay.value },
     },
     transparent: true,
     precision: "highp",
@@ -84,18 +86,19 @@ export function getBubbles(
   const points = new THREE.Points(geometry, material);
 
   points.position.y -= seaParameters.depth.value;
-  seaParameters.depth.subscribeOnChange((depth) => {
-    points.position.y = -depth;
-  });
-  seaParameters.color.subscribeOnChange((v) => {
-    material.uniforms.uSeaColor.value = new THREE.Color(v);
-  });
-  seaParameters.visibility.min.subscribeOnChange((v) => {
-    material.uniforms.uMinVisibility.value = v;
-  });
-  seaParameters.visibility.max.subscribeOnChange((v) => {
-    material.uniforms.uMaxVisibility.value = v;
-  });
+  seaParameters.depth.subscribeOnChange(
+    (depth) => (points.position.y = -depth)
+  );
+  seaParameters.color.subscribeOnChange(
+    (v) => (material.uniforms.uSeaColor.value = new THREE.Color(v))
+  );
+  seaParameters.visibility.min.subscribeOnChange(
+    (v) => (material.uniforms.uMinVisibility.value = v)
+  );
+  seaParameters.visibility.max.subscribeOnChange(
+    (v) => (material.uniforms.uMaxVisibility.value = v)
+  );
+  isDay.subscribeOnChange((d) => (material.uniforms.uIsDay.value = d));
 
   gui
     .add(parameters, "numBubbles")

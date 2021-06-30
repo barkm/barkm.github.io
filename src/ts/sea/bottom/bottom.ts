@@ -14,7 +14,7 @@ import bottomFragmentShader from "../../../shaders/bottom/fragment.glsl";
 function getMaterial(
   seaParameters: SeaParameters,
   gui: dat.GUI,
-  isDay: Subscribable<boolean>
+  isDay: Subscribable<number>
 ): THREE.ShaderMaterial {
   const parameters = {
     causticColor: "#ffffff",
@@ -45,8 +45,6 @@ function getMaterial(
     },
     precision: "highp",
   });
-
-  console.log(isDay);
 
   gui
     .add(material.uniforms.uCausticStrength, "value")
@@ -107,7 +105,7 @@ export function getBottom(
   seaParameters: SeaParameters,
   gui: dat.GUI,
   time: Subscribable<THREE_UTILS.Time>,
-  isDay: Subscribable<boolean>
+  isDay: Subscribable<number>
 ) {
   const material = getMaterial(seaParameters, gui.addFolder("material"), isDay);
 
@@ -134,14 +132,9 @@ export function getBottom(
   THREE_UTILS.addVisibilityToggle(coralGui, corals, group, "visible");
 
   const bubblesGui = gui.addFolder("bubbles");
-  const bubbles = getBubbles(seaParameters, bubblesGui, time);
+  const bubbles = getBubbles(seaParameters, bubblesGui, time, isDay);
+  group.add(bubbles);
   THREE_UTILS.addVisibilityToggle(bubblesGui, bubbles, group, "visible");
-  if (isDay.value) {
-    group.add(bubbles);
-  }
-  isDay.subscribeOnFinishChange((d) =>
-    d ? group.add(bubbles) : group.remove(bubbles)
-  );
 
   time.subscribeOnChange((t) => {
     material.uniforms.uTime.value = t.elapsed;

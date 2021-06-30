@@ -5,11 +5,13 @@ uniform float uMaxVisibility;
 uniform float uTime;
 uniform float uShimmerFrequency;
 uniform float uShimmerSpeed;
-uniform bool uShimmer;
+uniform float uIsDay;
+uniform vec3 uSeaColor;
+uniform vec3 uColor;
+
 
 varying vec3 vBarycentricCoordinate;
-varying float vVisibility;
-varying float vShimmer;
+varying vec3 vColor;
 
 #include <skinning_pars_vertex>
 #include "../visibility.glsl";
@@ -20,11 +22,10 @@ void main() {
 	#include <begin_vertex>
 	#include <skinning_vertex>
 	#include <project_vertex>
-	vVisibility = getVisibility(mvPosition.xyz, uMinVisibility, uMaxVisibility);
 
- 	vShimmer = 1.0;
-	 
-	if (uShimmer) {
-		vShimmer+= (sin(uShimmerFrequency * position.z + uShimmerSpeed * uTime) + 1.0) / 2.0;
-	}
+	float visibility = getVisibility(mvPosition.xyz, uMinVisibility, uMaxVisibility);
+	float shimmer = 0.75 + (sin(uShimmerFrequency * position.z + uShimmerSpeed * uTime) + 1.0) / 2.0;
+	vec3 shimmerColor = shimmer * uColor;
+	vec3 targetColor = mix(shimmerColor, uColor, uIsDay);
+    	vColor = mix(uSeaColor, targetColor, visibility);
 }

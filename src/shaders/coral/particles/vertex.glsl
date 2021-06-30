@@ -9,7 +9,7 @@ uniform float uNoiseFrequency;
 uniform float uScale;
 uniform float uHeightOffset;
 uniform vec3 uSeaColor;
-uniform bool uShimmer;
+uniform float uIsDay;
 
 attribute float aSize;
 attribute vec3 aColor;
@@ -40,9 +40,6 @@ void main() {
 
 	vVisibility = getVisibility(viewPosition.xyz, uMinVisibility, uMaxVisibility);
 
-    vColor = vec4(aColor, 1.0);
-
-    if (uShimmer) {
-        vColor = mix(vec4(uSeaColor, 0.0), vColor, getShimmer());
-    }
+    vec4 shimmerColor = mix(vec4(uSeaColor, 0.0), vec4(aColor, 1.0), getShimmer());
+    vColor = mix(shimmerColor, vec4(aColor, 1.0), uIsDay);
 }

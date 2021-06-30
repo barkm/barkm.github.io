@@ -23,7 +23,6 @@ function addButton(
   const icon = isDay ? "fa-moon" : "fa-sun";
   iconElement.classList.add("fas", icon, "icon");
   iconElement.style.color = colorParameters.icon;
-  console.log(colorParameters);
   dayNightButton.appendChild(iconElement);
   return dayNightButton;
 }

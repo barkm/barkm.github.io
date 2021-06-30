@@ -8,6 +8,7 @@ uniform float uNoiseFrequency;
 uniform float uSize;
 uniform float uScale;
 uniform float uDecayPower;
+uniform float uIsDay;
 
 varying float vVisibility;
 varying float vTransparency;
@@ -34,4 +35,5 @@ void main() {
 
 	vVisibility = getVisibility(viewPosition.xyz, uMinVisibility, uMaxVisibility);
     vTransparency = 1.0 - pow(smoothstep(0.0, 1.0, bubblePosition.y / uMaxHeight), uDecayPower);
+    vTransparency *= uIsDay;
 }

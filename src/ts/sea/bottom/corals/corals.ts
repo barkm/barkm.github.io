@@ -87,7 +87,7 @@ export function getCorals(
   terrainParameters: TerrainParameters,
   gui: dat.GUI,
   time: Subscribable<Time>,
-  isDay: Subscribable<boolean>
+  isDay: Subscribable<number>
 ) {
   const parameters = {
     numCorals: 750,
@@ -162,9 +162,11 @@ export function getCorals(
   const step = Math.floor(100 / parameters.numColors);
   const hues = subsample(range(100), step);
   const colors = hues.map((hue) => {
-    const getColor = (d: boolean) => {
+    const getColor = (d: number) => {
       const lightness = isDay.value ? 85 : 65;
-      return new THREE.Color(`hsl(${hue}, 100%, ${lightness}%)`);
+      let dayColor = new THREE.Color(`hsl(${hue}, 100%, 85%)`);
+      let nightColor = new THREE.Color(`hsl(${hue}, 100%, 65%)`);
+      return nightColor.lerpHSL(dayColor, d);
     };
     const color = new Subscribable(getColor(isDay.value));
     isDay.subscribeOnFinishChange((d) => {

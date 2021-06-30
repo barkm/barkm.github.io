@@ -11,11 +11,17 @@ import { Subscribable } from "../subscribable";
 function getMaterial(
   seaParameters: SeaParameters,
   gui: dat.GUI,
-  isDay: Subscribable<boolean>
+  isDay: Subscribable<number>
 ): THREE.ShaderMaterial {
+  let edgeDayColor = new THREE.Color("#0000ff");
+  let edgeNightColor = new THREE.Color("#7a7a7a");
+
+  let getColor = (d: number) =>
+    new THREE.Color().lerpColors(edgeNightColor, edgeDayColor, d);
+
   const parameters = {
     skyColor: "#ffffff",
-    edgeColor: isDay.value ? "#0000ff" : "#7a7a7a",
+    edgeColor: getColor(isDay.value),
     useRefraction: false,
   };
 
@@ -44,18 +50,12 @@ function getMaterial(
     material.uniforms.uMaxVisibility.value = v;
   });
 
-  isDay.subscribeOnFinishChange(
-    (d) =>
-      (material.uniforms.uEdgeColor.value = new THREE.Color(
-        d ? "#0000ff" : "#7a7a7a"
-      ))
+  isDay.subscribeOnChange(
+    (d) => (material.uniforms.uEdgeColor.value = getColor(d))
   );
 
   gui.addColor(parameters, "skyColor").onChange(() => {
     material.uniforms.uSkyColor.value = new THREE.Color(parameters.skyColor);
-  });
-  gui.addColor(parameters, "edgeColor").onChange(() => {
-    material.uniforms.uEdgeColor.value = new THREE.Color(parameters.edgeColor);
   });
 
   return material;
@@ -65,7 +65,7 @@ export function getSurface(
   seaParameters: SeaParameters,
   gui: dat.GUI,
   time: Subscribable<THREE_UTILS.Time>,
-  isDay: Subscribable<boolean>
+  isDay: Subscribable<number>
 ) {
   const material = getMaterial(seaParameters, gui, isDay);
 

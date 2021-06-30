@@ -12,7 +12,7 @@ import { getSurface } from "./surface";
 import { getTurtle } from "./turtle";
 
 export interface SeaParameters {
-  color: Subscribable<string>;
+  color: Subscribable<THREE.Color>;
   visibility: {
     min: Subscribable<number>;
     max: Subscribable<number>;
@@ -27,7 +27,7 @@ export function getSea(
   renderer: THREE.WebGLRenderer,
   gui: dat.GUI,
   time: Subscribable<Time>,
-  isDay: Subscribable<boolean>
+  isDay: Subscribable<number>
 ) {
   renderer.setClearColor(parameters.color.value);
   parameters.color.subscribeOnChange((v) => {

@@ -3,7 +3,7 @@
 uniform float uTime;
 uniform float uMinVisibility;
 uniform float uMaxVisibility;
-uniform bool uShowCaustic;
+uniform float uShowCaustic;
 
 varying float vVisibility;
 
@@ -19,7 +19,7 @@ void main() {
 
     vVisibility = getVisibility(viewPosition.xyz, uMinVisibility, uMaxVisibility);
 
-    if (uShowCaustic) {
+    if (uShowCaustic > 0.01) {
         vUv = uv;
     }
 }

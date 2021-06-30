@@ -52,7 +52,7 @@ export function getParticlesMaterial(
   shimmerParameters: ShimmerParameters,
   gui: dat.GUI,
   time: Subscribable<Time>,
-  isDay: Subscribable<boolean>
+  isDay: Subscribable<number>
 ) {
   const material = new THREE.ShaderMaterial({
     vertexShader: particlesVertexShader,
@@ -72,7 +72,7 @@ export function getParticlesMaterial(
       uSpeed: { value: 0.05 },
       uHeightOffset: { value: 0 },
       uTime: { value: 0 },
-      uShimmer: { value: !isDay.value },
+      uIsDay: { value: isDay.value },
     },
     transparent: true,
     precision: "highp",
@@ -102,7 +102,7 @@ export function getParticlesMaterial(
     material.uniforms.uFlickerSpeed.value = v;
   });
   isDay.subscribeOnFinishChange((d) => {
-    material.uniforms.uShimmer.value = !d;
+    material.uniforms.uIsDay.value = d;
   });
   gui.add(material.uniforms.uScale, "value").min(0).max(20).name("scale");
   gui

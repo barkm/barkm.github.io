@@ -6,7 +6,7 @@ uniform float uMinVisibility;
 uniform float uMaxVisibility;
 uniform float uTime;
 uniform vec3 uSeaColor;
-uniform bool uShimmer;
+uniform float uIsDay;
 
 attribute vec3 aColor;
 
@@ -28,9 +28,6 @@ void main() {
 	vVisibility = getVisibility(viewPosition.xyz, uMinVisibility, uMaxVisibility);
 
 
-    vColor = aColor;
-
-    if (uShimmer) {
-        vColor = mix(uSeaColor, vColor, getShimmer());
-    }
+    vec3 shimmerColor = mix(uSeaColor, aColor, getShimmer());
+    vColor = mix(shimmerColor, aColor, uIsDay);
 }
