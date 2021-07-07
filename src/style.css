@@ -1,6 +1,7 @@
 * {
   margin: 0;
   padding: 0;
+  color: white;
 }
 
 html,
@@ -8,29 +9,19 @@ body {
   overflow: hidden;
 }
 
+a,
+a:hover,
+a:focus,
+a:active {
+  text-decoration: none;
+  color: inherit;
+}
+
 .webgl {
   position: fixed;
   top: 0;
   left: 0;
   outline: none;
-}
-
-.day-night-button {
-  position: absolute;
-  top: 2%;
-  right: 2%;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.day-night-button .icon {
-  width: 20px;
-  height: 20px;
 }
 
 .outer {
@@ -52,7 +43,6 @@ body {
   margin-right: auto;
   text-align: center;
   font-family: Helvetica;
-  color: rgb(131, 48, 240);
 }
 
 .name {
@@ -74,10 +64,19 @@ body {
   margin-right: 2.5vw;
 }
 
-a,
-a:hover,
-a:focus,
-a:active {
-  text-decoration: none;
-  color: inherit;
+.day-night-field {
+  position: absolute;
+  bottom: 5%;
+  width: 100%;
+}
+
+.day-night-field .day-night-button {
+  cursor: pointer;
+  text-align: center;
+  margin: auto;
+}
+
+.day-night-field .day-night-button .day-night-icon {
+  height: clamp(15px, 2vh, 100px);
+  width: clamp(15px, 2vh, 100px);
 }

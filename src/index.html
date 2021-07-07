@@ -8,21 +8,32 @@
     <canvas class="webgl"></canvas>
   </body>
 
-  <div class="day-night-button"><i class="icon"></i></div>
-
   <div class="outer">
     <div class="middle">
       <div class="inner">
         <div class="name">Patrik Barkman</div>
         <div class="link-icons">
           <a href="https://github.com/barkm">
-            <i class="fab fa-github link-icon"></i>
+            <i
+              class="fab fa-github link-icon"
+              ,
+              onclick="event.stopPropagation()"
+            ></i>
           </a>
-          <a href="https://se.linkedin.com/in/patrik-barkman">
+          <a
+            href="https://se.linkedin.com/in/patrik-barkman"
+            ,
+            onclick="event.stopPropagation()"
+          >
             <i class="fab fa-linkedin-in link-icon"></i>
           </a>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="day-night-field">
+    <div class="day-night-button">
+      <i class="day-night-icon"></i>
     </div>
   </div>
 </html>

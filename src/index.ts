@@ -11,11 +11,7 @@ import Stats from "stats.js";
 import * as UTILS from "./ts/utils";
 import * as THREE_UTILS from "./ts/three/utils";
 import { getSea } from "./ts/sea/sea";
-import {
-  addDayNightToggle,
-  ColorParameters,
-  DayNightParameters,
-} from "./ts/day_night";
+import { addDayNightToggle } from "./ts/day_night";
 import { Subscribable } from "./ts/subscribable";
 import anime from "animejs";
 
@@ -132,16 +128,4 @@ animationLoop.time.subscribeOnChange(() => renderer.render(scene, camera));
 
 animationLoop.loop();
 
-const dayParameters: ColorParameters = {
-  background: "#ffffff",
-  icon: "#061222",
-};
-const nightParameters: ColorParameters = {
-  background: "#061222",
-  icon: "#ffffff",
-};
-const dayNightParameters: DayNightParameters = {
-  day: dayParameters,
-  night: nightParameters,
-};
-addDayNightToggle(isLightMode, dayNightParameters);
+addDayNightToggle(isLightMode);
