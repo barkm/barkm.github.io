@@ -5,8 +5,8 @@ import { SeaParameters } from "../../sea";
 import { setBarycentricCoordinateAttribute } from "../../../three/barycentric";
 import { loadModel, Time } from "../../../three/utils";
 
-import vertexShader from "../../../../shaders/coral/vertex.glsl";
-import fragmentShader from "../../../../shaders/coral/fragment.glsl";
+import vertexShader from "../../../../shaders/sea/coral/vertex.glsl";
+import fragmentShader from "../../../../shaders/sea/coral/fragment.glsl";
 import coralModel from "../../../../../models/coral.glb";
 import { Subscribable } from "../../../subscribable";
 import { ShimmerParameters } from "./corals";

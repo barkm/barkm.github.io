@@ -8,8 +8,8 @@ import { getCorals } from "./corals/corals";
 import { getBubbles } from "./bubbles";
 import { Subscribable } from "../../subscribable";
 
-import vertexShader from "../../../shaders/bottom/vertex.glsl";
-import bottomFragmentShader from "../../../shaders/bottom/fragment.glsl";
+import vertexShader from "../../../shaders/sea/bottom/vertex.glsl";
+import bottomFragmentShader from "../../../shaders/sea/bottom/fragment.glsl";
 
 function getMaterial(
   seaParameters: SeaParameters,

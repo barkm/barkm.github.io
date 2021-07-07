@@ -2,8 +2,8 @@ import * as THREE from "three";
 
 import * as THREE_UTILS from "../three/utils";
 
-import vertexShader from "../../shaders/surface/vertex.glsl";
-import fragmentShader from "../../shaders/surface/fragment.glsl";
+import vertexShader from "../../shaders/sea/surface/vertex.glsl";
+import fragmentShader from "../../shaders/sea/surface/fragment.glsl";
 
 import { SeaParameters } from "./sea";
 import { Subscribable } from "../subscribable";

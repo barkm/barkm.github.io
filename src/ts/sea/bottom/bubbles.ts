@@ -2,8 +2,8 @@ import * as THREE from "three";
 
 import { SeaParameters } from "../sea";
 
-import vertexShader from "../../../shaders/bubbles/vertex.glsl";
-import fragmentShader from "../../../shaders/bubbles/fragment.glsl";
+import vertexShader from "../../../shaders/sea/bubbles/vertex.glsl";
+import fragmentShader from "../../../shaders/sea/bubbles/fragment.glsl";
 import { Time } from "../../three/utils";
 import { addSubscribable, Subscribable } from "../../subscribable";
 

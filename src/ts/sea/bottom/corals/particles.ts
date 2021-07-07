@@ -4,8 +4,8 @@ import { SeaParameters } from "../../sea";
 import { setColorAttribute, Time } from "../../../three/utils";
 import { Subscribable } from "../../../subscribable";
 
-import particlesVertexShader from "../../../../shaders/coral/particles/vertex.glsl";
-import particlesFragmentShader from "../../../../shaders/coral/particles/fragment.glsl";
+import particlesVertexShader from "../../../../shaders/sea/coral/particles/vertex.glsl";
+import particlesFragmentShader from "../../../../shaders/sea/coral/particles/fragment.glsl";
 
 import { ShimmerParameters } from "./corals";
 export interface ParticlesParameters {

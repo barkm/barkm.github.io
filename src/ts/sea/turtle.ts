@@ -6,8 +6,8 @@ import { Turtle } from "../three/turtle";
 
 import { SeaParameters } from "./sea";
 
-import vertexShader from "../../shaders/turtle/vertex.glsl";
-import fragmentShader from "../../shaders/turtle/fragment.glsl";
+import vertexShader from "../../shaders/sea/turtle/vertex.glsl";
+import fragmentShader from "../../shaders/sea/turtle/fragment.glsl";
 import { Subscribable } from "../subscribable";
 
 export function getTurtle(
