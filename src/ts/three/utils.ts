@@ -68,6 +68,7 @@ export function getRenderer(windowSize: UTILS.WindowSize): THREE.WebGLRenderer {
   const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     powerPreference: "high-performance",
+    antialias: true,
   });
   renderer.setSize(windowSize.width, windowSize.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

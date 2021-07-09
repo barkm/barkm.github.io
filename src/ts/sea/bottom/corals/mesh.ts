@@ -40,6 +40,7 @@ export function getMeshMaterial(
       derivatives: true,
     },
     precision: "highp",
+    alphaToCoverage: true,
   });
 
   seaParameters.color.subscribeOnChange((c) => {

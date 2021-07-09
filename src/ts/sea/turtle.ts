@@ -55,6 +55,7 @@ export function getTurtle(
     extensions: {
       derivatives: true,
     },
+    alphaToCoverage: true,
   });
   gui.addColor(parameters, "color").onChange(() => {
     turtleMaterial.uniforms.uColor.value.set(parameters.color);
