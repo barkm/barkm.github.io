@@ -45,12 +45,8 @@ a:active {
   font-family: Helvetica;
 }
 
-.name {
-  font-size: clamp(40px, 8vw, 100px);
-}
-
 .link-icons {
-  height: 15vh;
+  height: 8vh;
   width: 100vw;
   text-align: center;
   vertical-align: bottom;
@@ -58,10 +54,10 @@ a:active {
 }
 
 .link-icons .link-icon {
-  height: clamp(20px, 4vh, 100px);
-  width: clamp(20px, 4vh, 100px);
-  margin-left: 2.5vw;
-  margin-right: 2.5vw;
+  height: clamp(20px, 8vh, 50px);
+  width: clamp(20px, 8vh, 50px);
+  margin-left: 3vw;
+  margin-right: 3vw;
 }
 
 .day-night-field {
